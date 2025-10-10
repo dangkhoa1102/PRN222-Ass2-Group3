@@ -25,14 +25,7 @@
                     <span class="brand-text">EV Dealer System</span>
                 </a>
                 
-                <button class="navbar-toggler modern-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="toggler-icon"></span>
-                    <span class="toggler-icon"></span>
-                    <span class="toggler-icon"></span>
-                </button>
-                
-                <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="collapse navbar-collapse show" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         @{
                             var userId = Context.Session.GetString("UserId");
@@ -56,23 +49,81 @@
                                     <span>Chat</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link modern-nav-link" href="#vehicles">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
                                     <i class="fas fa-car"></i>
                                     <span>Vehicles</span>
                                 </a>
+                                <ul class="dropdown-menu vehicles-dropdown">
+                                    <li><a class="dropdown-item" href="#vehicles">
+                                        <i class="fas fa-search"></i>
+                                        <div>
+                                            <div class="item-title">Browse All Vehicles</div>
+                                            <div class="item-desc">Explore our complete catalog</div>
+                                        </div>
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#vehicles?type=sedan">
+                                        <i class="fas fa-car-side"></i>
+                                        <div>
+                                            <div class="item-title">Sedans</div>
+                                            <div class="item-desc">Luxury electric sedans</div>
+                                        </div>
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#vehicles?type=suv">
+                                        <i class="fas fa-truck"></i>
+                                        <div>
+                                            <div class="item-title">SUVs</div>
+                                            <div class="item-desc">Family-friendly electric SUVs</div>
+                                        </div>
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#vehicles?type=sports">
+                                        <i class="fas fa-bolt"></i>
+                                        <div>
+                                            <div class="item-title">Sports Cars</div>
+                                            <div class="item-desc">High-performance electric sports cars</div>
+                                        </div>
+                                    </a></li>
+                                </ul>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link modern-nav-link" href="#appointments">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
                                     <i class="fas fa-calendar-check"></i>
                                     <span>Test Drives</span>
                                 </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#appointments">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        <span>Schedule Test Drive</span>
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#appointments?view=my">
+                                        <i class="fas fa-list"></i>
+                                        <span>My Appointments</span>
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#appointments?view=history">
+                                        <i class="fas fa-history"></i>
+                                        <span>Test Drive History</span>
+                                    </a></li>
+                                </ul>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link modern-nav-link" href="#orders">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
                                     <i class="fas fa-shopping-bag"></i>
                                     <span>Orders</span>
                                 </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#orders">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <span>Current Orders</span>
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#orders?view=history">
+                                        <i class="fas fa-receipt"></i>
+                                        <span>Order History</span>
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#orders?view=wishlist">
+                                        <i class="fas fa-heart"></i>
+                                        <span>Wishlist</span>
+                                    </a></li>
+                                </ul>
                             </li>
                         }
                         else
@@ -97,7 +148,7 @@
                         <ul class="navbar-nav">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle modern-user-menu" href="#" id="navbarDropdown" 
-                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                   role="button" aria-expanded="false">
                                     <div class="user-avatar">
                                         <i class="fas fa-user-circle"></i>
                                     </div>
@@ -233,9 +284,59 @@
             cards.forEach(card => observer.observe(card));
         });
 
-        // Mobile menu toggle animation
-        document.querySelector('.navbar-toggler').addEventListener('click', function() {
-            this.classList.toggle('collapsed');
+        // Enhanced dropdown hover functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownItems = document.querySelectorAll('.nav-item.dropdown');
+            
+            dropdownItems.forEach(function(item) {
+                const dropdownMenu = item.querySelector('.dropdown-menu');
+                const dropdownToggle = item.querySelector('.dropdown-toggle');
+                let hoverTimeout;
+
+                // Desktop hover effect
+                item.addEventListener('mouseenter', function() {
+                    if (window.innerWidth > 991) {
+                        clearTimeout(hoverTimeout);
+                        dropdownMenu.style.opacity = '1';
+                        dropdownMenu.style.visibility = 'visible';
+                        dropdownMenu.style.transform = 'translateX(-50%) translateY(0)';
+                        dropdownMenu.style.pointerEvents = 'auto';
+                    }
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    if (window.innerWidth > 991) {
+                        hoverTimeout = setTimeout(function() {
+                            dropdownMenu.style.opacity = '0';
+                            dropdownMenu.style.visibility = 'hidden';
+                            dropdownMenu.style.transform = 'translateX(-50%) translateY(-10px)';
+                            dropdownMenu.style.pointerEvents = 'none';
+                        }, 300); // 300ms delay before hiding
+                    }
+                });
+
+                // Keep dropdown open when hovering over the dropdown menu itself
+                dropdownMenu.addEventListener('mouseenter', function() {
+                    if (window.innerWidth > 991) {
+                        clearTimeout(hoverTimeout);
+                        this.style.opacity = '1';
+                        this.style.visibility = 'visible';
+                        this.style.transform = 'translateX(-50%) translateY(0)';
+                        this.style.pointerEvents = 'auto';
+                    }
+                });
+
+                dropdownMenu.addEventListener('mouseleave', function() {
+                    if (window.innerWidth > 991) {
+                        hoverTimeout = setTimeout(() => {
+                            this.style.opacity = '0';
+                            this.style.visibility = 'hidden';
+                            this.style.transform = 'translateX(-50%) translateY(-10px)';
+                            this.style.pointerEvents = 'none';
+                        }, 200);
+                    }
+                });
+            });
         });
     </script>
 </body>
