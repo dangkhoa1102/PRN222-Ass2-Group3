@@ -1,0 +1,105 @@
+############################
+# Visual Studio
+############################
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.csproj.user
+*.dbmdl
+
+############################
+# Build results
+############################
+bin/
+obj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+############################
+# Visual Studio cache files
+############################
+*.ide
+*.VC.db
+*.VC.opendb
+
+############################
+# NuGet
+############################
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+############################
+# Others
+############################
+# Backup & temp
+*.bak
+*.tmp
+*.swp
+*.cache
+*.pdb
+*.mdb
+*.log
+
+# Rider / JetBrains
+.idea/
+*.iml
+
+# Test results
+TestResult*/
+[Tt]est[Rr]esult*
+[Bb]uild[Ll]og.*
+
+# Coverage
+*.coverage
+*.coveragexml
+
+############################
+# OS generated files
+############################
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+############################
+# Node / Web (if using frontend)
+############################
+node_modules/
+dist/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+############################
+# Optional: SQLite / Local DB
+############################
+*.db
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
