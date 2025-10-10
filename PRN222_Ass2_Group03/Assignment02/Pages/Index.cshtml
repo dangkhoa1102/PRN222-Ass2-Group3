@@ -1,0 +1,56 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+    <div class="mt-5">
+        <h2>SignalR Integration</h2>
+        <p class="lead">This application now includes SignalR for real-time communication!</p>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Real-time Chat</h5>
+                        <p class="card-text">Send and receive messages instantly with other connected users.</p>
+                        <a href="/Chat" class="btn btn-primary">Try Chat</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Group Messaging</h5>
+                        <p class="card-text">Join specific groups and communicate with group members only.</p>
+                        <a href="/Chat" class="btn btn-success">Join Groups</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Connection Status</h5>
+                        <p class="card-text">Monitor real-time connection status and user activities.</p>
+                        <a href="/Chat" class="btn btn-info">Check Status</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3>Test SignalR Notifications</h3>
+                <p>Try these buttons to see SignalR notifications in action:</p>
+                <button class="btn btn-info me-2" onclick="sendNotification('Info', 'This is an info notification', 'info')">Info Notification</button>
+                <button class="btn btn-success me-2" onclick="sendNotification('Success', 'Operation completed successfully!', 'success')">Success Notification</button>
+                <button class="btn btn-warning me-2" onclick="sendNotification('Warning', 'This is a warning message', 'warning')">Warning Notification</button>
+                <button class="btn btn-danger me-2" onclick="sendNotification('Error', 'An error occurred', 'error')">Error Notification</button>
+                <button class="btn btn-secondary" onclick="sendSystemMessage('System maintenance scheduled for tonight')">System Message</button>
+            </div>
+        </div>
+    </div>
+</div>
