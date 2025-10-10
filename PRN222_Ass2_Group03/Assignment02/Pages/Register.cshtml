@@ -1,0 +1,356 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EV Dealer System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/modern-theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/register.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="animated-background"></div>
+    
+    <div class="register-container">
+        <div class="register-wrapper">
+            <!-- Features Panel -->
+            <div class="features-panel">
+                <div class="features-header">
+                    <div class="brand-logo">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h1 class="features-title">Join EV Dealer</h1>
+                    <p class="features-subtitle">Create your account and start your electric journey</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-car-alt"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h6>250+ Electric Vehicles</h6>
+                            <p>Browse our extensive collection of cutting-edge electric vehicles</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h6>Trusted Dealers</h6>
+                            <p>Connect with verified dealers across the country</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h6>100% Eco-Friendly</h6>
+                            <p>Join the sustainable transportation revolution</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h6>Real-time Chat</h6>
+                            <p>Instant communication with dealers and customers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <h3>1,500+</h3>
+                        <p>Happy Customers</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>50+</h3>
+                        <p>Dealer Partners</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>24/7</h3>
+                        <p>Support</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Panel -->
+            <div class="form-panel">
+                <div class="form-header">
+                    <div class="logo-small">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2>Create Account</h2>
+                    <p>Fill in your information to get started</p>
+                </div>
+
+                <!-- Error Message -->
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert error-alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>@Model.ErrorMessage</span>
+                    </div>
+                }
+
+                <form method="post" class="register-form">
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-user"></i>Personal Information
+                        </h5>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <div class="input-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <input asp-for="Username" type="text" class="form-input" placeholder=" " required>
+                                    <label class="form-label">Username</label>
+                                </div>
+                                <span asp-validation-for="Username" class="validation-message"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <div class="input-icon">
+                                        <i class="fas fa-id-card"></i>
+                                    </div>
+                                    <input asp-for="FullName" type="text" class="form-input" placeholder=" " required>
+                                    <label class="form-label">Full Name</label>
+                                </div>
+                                <span asp-validation-for="FullName" class="validation-message"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <div class="input-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <input asp-for="Email" type="email" class="form-input" placeholder=" " required>
+                                    <label class="form-label">Email Address</label>
+                                </div>
+                                <span asp-validation-for="Email" class="validation-message"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <div class="input-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <input asp-for="Phone" type="tel" class="form-input" placeholder=" ">
+                                    <label class="form-label">Phone Number (Optional)</label>
+                                </div>
+                                <span asp-validation-for="Phone" class="validation-message"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Section -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-shield-alt"></i>Security
+                        </h5>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <div class="input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <input asp-for="Password" type="password" class="form-input" id="passwordInput" placeholder=" " required>
+                                    <label class="form-label">Password</label>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('passwordInput', 'passwordToggle1')">
+                                        <i class="fas fa-eye" id="passwordToggle1"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="Password" class="validation-message"></span>
+                                <div class="password-strength">
+                                    <div class="strength-bar">
+                                        <div class="strength-fill" id="strengthBar"></div>
+                                    </div>
+                                    <small class="strength-text" id="strengthText">Enter a password</small>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <div class="input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <input asp-for="ConfirmPassword" type="password" class="form-input" id="confirmPasswordInput" placeholder=" " required>
+                                    <label class="form-label">Confirm Password</label>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPasswordInput', 'passwordToggle2')">
+                                        <i class="fas fa-eye" id="passwordToggle2"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="ConfirmPassword" class="validation-message"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms & Submit -->
+                    <div class="form-section">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="termsCheck" required>
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                                I agree to the <a href="#" target="_blank">Terms of Service</a> and 
+                                <a href="/Privacy" target="_blank">Privacy Policy</a>
+                            </span>
+                        </label>
+
+                        <button type="submit" class="register-btn">
+                            <span class="btn-text">Create Account</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="divider">
+                    <span>or sign up with</span>
+                </div>
+
+                <div class="social-register">
+                    <button type="button" class="social-btn google-btn">
+                        <i class="fab fa-google"></i>
+                        <span>Google</span>
+                    </button>
+                    <button type="button" class="social-btn microsoft-btn">
+                        <i class="fab fa-microsoft"></i>
+                        <span>Microsoft</span>
+                    </button>
+                </div>
+
+                <div class="login-link">
+                    <p>Already have an account? <a href="/Login">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+
+    <script>
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        }
+
+        // Password strength checker
+        document.getElementById('passwordInput').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            let message = '';
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            strengthBar.className = 'strength-fill';
+            
+            if (password.length === 0) {
+                message = 'Enter a password';
+            } else if (strength < 2) {
+                strengthBar.classList.add('strength-weak');
+                message = 'Weak password';
+            } else if (strength < 3) {
+                strengthBar.classList.add('strength-fair');
+                message = 'Fair password';
+            } else if (strength < 4) {
+                strengthBar.classList.add('strength-good');
+                message = 'Good password';
+            } else {
+                strengthBar.classList.add('strength-strong');
+                message = 'Strong password';
+            }
+            
+            strengthText.textContent = message;
+        });
+
+        // Form submission animation
+        document.querySelector('.register-form').addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.register-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            
+            btnText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+            submitBtn.disabled = true;
+        });
+
+        // Add focus animations and fix label positioning
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    this.parentElement.classList.remove('focused');
+                } else {
+                    this.parentElement.classList.add('focused');
+                }
+            });
+
+            // Check if input has value on page load
+            if (input.value && input.value.trim()) {
+                input.parentElement.classList.add('focused');
+            }
+
+            // Handle input event to update label position
+            input.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.parentElement.classList.add('focused');
+                } else {
+                    this.parentElement.classList.remove('focused');
+                }
+            });
+        });
+
+        // Initialize focused state for inputs with values
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.form-input').forEach(input => {
+                if (input.value && input.value.trim()) {
+                    input.parentElement.classList.add('focused');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

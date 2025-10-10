@@ -1,10 +1,25 @@
 using Assignment02.Hubs;
+using Business_Logic_Layer.Services;
+using DataAccess_Layer.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
+    
+// Register repositories and services (they will use EVDealerSystemContext's own connection)
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Configure session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -20,6 +35,31 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
+
+// Custom middleware to redirect unauthenticated users to login
+app.Use(async (context, next) =>
+{
+    // Check if user is accessing root path
+    if (context.Request.Path == "/")
+    {
+        // Check if user is authenticated
+        var userId = context.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userId))
+        {
+            // Redirect to login page
+            context.Response.Redirect("/Login");
+            return;
+        }
+        else
+        {
+            // Redirect to index page if authenticated
+            context.Response.Redirect("/Index");
+            return;
+        }
+    }
+    await next();
+});
 
 app.UseAuthorization();
 

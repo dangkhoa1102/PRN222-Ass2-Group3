@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages
 {
-    public class IndexModel : PageModel
+    public class IndexModel : AuthenticatedPageModel
     {
         private readonly ILogger<IndexModel> _logger;
 

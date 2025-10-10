@@ -1,0 +1,59 @@
+/* Index/Dashboard Page Styles */
+.stat-item {
+    text-align: center;
+    color: white;
+}
+
+.stat-box {
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.dashboard-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(33, 150, 243, 0.1), transparent);
+    transform: rotate(-45deg);
+    transition: transform 0.6s;
+    opacity: 0;
+}
+
+.dashboard-card:hover::after {
+    transform: rotate(-45deg) translate(50%, 50%);
+    opacity: 1;
+}
+
+.user-stats {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 1.5rem;
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 0;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .dashboard-card {
+        margin-bottom: 1.5rem;
+    }
+}

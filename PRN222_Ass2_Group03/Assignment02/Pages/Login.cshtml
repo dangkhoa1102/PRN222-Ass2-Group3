@@ -1,0 +1,227 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EV Dealer System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/modern-theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="animated-background">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+            <div class="shape shape-5"></div>
+            <div class="shape shape-6"></div>
+        </div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-wrapper">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="logo-ring">
+                        <div class="logo-inner">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                    </div>
+                </div>
+                <h1 class="brand-name">EV Dealer</h1>
+                <p class="brand-tagline">Powering Your Electric Future</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="form-section">
+                <div class="form-header">
+                    <h2>Welcome Back!</h2>
+                    <p>Sign in to continue your electric journey</p>
+                </div>
+
+                <!-- Success Message -->
+                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                {
+                    <div class="alert success-alert">
+                        <i class="fas fa-check-circle"></i>
+                        <span>@Model.SuccessMessage</span>
+                    </div>
+                }
+
+                <!-- Error Message -->
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert error-alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>@Model.ErrorMessage</span>
+                    </div>
+                }
+
+                <form method="post" class="login-form">
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <input asp-for="Username" type="text" class="form-input" placeholder=" " required>
+                            <label class="form-label">Username</label>
+                        </div>
+                        <span asp-validation-for="Username" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <input asp-for="Password" type="password" class="form-input" id="passwordInput" placeholder=" " required>
+                            <label class="form-label">Password</label>
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="validation-message"></span>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-container">
+                            <input asp-for="RememberMe" type="checkbox">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        <span class="btn-text">Sign In</span>
+                        <div class="btn-ripple"></div>
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>or continue with</span>
+                </div>
+
+                <div class="social-login">
+                    <button type="button" class="social-btn google-btn">
+                        <i class="fab fa-google"></i>
+                        <span>Google</span>
+                    </button>
+                    <button type="button" class="social-btn microsoft-btn">
+                        <i class="fab fa-microsoft"></i>
+                        <span>Microsoft</span>
+                    </button>
+                </div>
+
+                <div class="signup-link">
+                    <p>Don't have an account? <a href="/Register">Create one now</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        }
+
+        // Enhanced label positioning logic
+        function handleInputState(input) {
+            const wrapper = input.parentElement;
+            const hasValue = input.value && input.value.trim() !== '';
+            const isFocused = document.activeElement === input;
+            const isAutofilled = input.matches(':-webkit-autofill');
+            
+            if (hasValue || isFocused || isAutofilled) {
+                wrapper.classList.add('focused');
+            } else {
+                wrapper.classList.remove('focused');
+            }
+        }
+
+        // Form submission animation
+        document.querySelector('.login-form').addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.login-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            
+            btnText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing In...';
+            submitBtn.disabled = true;
+        });
+
+        // Initialize input handling when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.form-input');
+            
+            inputs.forEach(input => {
+                // Check initial state (for pre-filled values)
+                handleInputState(input);
+                
+                // Handle focus events
+                input.addEventListener('focus', function() {
+                    handleInputState(this);
+                });
+                
+                // Handle blur events
+                input.addEventListener('blur', function() {
+                    handleInputState(this);
+                });
+                
+                // Handle input events (while typing)
+                input.addEventListener('input', function() {
+                    handleInputState(this);
+                });
+                
+                // Handle change events
+                input.addEventListener('change', function() {
+                    handleInputState(this);
+                });
+            });
+            
+            // Handle autofill with MutationObserver
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                        handleInputState(mutation.target);
+                    }
+                });
+            });
+            
+            inputs.forEach(input => {
+                observer.observe(input, { attributes: true, attributeFilter: ['value'] });
+                
+                // Check for autofill periodically
+                setInterval(() => {
+                    if (input.matches(':-webkit-autofill') || input.value) {
+                        handleInputState(input);
+                    }
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
