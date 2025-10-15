@@ -1,16 +1,22 @@
 using Assignment02.Hubs;
 using Business_Logic_Layer.Services;
 using DataAccess_Layer.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
-    
+
 // Register repositories and services (they will use EVDealerSystemContext's own connection)
+// Thêm d?ch v? DbContext
+builder.Services.AddDbContext<EVDealerDbContext.EVDealerSystemContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection")));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITestDriveRepository, TestDriveRepository>();
+builder.Services.AddScoped<ITestDriveService, TestDriveService>();
 
 // Configure session
 builder.Services.AddDistributedMemoryCache();

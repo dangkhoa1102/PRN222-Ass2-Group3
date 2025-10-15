@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace EVDealerDbContext.Models;
 
@@ -24,7 +25,7 @@ public partial class Dealer
     public bool? IsActive { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
+    [JsonIgnore]
     public virtual ICollection<TestDriveAppointment> TestDriveAppointments { get; set; } = new List<TestDriveAppointment>();
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();

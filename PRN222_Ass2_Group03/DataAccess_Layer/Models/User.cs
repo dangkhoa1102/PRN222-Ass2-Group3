@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace EVDealerDbContext.Models;
 
@@ -32,6 +33,6 @@ public partial class User
     public virtual ICollection<OrderHistory> OrderHistories { get; set; } = new List<OrderHistory>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
+    [JsonIgnore]
     public virtual ICollection<TestDriveAppointment> TestDriveAppointments { get; set; } = new List<TestDriveAppointment>();
 }
