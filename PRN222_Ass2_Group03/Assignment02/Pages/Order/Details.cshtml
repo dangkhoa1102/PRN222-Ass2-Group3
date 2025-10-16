@@ -1,0 +1,121 @@
+﻿@page
+@model Assignment02.Pages.Order.DetailsModel
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .details-container {
+        max-width: 800px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px 40px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .details-header {
+        text-align: center;
+        color: #007bff;
+        font-weight: 700;
+        margin-bottom: 25px;
+    }
+
+    .detail-item {
+        margin-bottom: 15px;
+        font-size: 1.05rem;
+    }
+
+    .badge {
+        padding: 7px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .badge-success {
+        background-color: #d4edda;
+        color: #198754;
+    }
+
+    .badge-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-danger {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .btn-back {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+
+        .btn-back:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #0056b3, #007bff);
+        }
+</style>
+
+@if (Model.Order == null)
+{
+    <div class="alert alert-danger text-center mt-5">Order not found.</div>
+}
+else
+{
+    <div class="details-container">
+        <h2 class="details-header">Order Details</h2>
+
+        <div class="detail-item"><strong>Order #:</strong> @Model.Order.OrderNumber</div>
+        <div class="detail-item"><strong>Vehicle:</strong> @Model.Order.VehicleName</div>
+        <div class="detail-item"><strong>Total:</strong> @Model.Order.TotalAmount.ToString("N0") ₫</div>
+        <div class="detail-item">
+            <strong>Status:</strong>
+            @if (Model.Order.Status?.Equals("completed", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <span class="badge badge-success">Completed</span>
+            }
+            else if (Model.Order.Status?.Equals("processing", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <span class="badge badge-warning">Processing</span>
+            }
+            else if (Model.Order.Status?.Equals("cancelled", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <span class="badge badge-danger">Cancelled</span>
+            }
+            else
+            {
+                <span class="badge badge-info">@Model.Order.Status</span>
+            }
+        </div>
+        <div class="detail-item">
+            <strong>Payment:</strong>
+            @if (Model.Order.PaymentStatus == "Paid")
+            {
+                <span class="badge badge-success">Paid</span>
+            }
+            else
+            {
+
+                <span class="badge badge-danger">Unpaid</span>
+            }
+        </div>
+        <div class="detail-item"><strong>Created At:</strong> @Model.Order.CreatedAt?.ToString("dd/MM/yyyy")</div>
+        <div class="detail-item"><strong>Notes:</strong> @(Model.Order.Notes ?? "—")</div>
+
+        <div class="text-center mt-4">
+            <a asp-page="/Order/MyOrders" class="btn btn-back">← Back to My Orders</a>
+        </div>
+    </div>
+}

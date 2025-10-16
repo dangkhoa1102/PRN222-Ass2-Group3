@@ -21,11 +21,4 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\Implement\" />
-    <Folder Include="Repositories\Interface\" />
-    <Folder Include="Repositories\Implement\" />
-    <Folder Include="Repositories\Interface\" />
-  </ItemGroup>
-
 </Project>
