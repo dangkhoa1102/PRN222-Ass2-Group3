@@ -30,6 +30,8 @@ namespace Business_Logic_Layer.Interfaces
         Task<List<OrderDTO>> GetOrderHistoryAsync(Guid userId);
         Task<List<OrderDTO>> GetPendingOrdersByUserIdAsync(Guid userId);
         Task<OrderDTO?> GetOrderByIdAsync(Guid orderId);
+        Task<bool> CancelOrderAsync(Guid orderId);
+
     }
 }
 
