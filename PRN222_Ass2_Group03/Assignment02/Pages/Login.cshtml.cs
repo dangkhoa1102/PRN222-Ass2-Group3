@@ -1,6 +1,10 @@
-using Business_Logic_Layer.Services;
+﻿using Business_Logic_Layer.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Assignment02.Pages
 {
@@ -42,8 +46,10 @@ namespace Assignment02.Pages
             }
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            returnUrl ??= Url.Content("~/");
+
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "Please provide valid credentials.";
@@ -53,19 +59,34 @@ namespace Assignment02.Pages
             try
             {
                 var user = await _userService.LoginAsync(Username, Password);
-                
+
                 if (user != null)
                 {
-                    // Store user information in session
+                    // Tạo claims để hỗ trợ [Authorize]
+                    var claims = new[]
+                    {
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Role, user.Role ?? "Customer"),
+                        new Claim("FullName", user.FullName ?? user.Username)
+                    };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+
+                    // Sign in the user with authentication
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                    // Store user information in session (giữ nguyên logic hiện tại)
                     HttpContext.Session.SetString("UserId", user.Id.ToString());
                     HttpContext.Session.SetString("Username", user.Username);
                     HttpContext.Session.SetString("FullName", user.FullName ?? user.Username);
                     HttpContext.Session.SetString("Role", user.Role ?? "Customer");
-                    
+
                     _logger.LogInformation("User {Username} logged in successfully", Username);
-                    
-                    // Redirect to homepage
-                    return RedirectToPage("/Index");
+
+                    // Redirect to returnUrl or homepage
+                    return LocalRedirect(returnUrl);
                 }
                 else
                 {
