@@ -16,7 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataAccess_Layer\DataAccess_Layer.csproj" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Interfaces\" />
   </ItemGroup>
 
 </Project>
