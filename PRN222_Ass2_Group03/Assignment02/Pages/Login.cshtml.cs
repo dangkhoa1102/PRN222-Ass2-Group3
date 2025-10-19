@@ -46,7 +46,7 @@ namespace Assignment02.Pages
             }
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
 
@@ -80,7 +80,7 @@ namespace Assignment02.Pages
                     // Store user information in session (giữ nguyên logic hiện tại)
                     HttpContext.Session.SetString("UserId", user.Id.ToString());
                     HttpContext.Session.SetString("Username", user.Username);
-                    HttpContext.Session.SetString("FullName", user.FullName ?? user.Username);
+                    HttpContext.Session.SetString("FullName", user.FullName ?? user.Username ?? string.Empty);
                     HttpContext.Session.SetString("Role", user.Role ?? "Customer");
 
                     _logger.LogInformation("User {Username} logged in successfully", Username);

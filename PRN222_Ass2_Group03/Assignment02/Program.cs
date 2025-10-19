@@ -1,10 +1,5 @@
 ﻿using Assignment02.Hubs;
-using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Services;
-using DataAccess_Layer;
-using DataAccess_Layer.Repositories;
-using DataAccess_Layer.Repositories.Implement;
-using DataAccess_Layer.Repositories.Interface;
 using EVDealerDbContext;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,11 +13,14 @@ builder.Services.AddSignalR();
 builder.Services.AddDbContext<EVDealerSystemContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection")));
 
-// Register Repositories & Services
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+// Register Service Factory
+builder.Services.AddScoped<ServiceFactory>();
+
+// Register Services through Factory
+builder.Services.AddScoped<IUserService>(provider => provider.GetRequiredService<ServiceFactory>().CreateUserService());
+builder.Services.AddScoped<IOrderService>(provider => provider.GetRequiredService<ServiceFactory>().CreateOrderService());
+builder.Services.AddScoped<ICustomerTestDriveAppointmentService>(provider => provider.GetRequiredService<ServiceFactory>().CreateCustomerTestDriveAppointmentService());
+builder.Services.AddScoped<IVehicleService>(provider => provider.GetRequiredService<ServiceFactory>().CreateVehicleService());
 
 // Session Configuration
 builder.Services.AddDistributedMemoryCache();

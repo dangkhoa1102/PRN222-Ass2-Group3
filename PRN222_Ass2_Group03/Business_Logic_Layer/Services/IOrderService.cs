@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Business_Logic_Layer.DTOs;
 
-namespace Business_Logic_Layer.Interfaces
+namespace Business_Logic_Layer.Services
 {
     public interface IOrderService
     {

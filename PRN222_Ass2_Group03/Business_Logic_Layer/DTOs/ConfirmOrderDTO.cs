@@ -15,6 +15,6 @@ namespace Business_Logic_Layer.DTOs
         [Required]
         public Guid StaffId { get; set; }
 
-        public string Notes { get; set; }
+        public string Notes { get; set; } = string.Empty;
     }
 }

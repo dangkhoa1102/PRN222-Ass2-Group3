@@ -1,5 +1,4 @@
 ﻿using Business_Logic_Layer.DTOs;
-using Business_Logic_Layer.Interfaces;
 using DataAccess_Layer.Repositories.Interface;
 using EVDealerDbContext.Models;
 using Microsoft.EntityFrameworkCore;
@@ -62,11 +61,11 @@ namespace Business_Logic_Layer.Services
                 Id = o.Id,
                 OrderNumber = o.OrderNumber,
                 CustomerId = o.CustomerId,
-                CustomerName = o.Customer?.FullName,
+                CustomerName = o.Customer?.FullName ?? string.Empty,
                 DealerId = o.DealerId,
-                DealerName = o.Dealer?.Name,
+                DealerName = o.Dealer?.Name ?? string.Empty,
                 VehicleId = o.VehicleId,
-                VehicleName = o.Vehicle?.Name,
+                VehicleName = o.Vehicle?.Name ?? string.Empty,
                 TotalAmount = o.TotalAmount,
                 Status = o.Status,
                 PaymentStatus = o.PaymentStatus,

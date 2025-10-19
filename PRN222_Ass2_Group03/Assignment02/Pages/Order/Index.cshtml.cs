@@ -1,5 +1,5 @@
 ﻿using Business_Logic_Layer.DTOs;
-using Business_Logic_Layer.Interfaces;
+using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

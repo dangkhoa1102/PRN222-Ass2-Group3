@@ -1,0 +1,412 @@
+@page "/Vehicles/Details/{id}"
+@model Assignment02.Pages.Vehicles.DetailsModel
+@{
+    ViewData["Title"] = "Chi tiết xe";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/vehicles.css" asp-append-version="true" />
+    <style>
+        .vehicle-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .vehicle-detail-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .vehicle-detail-header {
+            background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .vehicle-detail-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .vehicle-detail-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .vehicle-detail-content {
+            padding: 2rem;
+        }
+
+        .vehicle-image-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .vehicle-main-image {
+            max-width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .vehicle-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .info-card h3 {
+            color: #2196F3;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .info-value {
+            color: #6c757d;
+        }
+
+        .price-highlight {
+            background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .description-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .description-section h3 {
+            color: #2196F3;
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+            padding: 2rem 0;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            cursor: pointer;
+            min-width: 160px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-action:hover::before {
+            left: 100%;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-edit:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-delete:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(78, 205, 196, 0.4);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-back:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-test-drive {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-test-drive:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(255, 154, 158, 0.4);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-test-drive:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-action i {
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-action:hover i {
+            transform: scale(1.2);
+        }
+
+        .specifications-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .specifications-section h3 {
+            color: #2196F3;
+            margin-bottom: 1rem;
+        }
+
+        .spec-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .spec-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #2196F3;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-value {
+            color: #495057;
+        }
+
+        @@media (max-width: 768px) {
+            .vehicle-detail-container {
+                padding: 1rem;
+            }
+            
+            .vehicle-detail-title {
+                font-size: 2rem;
+            }
+            
+            .vehicle-main-image {
+                height: 250px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+}
+
+<div class="vehicle-detail-container">
+    <div class="vehicle-detail-card">
+        <div class="vehicle-detail-header">
+            <h1 class="vehicle-detail-title">@Model.Vehicle.Name</h1>
+            <p class="vehicle-detail-subtitle">@Model.Vehicle.Brand @Model.Vehicle.Model</p>
+        </div>
+
+        <div class="vehicle-detail-content">
+            @if (!string.IsNullOrEmpty(Model.Vehicle.Images))
+            {
+                <div class="vehicle-image-section">
+                    <img src="@Model.Vehicle.Images" alt="@Model.Vehicle.Name" class="vehicle-main-image" />
+                </div>
+            }
+
+            <div class="price-highlight">
+                @Model.Vehicle.Price.ToString("N0") ₫
+            </div>
+
+            <div class="vehicle-info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Thông tin cơ bản</h3>
+                    <div class="info-item">
+                        <span class="info-label">Tên xe:</span>
+                        <span class="info-value">@Model.Vehicle.Name</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hãng:</span>
+                        <span class="info-value">@Model.Vehicle.Brand</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Model:</span>
+                        <span class="info-value">@Model.Vehicle.Model</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Năm sản xuất:</span>
+                        <span class="info-value">@Model.Vehicle.Year</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-warehouse"></i> Thông tin kho</h3>
+                    <div class="info-item">
+                        <span class="info-label">Số lượng tồn kho:</span>
+                        <span class="info-value">@Model.Vehicle.StockQuantity</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Trạng thái:</span>
+                        <span class="info-value">@(Model.Vehicle.IsActive == true ? "Hoạt động" : "Ngừng hoạt động")</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ngày tạo:</span>
+                        <span class="info-value">@Model.Vehicle.CreatedAt?.ToString("dd/MM/yyyy")</span>
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Vehicle.Description))
+            {
+                <div class="description-section">
+                    <h3><i class="fas fa-align-left"></i> Mô tả</h3>
+                    <p>@Model.Vehicle.Description</p>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.Vehicle.Specifications))
+            {
+                <div class="specifications-section">
+                    <h3><i class="fas fa-cogs"></i> Thông số kỹ thuật</h3>
+                    <div class="spec-list">
+                        @try
+                        {
+                            var specs = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Model.Vehicle.Specifications ?? "{}");
+                            @foreach (var spec in specs)
+                            {
+                                <div class="spec-item">
+                                    <div class="spec-label">@spec.Key</div>
+                                    <div class="spec-value">@spec.Value</div>
+                                </div>
+                            }
+                        }
+                        catch
+                        {
+                            <div class="spec-item">
+                                <div class="spec-value">@Model.Vehicle.Specifications</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="action-buttons">
+                <a href="/BookTestDrive?vehicleId=@Model.Vehicle.Id" class="btn-action btn-test-drive">
+                    <i class="fas fa-car-side"></i>
+                    Đặt lịch lái thử
+                </a>
+                <a href="/Vehicles/Edit/@Model.Vehicle.Id" class="btn-action btn-edit">
+                    <i class="fas fa-edit"></i>
+                    Chỉnh sửa
+                </a>
+                <a href="/Vehicles/Delete/@Model.Vehicle.Id" class="btn-action btn-delete">
+                    <i class="fas fa-trash"></i>
+                    Xóa
+                </a>
+                <a href="/Vehicles/Index" class="btn-action btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,5 @@
 using Business_Logic_Layer.DTOs;
-using Business_Logic_Layer.Interfaces;
+using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -29,7 +29,7 @@ namespace Assignment02.Pages.Order
             return Page();
         }
 
-        // ? X? lý khi ng??i dùng nh?n nút Cancel
+        // ? X? lï¿½ khi ng??i dï¿½ng nh?n nï¿½t Cancel
         public async Task<IActionResult> OnPostCancelAsync(Guid id)
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
@@ -40,24 +40,24 @@ namespace Assignment02.Pages.Order
 
             try
             {
-                // G?i hàm CancelOrderAsync trong Service
+                // G?i hï¿½m CancelOrderAsync trong Service
                 bool result = await _orderService.CancelOrderAsync(id);
 
                 if (result)
                 {
-                    TempData["SuccessMessage"] = "??n hàng ?ã ???c h?y thành công.";
+                    TempData["SuccessMessage"] = "??n hï¿½ng ?ï¿½ ???c h?y thï¿½nh cï¿½ng.";
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Không th? h?y ??n hàng này.";
+                    TempData["ErrorMessage"] = "Khï¿½ng th? h?y ??n hï¿½ng nï¿½y.";
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"?ã x?y ra l?i: {ex.Message}";
+                TempData["ErrorMessage"] = $"?ï¿½ x?y ra l?i: {ex.Message}";
             }
 
-            // Redirect l?i trang hi?n t?i ?? c?p nh?t danh sách
+            // Redirect l?i trang hi?n t?i ?? c?p nh?t danh sï¿½ch
             return RedirectToPage();
         }
     }

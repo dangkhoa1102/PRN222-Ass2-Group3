@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/modern-theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/navbar.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dropdown-fix.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dropdown-override.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Assignment02.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -37,18 +39,6 @@
 
                         @if (isAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link modern-nav-link" asp-area="" asp-page="/Index">
-                                    <i class="fas fa-tachometer-alt"></i>
-                                    <span>Dashboard</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link modern-nav-link" asp-area="" asp-page="/Chat">
-                                    <i class="fas fa-comments"></i>
-                                    <span>Chat</span>
-                                </a>
-                            </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
                                     <i class="fas fa-car"></i>
@@ -56,38 +46,11 @@
                                 </a>
                                 <ul class="dropdown-menu vehicles-dropdown">
                                     <li>
-                                        <a class="dropdown-item" href="#vehicles">
-                                            <i class="fas fa-search"></i>
+                                        <a class="dropdown-item" asp-page="/Vehicles/Index">
+                                            <i class="fas fa-cogs"></i>
                                             <div>
-                                                <div class="item-title">Browse All Vehicles</div>
-                                                <div class="item-desc">Explore our complete catalog</div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#vehicles?type=sedan">
-                                            <i class="fas fa-car-side"></i>
-                                            <div>
-                                                <div class="item-title">Sedans</div>
-                                                <div class="item-desc">Luxury electric sedans</div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#vehicles?type=suv">
-                                            <i class="fas fa-truck"></i>
-                                            <div>
-                                                <div class="item-title">SUVs</div>
-                                                <div class="item-desc">Family-friendly electric SUVs</div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#vehicles?type=sports">
-                                            <i class="fas fa-bolt"></i>
-                                            <div>
-                                                <div class="item-title">Sports Cars</div>
-                                                <div class="item-desc">High-performance electric sports cars</div>
+                                                <div class="item-title">Manage Vehicles</div>
+                                                <div class="item-desc">CRUD operations for vehicles</div>
                                             </div>
                                         </a>
                                     </li>
@@ -100,19 +63,19 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="#appointments">
+                                        <a class="dropdown-item" asp-page="/BookTestDrive">
                                             <i class="fas fa-calendar-plus"></i>
                                             <span>Schedule Test Drive</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#appointments?view=my">
+                                        <a class="dropdown-item" asp-page="/MyAppointment">
                                             <i class="fas fa-list"></i>
                                             <span>My Appointments</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#appointments?view=history">
+                                        <a class="dropdown-item" asp-page="/MyAppointment">
                                             <i class="fas fa-history"></i>
                                             <span>Test Drive History</span>
                                         </a>
@@ -315,7 +278,7 @@
             cards.forEach(card => observer.observe(card));
         });
 
-        // Enhanced dropdown hover functionality
+        // Enhanced dropdown hover functionality - FORCE DROPDOWN TO WORK
         document.addEventListener('DOMContentLoaded', function() {
             const dropdownItems = document.querySelectorAll('.nav-item.dropdown');
 
@@ -324,49 +287,72 @@
                 const dropdownToggle = item.querySelector('.dropdown-toggle');
                 let hoverTimeout;
 
+                // Force dropdown z-index
+                if (dropdownMenu) {
+                    dropdownMenu.style.zIndex = '999999';
+                    dropdownMenu.style.position = 'absolute';
+                }
+
                 // Desktop hover effect
                 item.addEventListener('mouseenter', function() {
                     if (window.innerWidth > 991) {
                         clearTimeout(hoverTimeout);
-                        dropdownMenu.style.opacity = '1';
-                        dropdownMenu.style.visibility = 'visible';
-                        dropdownMenu.style.transform = 'translateX(-50%) translateY(0)';
-                        dropdownMenu.style.pointerEvents = 'auto';
+                        if (dropdownMenu) {
+                            dropdownMenu.style.display = 'block';
+                            dropdownMenu.style.opacity = '1';
+                            dropdownMenu.style.visibility = 'visible';
+                            dropdownMenu.style.transform = 'translateX(-50%) translateY(0)';
+                            dropdownMenu.style.pointerEvents = 'auto';
+                            dropdownMenu.style.zIndex = '999999';
+                        }
                     }
                 });
 
                 item.addEventListener('mouseleave', function() {
                     if (window.innerWidth > 991) {
                         hoverTimeout = setTimeout(function() {
-                            dropdownMenu.style.opacity = '0';
-                            dropdownMenu.style.visibility = 'hidden';
-                            dropdownMenu.style.transform = 'translateX(-50%) translateY(-10px)';
-                            dropdownMenu.style.pointerEvents = 'none';
+                            if (dropdownMenu) {
+                                dropdownMenu.style.opacity = '0';
+                                dropdownMenu.style.visibility = 'hidden';
+                                dropdownMenu.style.transform = 'translateX(-50%) translateY(-10px)';
+                                dropdownMenu.style.pointerEvents = 'none';
+                            }
                         }, 300); // 300ms delay before hiding
                     }
                 });
 
                 // Keep dropdown open when hovering over the dropdown menu itself
-                dropdownMenu.addEventListener('mouseenter', function() {
-                    if (window.innerWidth > 991) {
-                        clearTimeout(hoverTimeout);
-                        this.style.opacity = '1';
-                        this.style.visibility = 'visible';
-                        this.style.transform = 'translateX(-50%) translateY(0)';
-                        this.style.pointerEvents = 'auto';
-                    }
-                });
+                if (dropdownMenu) {
+                    dropdownMenu.addEventListener('mouseenter', function() {
+                        if (window.innerWidth > 991) {
+                            clearTimeout(hoverTimeout);
+                            this.style.display = 'block';
+                            this.style.opacity = '1';
+                            this.style.visibility = 'visible';
+                            this.style.transform = 'translateX(-50%) translateY(0)';
+                            this.style.pointerEvents = 'auto';
+                            this.style.zIndex = '999999';
+                        }
+                    });
 
-                dropdownMenu.addEventListener('mouseleave', function() {
-                    if (window.innerWidth > 991) {
-                        hoverTimeout = setTimeout(() => {
-                            this.style.opacity = '0';
-                            this.style.visibility = 'hidden';
-                            this.style.transform = 'translateX(-50%) translateY(-10px)';
-                            this.style.pointerEvents = 'none';
-                        }, 200);
-                    }
-                });
+                    dropdownMenu.addEventListener('mouseleave', function() {
+                        if (window.innerWidth > 991) {
+                            hoverTimeout = setTimeout(() => {
+                                this.style.opacity = '0';
+                                this.style.visibility = 'hidden';
+                                this.style.transform = 'translateX(-50%) translateY(-10px)';
+                                this.style.pointerEvents = 'none';
+                            }, 200);
+                        }
+                    });
+                }
+            });
+
+            // Force all dropdowns to have high z-index
+            const allDropdowns = document.querySelectorAll('.dropdown-menu');
+            allDropdowns.forEach(function(dropdown) {
+                dropdown.style.zIndex = '999999';
+                dropdown.style.position = 'absolute';
             });
         });
     </script>

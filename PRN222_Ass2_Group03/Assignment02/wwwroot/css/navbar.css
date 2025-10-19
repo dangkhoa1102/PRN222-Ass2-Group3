@@ -1,15 +1,16 @@
 /* Modern Navigation Styles - Redesigned with Horizontal Layout */
 .modern-navbar {
-    background: linear-gradient(135deg, #2196F3, #1976D2) !important;
+    background: linear-gradient(135deg, #2196F3, #4CAF50) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     padding: 0.75rem 0;
-    z-index: 1030;
+    z-index: 100000 !important;
     border: none;
+    position: relative;
 }
 
 .modern-navbar.scrolled {
-    background: linear-gradient(135deg, #1976D2, #1565C0) !important;
+    background: linear-gradient(135deg, #1976D2, #388E3C) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     padding: 0.5rem 0;
 }
@@ -198,7 +199,7 @@
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s ease;
-    z-index: 1000;
+    z-index: 99999 !important;
     list-style: none !important;
     pointer-events: none;
 }

@@ -19,6 +19,6 @@ namespace Business_Logic_Layer.DTOs
         [Required]
         public Guid VehicleId { get; set; }
 
-        public string Notes { get; set; }
+        public string Notes { get; set; } = string.Empty;
     }
 }
