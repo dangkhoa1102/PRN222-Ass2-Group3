@@ -16,6 +16,7 @@ namespace Assignment02.Pages.Orders
             _orderService = orderService;
         }
 
+        // ✅ Lấy danh sách đơn đang xử lý
         public async Task<IActionResult> OnGetAsync()
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
@@ -29,7 +30,8 @@ namespace Assignment02.Pages.Orders
             return Page();
         }
 
-        public async Task<IActionResult> OnPostCancelAsync(Guid id)
+        // ✅ Nhận thêm tham số Notes từ form
+        public async Task<IActionResult> OnPostCancelAsync(Guid id, string Notes)
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdStr))
@@ -37,9 +39,17 @@ namespace Assignment02.Pages.Orders
                 return RedirectToPage("/Login");
             }
 
+            // 🔸 Kiểm tra người dùng có nhập lý do không
+            if (string.IsNullOrWhiteSpace(Notes))
+            {
+                TempData["ErrorMessage"] = "Bạn phải nhập lý do hủy đơn hàng.";
+                return RedirectToPage();
+            }
+
             try
             {
-                bool result = await _orderService.CancelOrderAsync(id);
+                // ✅ Gọi service mới có tham số Notes
+                bool result = await _orderService.CancelOrderAsync(id, Notes);
 
                 if (result)
                 {

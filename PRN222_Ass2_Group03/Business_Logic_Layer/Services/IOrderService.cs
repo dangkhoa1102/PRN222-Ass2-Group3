@@ -11,6 +11,8 @@ namespace Business_Logic_Layer.Services
         Task<IEnumerable<Order>> GetOrderHistoryAsync(Guid userId);
         Task<IEnumerable<Order>> GetPendingOrdersByUserIdAsync(Guid userId);
         Task<Order?> GetOrderByIdAsync(Guid orderId);
-        Task<bool> CancelOrderAsync(Guid orderId);
+        Task<bool> CancelOrderAsync(Guid orderId, string Notes);
+        Task<Order> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes);
+
     }
 }

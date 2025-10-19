@@ -150,7 +150,8 @@
                     <th>Status</th>
                     <th>Payment</th>
                     <th>Created</th>
-                    <th>View</th>
+                    <th>Detail</th>
+                    <th>Reason</th>
                     <th>Cancel</th>
                 </tr>
             </thead>
@@ -159,7 +160,7 @@
                 {
                     <tr>
                         <td>@order.OrderNumber</td>
-                        <td>@order.Vehicle</td>
+                        <td>@order.Vehicle?.Name</td>
                         <td>@order.TotalAmount.ToString("N0") ₫</td>
                         <td><span class="badge badge-warning">@order.Status</span></td>
                         <td>
@@ -174,18 +175,23 @@
                         </td>
                         <td>@order.CreatedAt?.ToString("dd/MM/yyyy")</td>
 
-                        <!-- Cột View riêng -->
                         <td>
-                            <a asp-page="/Order/Details" asp-route-id="@order.Id" class="btn btn-details">
-                                <i class="fas fa-info-circle"></i> View
+                            <a asp-page="/Orders/Details" asp-route-id="@order.Id" class="btn btn-details">
+                                <i class="fas fa-info-circle"></i> Details
                             </a>
                         </td>
 
-                        <!-- Cột Cancel riêng -->
                         <td>
-                            <form method="post" asp-page-handler="Cancel" asp-route-id="@order.Id" class="d-inline">
+                            <input type="text" name="CancelReason" class="form-control"
+                                   placeholder="Enter reason..." required
+                                   form="cancelForm-@order.Id" />
+                        </td>
+
+                        <td>
+                            <form id="cancelForm-@order.Id" method="post" asp-page-handler="Cancel" asp-route-id="@order.Id" class="d-inline">
+                                <input type="hidden" name="Notes" value="" />
                                 <button type="submit" class="btn btn-cancel"
-                                        onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">
+                                        onclick="return handleCancel(this, '@order.Id');">
                                     <i class="fas fa-times-circle"></i> Cancel
                                 </button>
                             </form>
@@ -195,4 +201,21 @@
             </tbody>
         </table>
     }
+
 </div>
+
+<script>
+    function handleCancel(button, orderId) {
+        const form = document.getElementById(`cancelForm-${orderId}`);
+        const reasonInput = form.parentElement.parentElement.querySelector('input[name="CancelReason"]');
+        const hiddenNotes = form.querySelector('input[name="Notes"]');
+
+        if (!reasonInput.value.trim()) {
+            alert("Please enter a reason before canceling the order.");
+            return false;
+        }
+
+        hiddenNotes.value = reasonInput.value;
+        return confirm("Are you sure you want to cancel this order?");
+    }
+</script>

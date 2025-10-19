@@ -88,11 +88,20 @@ namespace DataAccess_Layer.Repositories
                 Status = status,
                 Notes = notes,
                 CreatedBy = createdBy,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
 
             _context.OrderHistories.Add(orderHistory);
             return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<decimal?> GetVehiclePriceById(Guid vehicleId)
+        {
+            var vehicle = await _context.Vehicles
+                .Where(v => v.Id == vehicleId)
+                .Select(v => v.Price)
+                .FirstOrDefaultAsync();
+
+            return vehicle;
         }
     }
 }

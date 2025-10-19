@@ -42,7 +42,7 @@ namespace Business_Logic_Layer.Services
                 AppointmentDate = appointmentDate,
                 Status = "pending",
                 Notes = notes,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
 
             return await _repository.CreateAsync(appointment);
@@ -69,7 +69,7 @@ namespace Business_Logic_Layer.Services
 
             appointment.Status = "Cancelled";
             appointment.Notes = note;
-            appointment.UpdatedAt = DateTime.UtcNow;
+            appointment.UpdatedAt = DateTime.Now;
             await _repository.UpdateAsync(appointment);
             return true;
         }
@@ -106,7 +106,7 @@ namespace Business_Logic_Layer.Services
 
             appointment.AppointmentDate = newDateTime;
             appointment.Status = "Rescheduled";
-            appointment.UpdatedAt = DateTime.UtcNow;
+            appointment.UpdatedAt = DateTime.Now;
             await _repository.UpdateAsync(appointment);
             return true;
         }

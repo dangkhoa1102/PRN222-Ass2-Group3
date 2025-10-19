@@ -43,18 +43,44 @@ namespace Business_Logic_Layer.Services
         }
 
         // 🔹 Hủy đơn hàng
-        public async Task<bool> CancelOrderAsync(Guid orderId)
+        public async Task<bool> CancelOrderAsync(Guid orderId, string Notes)
         {
             var order = await _orderRepository.GetById(orderId);
             if (order == null) return false;
 
-            // Chỉ cho phép hủy khi đang xử lý
             if (order.Status != "Processing") return false;
 
             order.Status = "Cancelled";
-            order.UpdatedAt = DateTime.UtcNow;
+            order.Notes = Notes; 
+            order.UpdatedAt = DateTime.Now;
 
             return await _orderRepository.Update(order);
+        }
+        public async Task<Order> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes)
+        {
+            var now = DateTime.Now;
+            string orderNumber = $"ORD-{now:yyyyMMdd-HHmm}";
+
+            var vehiclePrice = await _orderRepository.GetVehiclePriceById(vehicleId);
+            decimal total = vehiclePrice ?? 0;
+
+            var newOrder = new Order
+            {
+                Id = Guid.NewGuid(),
+                OrderNumber = orderNumber,      
+                CustomerId = customerId,
+                DealerId = dealerId,
+                VehicleId = vehicleId,
+                Notes = notes,
+                Status = "Processing",          
+                PaymentStatus = "Unpaid",
+                TotalAmount = total,         
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+
+            await _orderRepository.Add(newOrder);
+            return newOrder;
         }
 
     }

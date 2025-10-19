@@ -12,5 +12,7 @@ namespace DataAccess_Layer.Repositories
         Task<List<Order>> GetByCustomerId(Guid customerId);
         Task<List<Order>> GetByStatus(string status);
         Task<bool> AddOrderHistory(Guid orderId, string status, string notes, Guid createdBy);
+        Task<decimal?> GetVehiclePriceById(Guid vehicleId);
+
     }
 }
