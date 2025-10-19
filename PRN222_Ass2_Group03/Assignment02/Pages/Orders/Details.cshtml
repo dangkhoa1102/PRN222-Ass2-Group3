@@ -117,7 +117,7 @@ else
         <div class="detail-item"><strong>Notes:</strong> @(Model.Order.Notes ?? "—")</div>
 
         <div class="text-center mt-4">
-            <a asp-page="/Orders/MyOrders" class="btn btn-back">← Back to My Orders</a>
+            <a href="javascript:history.back()" class="btn btn-back">← Back to previous page</a>
         </div>
     </div>
 }
