@@ -1,13 +1,9 @@
-﻿using Business_Logic_Layer.DTOs;
-using Business_Logic_Layer.Interfaces;
-using DataAccess_Layer.Repositories.Interface;
+﻿using DataAccess_Layer.Repositories;
 using EVDealerDbContext.Models;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 
 namespace Business_Logic_Layer.Services
 {
@@ -20,65 +16,39 @@ namespace Business_Logic_Layer.Services
             _orderRepository = orderRepository;
         }
 
-        // 🔹 Danh sách tất cả đơn hàng của người dùng
-        public async Task<List<OrderDTO>> GetOrdersByUserIdAsync(Guid userId)
+        // 🔹 Tất cả đơn hàng của user
+        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId)
         {
-            var orders = await _orderRepository.GetByCustomerId(userId);
-            return orders.Select(MapToDTO).ToList();
+            return await _orderRepository.GetByCustomerId(userId);
         }
 
-        // 🔹 Lịch sử đơn hàng (đã hoàn thành hoặc bị hủy)
-        public async Task<List<OrderDTO>> GetOrderHistoryAsync(Guid userId)
+        // 🔹 Lịch sử đơn hàng (đã hoàn thành hoặc hủy)
+        public async Task<IEnumerable<Order>> GetOrderHistoryAsync(Guid userId)
         {
             var orders = await _orderRepository.GetByCustomerId(userId);
-            return orders
-                .Where(o => o.Status == "Completed" || o.Status == "Cancelled")
-                .Select(MapToDTO)
-                .ToList();
+            return orders.Where(o => o.Status == "Completed" || o.Status == "Cancelled");
         }
 
         // 🔹 Đơn hàng đang chờ xử lý
-        public async Task<List<OrderDTO>> GetPendingOrdersByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<Order>> GetPendingOrdersByUserIdAsync(Guid userId)
         {
             var orders = await _orderRepository.GetByCustomerId(userId);
-            return orders
-                .Where(o => o.Status == "Pending" || o.Status == "Processing")
-                .Select(MapToDTO)
-                .ToList();
+            return orders.Where(o => o.Status == "Pending" || o.Status == "Processing");
         }
 
-        // 🔹 Chi tiết đơn hàng
-        public async Task<OrderDTO?> GetOrderByIdAsync(Guid orderId)
+        // 🔹 Lấy chi tiết đơn hàng
+        public async Task<Order?> GetOrderByIdAsync(Guid orderId)
         {
-            var order = await _orderRepository.GetById(orderId);
-            return order == null ? null : MapToDTO(order);
+            return await _orderRepository.GetById(orderId);
         }
 
-        // ✅ Map entity sang DTO
-        private static OrderDTO MapToDTO(Order o)
-        {
-            return new OrderDTO
-            {
-                Id = o.Id,
-                OrderNumber = o.OrderNumber,
-                CustomerId = o.CustomerId,
-                CustomerName = o.Customer?.FullName,
-                DealerId = o.DealerId,
-                DealerName = o.Dealer?.Name,
-                VehicleId = o.VehicleId,
-                VehicleName = o.Vehicle?.Name,
-                TotalAmount = o.TotalAmount,
-                Status = o.Status,
-                PaymentStatus = o.PaymentStatus,
-                Notes = o.Notes,
-                CreatedAt = o.CreatedAt,
-                UpdatedAt = o.UpdatedAt
-            };
-        }
+        // 🔹 Hủy đơn hàng
         public async Task<bool> CancelOrderAsync(Guid orderId)
         {
             var order = await _orderRepository.GetById(orderId);
             if (order == null) return false;
+
+            // Chỉ cho phép hủy khi đang xử lý
             if (order.Status != "Processing") return false;
 
             order.Status = "Cancelled";
@@ -86,7 +56,6 @@ namespace Business_Logic_Layer.Services
 
             return await _orderRepository.Update(order);
         }
+
     }
 }
-
-

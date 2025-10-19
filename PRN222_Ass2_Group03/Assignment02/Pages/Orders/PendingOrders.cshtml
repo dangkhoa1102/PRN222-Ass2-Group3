@@ -1,5 +1,5 @@
 ﻿@page
-@model Assignment02.Pages.Order.PendingOrdersModel
+@model Assignment02.Pages.Orders.PendingOrdersModel
 @{
     ViewData["Title"] = "Processing Orders";
 }
@@ -159,7 +159,7 @@
                 {
                     <tr>
                         <td>@order.OrderNumber</td>
-                        <td>@order.VehicleName</td>
+                        <td>@order.Vehicle</td>
                         <td>@order.TotalAmount.ToString("N0") ₫</td>
                         <td><span class="badge badge-warning">@order.Status</span></td>
                         <td>

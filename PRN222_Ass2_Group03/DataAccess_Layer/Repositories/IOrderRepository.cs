@@ -1,4 +1,3 @@
-using DataAccess_Layer;
 using EVDealerDbContext.Models;
 
 namespace DataAccess_Layer.Repositories

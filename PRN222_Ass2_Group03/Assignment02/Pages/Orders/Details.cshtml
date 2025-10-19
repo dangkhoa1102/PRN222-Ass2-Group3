@@ -1,5 +1,5 @@
 ﻿@page
-@model Assignment02.Pages.Order.DetailsModel
+@model Assignment02.Pages.Orders.DetailsModel
 @{
     ViewData["Title"] = "Order Details";
 }
@@ -78,8 +78,9 @@ else
         <h2 class="details-header">Order Details</h2>
 
         <div class="detail-item"><strong>Order #:</strong> @Model.Order.OrderNumber</div>
-        <div class="detail-item"><strong>Vehicle:</strong> @Model.Order.VehicleName</div>
+        <div class="detail-item"><strong>Vehicle:</strong> @Model.Order.Vehicle?.Name</div>
         <div class="detail-item"><strong>Total:</strong> @Model.Order.TotalAmount.ToString("N0") ₫</div>
+
         <div class="detail-item">
             <strong>Status:</strong>
             @if (Model.Order.Status?.Equals("completed", StringComparison.OrdinalIgnoreCase) == true)
@@ -99,6 +100,7 @@ else
                 <span class="badge badge-info">@Model.Order.Status</span>
             }
         </div>
+
         <div class="detail-item">
             <strong>Payment:</strong>
             @if (Model.Order.PaymentStatus == "Paid")
@@ -107,15 +109,15 @@ else
             }
             else
             {
-
                 <span class="badge badge-danger">Unpaid</span>
             }
         </div>
+
         <div class="detail-item"><strong>Created At:</strong> @Model.Order.CreatedAt?.ToString("dd/MM/yyyy")</div>
         <div class="detail-item"><strong>Notes:</strong> @(Model.Order.Notes ?? "—")</div>
 
         <div class="text-center mt-4">
-            <a asp-page="/Order/MyOrders" class="btn btn-back">← Back to My Orders</a>
+            <a asp-page="/Orders/MyOrders" class="btn btn-back">← Back to My Orders</a>
         </div>
     </div>
 }

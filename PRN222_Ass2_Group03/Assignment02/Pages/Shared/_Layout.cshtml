@@ -95,25 +95,25 @@
                             </li>
 
                             <li class="nav-item dropdown">
-                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
+                                <a class="nav-link modern-nav-link dropdown-toggle" href="javascript:void(0)" role="button" aria-expanded="false">
                                     <i class="fas fa-calendar-check"></i>
                                     <span>Test Drives</span>
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="#appointments">
+                                        <a class="dropdown-item" asp-page="/BookTestDrive">
                                             <i class="fas fa-calendar-plus"></i>
                                             <span>Schedule Test Drive</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#appointments?view=my">
+                                        <a class="dropdown-item" asp-page="/MyAppointment">
                                             <i class="fas fa-list"></i>
                                             <span>My Appointments</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#appointments?view=history">
+                                        <a class="dropdown-item" asp-page="/History">
                                             <i class="fas fa-history"></i>
                                             <span>Test Drive History</span>
                                         </a>
@@ -130,19 +130,19 @@
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Order/MyOrders">
+                                            <a class="dropdown-item" asp-page="/Orders/MyOrders">
                                                 <i class="fas fa-receipt"></i>
                                                 <span>My Orders</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Order/PendingOrders">
+                                            <a class="dropdown-item" asp-page="/Orders/PendingOrders">
                                                 <i class="fas fa-hourglass-half"></i>
                                                 <span>Processing Orders</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Order/History">
+                                            <a class="dropdown-item" asp-page="/Orders/History">
                                                 <i class="fas fa-history"></i>
                                                 <span>Order History</span>
                                             </a>

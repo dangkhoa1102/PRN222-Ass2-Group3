@@ -1,15 +1,15 @@
-using Business_Logic_Layer.DTOs;
-using Business_Logic_Layer.Interfaces;
+Ôªøusing Business_Logic_Layer.Services;
+using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Assignment02.Pages.Order
+namespace Assignment02.Pages.Orders
 {
     public class PendingOrdersModel : PageModel
     {
         private readonly IOrderService _orderService;
 
-        public List<OrderDTO> PendingOrders { get; set; } = new();
+        public IEnumerable<Order> PendingOrders { get; set; } = Enumerable.Empty<Order>();
 
         public PendingOrdersModel(IOrderService orderService)
         {
@@ -29,7 +29,6 @@ namespace Assignment02.Pages.Order
             return Page();
         }
 
-        // ? X? l˝ khi ng??i d˘ng nh?n n˙t Cancel
         public async Task<IActionResult> OnPostCancelAsync(Guid id)
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
@@ -40,24 +39,22 @@ namespace Assignment02.Pages.Order
 
             try
             {
-                // G?i h‡m CancelOrderAsync trong Service
                 bool result = await _orderService.CancelOrderAsync(id);
 
                 if (result)
                 {
-                    TempData["SuccessMessage"] = "??n h‡ng ?„ ???c h?y th‡nh cÙng.";
+                    TempData["SuccessMessage"] = "ƒê∆°n h√†ng ƒë√£ ƒë∆∞·ª£c h·ªßy th√†nh c√¥ng.";
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "KhÙng th? h?y ??n h‡ng n‡y.";
+                    TempData["ErrorMessage"] = "Kh√¥ng th·ªÉ h·ªßy ƒë∆°n h√†ng n√†y.";
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"?„ x?y ra l?i: {ex.Message}";
+                TempData["ErrorMessage"] = $"ƒê√£ x·∫£y ra l·ªói: {ex.Message}";
             }
 
-            // Redirect l?i trang hi?n t?i ?? c?p nh?t danh s·ch
             return RedirectToPage();
         }
     }

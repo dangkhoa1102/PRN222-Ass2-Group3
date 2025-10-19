@@ -16,7 +16,6 @@
         <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
     }
 
-    <!-- Bộ lọc -->
     <form method="get" class="row g-3 mb-4">
         <div class="col-md-3">
             <label class="form-label">Tình trạng đơn hàng</label>
@@ -24,7 +23,7 @@
                 <option value="">-- Tất cả --</option>
                 <option value="Processing">Processing</option>
                 <option value="Completed">Completed</option>
-                <option value="Canceled">Canceled</option>
+                <option value="Cancelled">Cancelled</option>
             </select>
         </div>
 
@@ -57,7 +56,6 @@
         </div>
     </form>
 
-    <!-- Bảng đơn hàng -->
     <table class="table table-striped table-hover">
         <thead class="table-dark">
             <tr>
@@ -74,14 +72,13 @@
             {
                 <tr>
                     <td>@order.OrderNumber</td>
-                    <td>@order.VehicleName</td>
+                    <td>@order.Vehicle?.Name</td>
                     <td>@order.TotalAmount.ToString("N0") đ</td>
                     <td>
                         <span class="badge bg-@(
                               order.Status == "Completed" ? "success" :
                               order.Status == "Cancelled" ? "danger" :
-                              order.Status == "Processing" ? "warning" : "secondary"
-                                                )">
+                              order.Status == "Processing" ? "warning" : "secondary")">
                         @order.Status
                     </span>
                 </td>

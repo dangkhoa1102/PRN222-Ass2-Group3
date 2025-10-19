@@ -1,5 +1,4 @@
-﻿using DataAccess_Layer.Repositories;
-using EVDealerDbContext;
+﻿using EVDealerDbContext;
 using EVDealerDbContext.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,44 +16,44 @@ namespace DataAccess_Layer.Repositories
         public async Task<List<Order>> GetAll()
         {
             return await _context.Orders
-                                 .Include(o => o.Customer)
-                                 .Include(o => o.Vehicle)
-                                 .Include(o => o.Dealer)
-                                 .OrderByDescending(o => o.CreatedAt)
-                                 .ToListAsync();
+                .Include(o => o.Customer)
+                .Include(o => o.Vehicle)
+                .Include(o => o.Dealer)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Order>> GetByStatus(string status)
         {
             return await _context.Orders
-                                 .Include(o => o.Customer)
-                                 .Include(o => o.Vehicle)
-                                 .Include(o => o.Dealer)
-                                 .Where(o => o.Status == status)
-                                 .OrderByDescending(o => o.CreatedAt)
-                                 .ToListAsync();
+                .Include(o => o.Customer)
+                .Include(o => o.Vehicle)
+                .Include(o => o.Dealer)
+                .Where(o => o.Status == status)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<List<Order>> GetByCustomerId(Guid customerId)
         {
             return await _context.Orders
-                                 .Include(o => o.Customer)
-                                 .Include(o => o.Vehicle)
-                                 .Include(o => o.Dealer)
-                                 .Include(o => o.OrderHistories) // ✅ Load lịch sử đơn hàng
-                                 .Where(o => o.CustomerId == customerId)
-                                 .OrderByDescending(o => o.CreatedAt)
-                                 .ToListAsync();
+                .Include(o => o.Customer)
+                .Include(o => o.Vehicle)
+                .Include(o => o.Dealer)
+                .Include(o => o.OrderHistories)
+                .Where(o => o.CustomerId == customerId)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<Order?> GetById(Guid id)
         {
             return await _context.Orders
-                                 .Include(o => o.Customer)
-                                 .Include(o => o.Vehicle)
-                                 .Include(o => o.Dealer)
-                                 .Include(o => o.OrderHistories)
-                                 .FirstOrDefaultAsync(o => o.Id == id);
+                .Include(o => o.Customer)
+                .Include(o => o.Vehicle)
+                .Include(o => o.Dealer)
+                .Include(o => o.OrderHistories)
+                .FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<bool> Add(Order order)
