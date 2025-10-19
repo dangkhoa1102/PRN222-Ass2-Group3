@@ -50,6 +50,11 @@ namespace Business_Logic_Layer.Services
             return await _userRepository.GetUserByIdAsync(id);
         }
 
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _userRepository.GetAllUsersAsync();
+        }
+
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
             return await _userRepository.GetUserByUsernameAsync(username);

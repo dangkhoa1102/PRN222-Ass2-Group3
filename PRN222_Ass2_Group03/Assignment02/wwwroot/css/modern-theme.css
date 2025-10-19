@@ -19,6 +19,42 @@
     --border-radius: 12px;
     --border-radius-large: 20px;
 }
+/* Modern Green Table */
+.table-modern {
+    --table-header-bg: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    --table-row-hover: rgba(76, 175, 80, 0.08);
+    --table-border: #E0E0E0;
+}
+
+.table-modern thead th {
+    background: var(--table-header-bg);
+    color: #fff;
+    border: none !important;
+    font-weight: 600;
+}
+
+.table-modern tbody tr {
+    border-bottom: 1px solid var(--table-border);
+}
+
+.table-modern tbody tr:hover {
+    background: var(--table-row-hover);
+}
+
+.badge-status {
+    border-radius: 20px;
+    padding: 0.35rem 0.6rem;
+    font-weight: 600;
+}
+
+.badge-status.processing { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+.badge-status.confirmed { background: #E3F2FD; color: #1565C0; border: 1px solid #90CAF9; }
+.badge-status.shipping { background: #FFF8E1; color: #F9A825; border: 1px solid #FFE082; }
+.badge-status.completed { background: #E8F5E9; color: #1B5E20; border: 1px solid #A5D6A7; }
+.badge-status.cancelled { background: #FFEBEE; color: #B71C1C; border: 1px solid #EF9A9A; }
+
+.action-btn { border: 1px solid #E0E0E0; background: #fff; color: #388E3C; }
+.action-btn:hover { background: #E8F5E9; }
 
 /* Global Styles */
 * {

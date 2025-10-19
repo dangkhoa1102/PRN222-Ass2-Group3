@@ -1,0 +1,378 @@
+﻿@page
+@model Assignment02.Pages.Orders.DetailsModel
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .card-custom {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease;
+    }
+
+        .card-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-row {
+        display: flex;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f7fafc;
+    }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+    .info-label {
+        flex: 0 0 35%;
+        font-weight: 600;
+        color: #4a5568;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #2d3748;
+    }
+
+    .badge-status {
+        display: inline-block;
+        padding: 0.35rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-processing {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-confirmed {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-shipping {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .payment-paid {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .payment-unpaid {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .payment-partial {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .btn-back {
+        background: #6b7280;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-block;
+    }
+
+        .btn-back:hover {
+            background: #4b5563;
+            color: white;
+            transform: translateX(-3px);
+        }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-block;
+    }
+
+        .btn-edit:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+    .order-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .total-amount {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #10b981;
+    }
+
+    .notes-box {
+        background: #f7fafc;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+        font-style: italic;
+        color: #4a5568;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-1">Chi tiết đơn hàng</h4>
+            <div class="order-number">#@Model.Order.OrderNumber</div>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-page="./Edit" asp-route-id="@Model.Order.Id" class="btn-edit">
+                ✏️ Chỉnh sửa
+            </a>
+            <a asp-page="./Index" class="btn-back">
+                ← Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-6">
+            <!-- Order Information -->
+            <div class="card-custom">
+                <div class="section-title">
+                    📋 Thông tin đơn hàng
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Mã đơn hàng:</div>
+                    <div class="info-value">
+                        <strong>@Model.Order.OrderNumber</strong>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Ngày tạo:</div>
+                    <div class="info-value">
+                        📅 @(Model.Order.CreatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Trạng thái đơn:</div>
+                    <div class="info-value">
+                        <span class="badge-status @GetStatusClass(Model.Order.Status)">
+                            @GetStatusText(Model.Order.Status)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Thanh toán:</div>
+                    <div class="info-value">
+                        <span class="badge-status @GetPaymentClass(Model.Order.PaymentStatus)">
+                            @GetPaymentText(Model.Order.PaymentStatus)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Tổng tiền:</div>
+                    <div class="info-value">
+                        <span class="total-amount">@Model.Order.TotalAmount.ToString("N0") VNĐ</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="card-custom">
+                <div class="section-title">
+                    👤 Thông tin khách hàng
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Họ và tên:</div>
+                    <div class="info-value">
+                        <strong>@Model.Order.Customer?.FullName</strong>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Số điện thoại:</div>
+                    <div class="info-value">
+                        📞 <a href="tel:@Model.Order.Customer?.Phone">@Model.Order.Customer?.Phone</a>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value">
+                        📧 <a href="mailto:@Model.Order.Customer?.Email">@Model.Order.Customer?.Email</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-6">
+            <!-- Vehicle Information -->
+            <div class="col-lg-6">
+                <!-- Vehicle Information -->
+                <div class="card-custom">
+                    <div class="section-title">
+                        🚗 Vehicle Information
+                    </div>
+
+                    @if (Model.Order.Vehicle != null)
+                    {
+                        <div class="info-row">
+                            <div class="info-label">Price:</div>
+                            <div class="info-value">
+                                <strong class="text-success">@Model.Order.Vehicle.Price.ToString("N0") VND</strong>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            <small>🔄 Waiting for vehicle data from another module...</small>
+                        </div>
+                    }
+                </div>
+            </div>
+
+
+            <!-- Notes -->
+            @if (!string.IsNullOrEmpty(Model.Order.Notes))
+            {
+                <div class="card-custom">
+                    <div class="section-title">
+                        📝 Ghi chú
+                    </div>
+                    <div class="notes-box">
+                        @Model.Order.Notes
+                    </div>
+                </div>
+            }
+
+            <!-- System Info -->
+            <div class="card-custom">
+                <div class="section-title">
+                    ℹ️ Thông tin hệ thống
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Ngày tạo:</div>
+                    <div class="info-value">
+                        <small>@(Model.Order.CreatedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</small>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Cập nhật lần cuối:</div>
+                    <div class="info-value">
+                        <small>@(Model.Order.UpdatedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusClass(string status)
+    {
+        return status?.ToLower() switch
+        {
+            "confirmed" => "status-confirmed",
+            "delivering" => "status-delivering",
+            "completed" => "status-completed",
+            "cancelled" => "status-cancelled",
+            _ => "status-processing"
+        };
+    }
+
+    private string GetStatusText(string status)
+    {
+        return status?.ToLower() switch
+        {
+            "confirmed" => "✅ Confirmed",
+            "delivering" => "🚚 Delivering",
+            "completed" => "🎉 Completed",
+            "cancelled" => "❌ Cancelled",
+            _ => status
+        };
+    }
+
+    private string GetPaymentClass(string payment)
+    {
+        return payment?.ToLower() switch
+        {
+            "paid" => "payment-paid",
+            "unpaid" => "payment-unpaid",
+            "partial" => "payment-partial",
+            _ => "payment-unpaid"
+        };
+    }
+
+    private string GetPaymentText(string payment)
+    {
+        return payment?.ToLower() switch
+        {
+            "paid" => "✅ Payment Completed",
+            "unpaid" => "❌ Payment Pending",
+
+            _ => payment
+        };
+    }
+}

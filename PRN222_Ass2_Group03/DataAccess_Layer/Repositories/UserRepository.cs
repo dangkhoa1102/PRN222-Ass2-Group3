@@ -14,6 +14,9 @@ namespace DataAccess_Layer.Repositories
             _logger = logger;
         }
 
+
+      
+
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
             try
@@ -69,7 +72,7 @@ namespace DataAccess_Layer.Repositories
                 using var _context = new EVDealerSystemContext();
                 return await _context.Users
                     .Include(u => u.Dealer)
-                    .Where(u => u.IsActive.GetValueOrDefault())
+                    .Where(u => u.IsActive == true)
                     .ToListAsync();
             }
             catch (Exception ex)

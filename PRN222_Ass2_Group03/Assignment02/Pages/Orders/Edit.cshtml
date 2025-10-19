@@ -1,0 +1,356 @@
+﻿@page
+@model Assignment02.Pages.Orders.EditModel
+@{
+    ViewData["Title"] = "Edit Order";
+}
+
+<style>
+    .edit-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 0 15px;
+    }
+
+    .edit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .edit-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .edit-card-body {
+        padding: 30px;
+    }
+
+    .edit-card-footer {
+        padding: 20px 30px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .edit-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px;
+    }
+
+    .edit-col-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 15px;
+    }
+
+    .edit-section-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .form-control, .form-select {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+        .form-control:focus, .form-select:focus {
+            outline: 0;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+
+    .input-group {
+        display: flex;
+    }
+
+        .input-group .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+    .input-group-text {
+        padding: 10px 12px;
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        border-left: 0;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+
+    .btn-secondary {
+        color: #fff;
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .alert-dismissible {
+        padding-right: 45px;
+        position: relative;
+    }
+
+    .btn-close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        background: transparent;
+        border: 0;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0.5;
+    }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
+    @@media (max-width: 768px) {
+        .edit-col-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .edit-header {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+</style>
+
+<div class="edit-container">
+
+    <!-- Header -->
+    <div class="edit-header">
+        <h3>Edit Order #@Model.Order.OrderNumber</h3>
+        <a href="/Orders/Index" class="btn btn-secondary">← Back</a>
+    </div>
+
+    <!-- Error Message -->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible">
+            ⚠️ @Model.ErrorMessage
+            <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+        </div>
+    }
+
+    <!-- Form -->
+    <form method="post">
+        <input type="hidden" asp-for="Order.Id" />
+        <input type="hidden" asp-for="Order.OrderNumber" />
+        <input type="hidden" asp-for="Order.CreatedAt" />
+
+        <div class="edit-card">
+            <div class="edit-card-body">
+                <div class="edit-row">
+
+                    <!-- Left Column -->
+                    <div class="edit-col-6">
+                        <h5 class="edit-section-title">Order Information</h5>
+
+                        <!-- Customer -->
+                        <div class="form-group">
+                            <label asp-for="Order.CustomerId" class="form-label">
+                                Customer
+                            </label>
+
+                            @if (Model.Order?.Customer != null)
+                            {
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.Order.Customer.FullName"
+                                       readonly
+                                       disabled />
+                                <input type="hidden" asp-for="Order.CustomerId" />
+                            }
+                            else
+                            {
+                                <input type="text"
+                                       class="form-control"
+                                       value="Customer information not found"
+                                       readonly
+                                       disabled />
+                                <input type="hidden" asp-for="Order.CustomerId" />
+                            }
+                        </div>
+
+                        <!-- Vehicle -->
+                        <div class="form-group">
+                            <label asp-for="Order.VehicleId" class="control-label">Vehicle</label>
+
+                            @if (Model.Vehicles != null && Model.Vehicles.Any())
+                            {
+                                <select asp-for="Order.VehicleId" class="form-control" asp-items="Model.Vehicles">
+                                    <option value="">-- No change (keep current vehicle) --</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <input type="text" class="form-control" readonly
+                                       value="Waiting for vehicle data from another module..." />
+                                <small class="form-text text-muted">
+                                    To keep the current vehicle, you can skip this field.
+                                </small>
+                                <input type="hidden" asp-for="Order.VehicleId" />
+                            }
+
+                            <span asp-validation-for="Order.VehicleId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Total Amount -->
+                        <div class="form-group">
+                            <label asp-for="Order.TotalAmount" class="form-label">
+                                Total Amount <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="Order.TotalAmount"
+                                       type="number"
+                                       step="1000"
+                                       class="form-control"
+                                       required />
+                                <span class="input-group-text">VND</span>
+                            </div>
+                            <span asp-validation-for="Order.TotalAmount" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="edit-col-6">
+                        <h5 class="edit-section-title">Status</h5>
+
+                        <!-- Payment Status -->
+                        <div class="form-group">
+                            <label asp-for="Order.PaymentStatus" class="form-label">
+                                Payment
+                            </label>
+                            <select asp-for="Order.PaymentStatus" class="form-select">
+                                <option value="Unpaid">Unpaid</option>
+                                <option value="Paid">Paid</option>
+                            </select>
+                        </div>
+
+                        <!-- Order Status -->
+                        <div class="form-group">
+                            <label asp-for="Order.Status" class="form-label">
+                                Order Status <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Order.Status" class="form-select" required>
+                                <option value="">--Select Status--</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Delivering">Delivering</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <span asp-validation-for="Order.Status" class="text-danger"></span>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group">
+                            <label asp-for="Order.Notes" class="form-label">
+                                Notes
+                            </label>
+                            <textarea asp-for="Order.Notes"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Delivery address, special requests..."></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="edit-card-footer">
+                <div class="action-buttons">
+                    <a href="/Orders/Index" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">✓ Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

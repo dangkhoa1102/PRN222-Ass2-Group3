@@ -1,0 +1,753 @@
+﻿@page
+@model Assignment02.Pages.Orders.IndexModel
+@{
+    ViewData["Title"] = "Orders Management";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EV Dealer System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+            /* Animated Background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15), transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15), transparent 50%), radial-gradient(circle at 40% 20%, rgba(16, 185, 129, 0.1), transparent 50%);
+                pointer-events: none;
+                z-index: 0;
+                animation: backgroundShift 20s ease infinite;
+            }
+
+        @@keyframes backgroundShift {
+            0%, 100%
+
+        {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.8;
+        }
+
+        }
+
+        .page-container {
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Card */
+        .header-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        @@keyframes fadeInDown {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100%
+
+        {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        }
+
+        .icon-box i {
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .title-text h1 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .title-text p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 30px rgba(59, 130, 246, 0.6);
+                background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            }
+
+        .btn-outline-primary {
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            background: transparent;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .btn-outline-primary:hover {
+                background: #3b82f6;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .btn-outline-secondary {
+            border: 2px solid #64748b;
+            color: #94a3b8;
+            background: transparent;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .btn-outline-secondary:hover {
+                background: #64748b;
+                color: white;
+            }
+
+        /* Alert Messages */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @@keyframes slideInRight {
+            from
+
+        {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+            color: #6ee7b7;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+            color: #fca5a5;
+        }
+
+        /* Filters Card */
+        .filters-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+
+        }
+
+        .form-label {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            background: rgba(30, 41, 59, 0.6);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: #e2e8f0;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus, .form-select:focus {
+                background: rgba(30, 41, 59, 0.8);
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+                color: white;
+            }
+
+            .form-control::placeholder {
+                color: #64748b;
+            }
+
+            .form-select option {
+                background: #1e293b;
+                color: #e2e8f0;
+            }
+
+        /* Table Card */
+        .table-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @@keyframes fadeInUp {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        .table {
+            color: #e2e8f0;
+            margin: 0;
+        }
+
+            .table thead th {
+                background: rgba(59, 130, 246, 0.1);
+                color: #93c5fd;
+                font-weight: 700;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.05em;
+                border: none;
+                padding: 1rem;
+            }
+
+            .table tbody tr {
+                border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+                transition: all 0.3s ease;
+            }
+
+                .table tbody tr:hover {
+                    background: rgba(59, 130, 246, 0.05);
+                    transform: scale(1.01);
+                }
+
+            .table tbody td {
+                padding: 1rem;
+                border: none;
+                vertical-align: middle;
+            }
+
+        .order-number {
+            color: #60a5fa;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .customer-info .fw-semibold,
+        .vehicle-info .fw-semibold {
+            color: white;
+            font-weight: 600;
+        }
+
+        .customer-info .text-muted,
+        .vehicle-info .text-muted {
+            color: #94a3b8 !important;
+            font-size: 0.85rem;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-confirmed {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .badge-completed {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .badge-cancelled {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .badge-processing {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .bg-success {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+        }
+
+        .bg-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .btn-action:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            }
+
+        .btn-view:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+
+        .btn-edit:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+        }
+
+        .btn-update:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+
+        /* Modal */
+        .modal-content {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #e2e8f0;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .modal-title {
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .page-container
+
+        {
+            padding: 1rem;
+        }
+
+        .header-card {
+            padding: 1.5rem;
+        }
+
+        .icon-box {
+            width: 50px;
+            height: 50px;
+        }
+
+            .icon-box i {
+                font-size: 1.5rem;
+            }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: linear-gradient(to bottom, #2563eb, #7c3aed);
+            }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Header -->
+        <div class="header-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box me-3">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="title-text">
+                        <h1 class="h4 mb-0">Orders Management</h1>
+                        <p class="mb-0">Manage and track all customer orders</p>
+                    </div>
+                </div>
+                <a href="/Orders/Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>New Order
+                </a>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@Model.SuccessMessage
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>@Model.ErrorMessage
+            </div>
+        }
+
+        <!-- Search + Filter -->
+        <div class="filters-card card">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Search</label>
+                    <input asp-for="SearchKeyword" class="form-control" placeholder="Order number, customer, phone..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select asp-for="StatusFilter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="delivering">Delivering</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Payment</label>
+                    <select asp-for="PaymentStatusFilter" class="form-select">
+                        <option value="All">All Payment Status</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Unpaid">Unpaid</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-outline-primary flex-fill">Apply</button>
+                    <a class="btn btn-outline-secondary flex-fill" href="@Url.Page("/Orders/Index")">Reset</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order No.</th>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th class="text-end">Total Amount</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Payment</th>
+                            <th class="text-center">Created Date</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Orders.Any())
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-5">
+                                    <i class="fas fa-inbox fa-3x mb-3 d-block opacity-50"></i>
+                                    No orders found.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var o in Model.Orders)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="order-number">@o.OrderNumber</span>
+                                    </td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <div class="fw-semibold">
+                                                @(string.IsNullOrWhiteSpace(o.Customer?.FullName) ? "N/A" : o.Customer.FullName)
+                                            </div>
+                                            <div class="text-muted small">
+                                                @(string.IsNullOrWhiteSpace(o.Customer?.Phone) ? "-" : o.Customer.Phone)
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="vehicle-info">
+                                            <div class="fw-semibold">
+                                                @(string.IsNullOrWhiteSpace(o.Vehicle?.Model) ? "N/A" : o.Vehicle.Model)
+                                            </div>
+                                            <div class="text-muted small">
+                                                @(string.IsNullOrWhiteSpace(o.Vehicle?.Brand) ? "-" : o.Vehicle.Brand)
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>@string.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", o.TotalAmount)</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @(Assignment02.Pages.Orders.IndexModel.GetStatusBadgeClass(o.Status))">
+                                            @Assignment02.Pages.Orders.IndexModel.GetStatusDisplay(o.Status)
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @(o.PaymentStatus?.ToLower() == "paid" ? "bg-success" : "bg-warning text-dark")">
+                                            @(o.PaymentStatus ?? "Unknown")
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div>@(o.CreatedAt?.ToString("dd/MM/yyyy") ?? "-")</div>
+                                        <small class="text-muted">@(o.CreatedAt?.ToString("HH:mm") ?? "")</small>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a asp-page="/Orders/Details" asp-route-id="@o.Id" class="btn-action btn-view text-primary" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-page="/Orders/Edit" asp-route-id="@o.Id" class="btn-action btn-edit text-success" title="Edit">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <button type="button" class="btn-action btn-update text-secondary"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#updateStatusModal"
+                                                    data-order-id="@o.Id"
+                                                    data-order-status="@o.Status"
+                                                    title="Update Status">
+                                                <i class="fas fa-rotate"></i>
+                                            </button>
+                                            <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Delete this order?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@o.Id" />
+                                                <button type="submit" class="btn-action btn-delete text-danger" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post" asp-page-handler="UpdateStatus">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-rotate me-2"></i>Update Order Status
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="updateOrderId" name="id" />
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select id="updateStatusSelect" name="status" class="form-select" required>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label">Notes (optional)</label>
+                            <textarea name="notes" class="form-control" rows="3" placeholder="Add notes here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-2"></i>Update Status
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Modal handler
+        var updateStatusModalEl = document.getElementById('updateStatusModal');
+        updateStatusModalEl.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            if (!button) return;
+            var orderId = button.getAttribute('data-order-id');
+            var orderStatus = button.getAttribute('data-order-status') || '';
+
+            document.getElementById('updateOrderId').value = orderId;
+            var select = document.getElementById('updateStatusSelect');
+            for (var i = 0; i < select.options.length; i++) {
+                select.options[i].selected = (select.options[i].value.toLowerCase() === (orderStatus || '').toLowerCase());
+            }
+        });
+    </script>
+</body>
+</html>
