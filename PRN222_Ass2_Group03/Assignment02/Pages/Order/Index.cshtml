@@ -1,0 +1,98 @@
+﻿@page
+@model Assignment02.Pages.Orders.IndexModel
+@{
+    ViewData["Title"] = "Đơn hàng của tôi";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">👤 Đơn hàng của tôi</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <!-- Bộ lọc -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label class="form-label">Tình trạng đơn hàng</label>
+            <select name="status" class="form-select">
+                <option value="">-- Tất cả --</option>
+                <option value="Processing">Processing</option>
+                <option value="Completed">Completed</option>
+                <option value="Canceled">Canceled</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Tình trạng thanh toán</label>
+            <select name="paymentStatus" class="form-select">
+                <option value="">-- Tất cả --</option>
+                <option value="Paid">Đã thanh toán</option>
+                <option value="Unpaid">Chưa thanh toán</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Từ ngày</label>
+            <input type="date" name="fromDate" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Đến ngày</label>
+            <input type="date" name="toDate" class="form-control" />
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-funnel me-1"></i> Lọc
+            </button>
+            <a asp-page="./Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-repeat me-1"></i> Reset
+            </a>
+        </div>
+    </form>
+
+    <!-- Bảng đơn hàng -->
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã đơn</th>
+                <th>Xe</th>
+                <th>Số tiền</th>
+                <th>Trạng thái</th>
+                <th>Thanh toán</th>
+                <th>Ngày tạo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+                    <td>@order.OrderNumber</td>
+                    <td>@order.VehicleName</td>
+                    <td>@order.TotalAmount.ToString("N0") đ</td>
+                    <td>
+                        <span class="badge bg-@(
+                              order.Status == "Completed" ? "success" :
+                              order.Status == "Cancelled" ? "danger" :
+                              order.Status == "Processing" ? "warning" : "secondary"
+                                                )">
+                        @order.Status
+                    </span>
+                </td>
+                <td>
+                    <span class="badge bg-@(order.PaymentStatus == "Paid" ? "success" : "warning text-dark")">
+                        @(order.PaymentStatus == "Paid" ? "Đã thanh toán" : "Chưa thanh toán")
+                    </span>
+                </td>
+                <td>@order.CreatedAt?.ToString("dd/MM/yyyy")</td>
+            </tr>
+                        }
+        </tbody>
+    </table>
+</div>

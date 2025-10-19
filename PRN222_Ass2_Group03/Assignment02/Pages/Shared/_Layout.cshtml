@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="~/Assignment02.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -24,7 +24,7 @@
                     </div>
                     <span class="brand-text">EV Dealer System</span>
                 </a>
-                
+
                 <div class="collapse navbar-collapse show" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         @{
@@ -34,7 +34,7 @@
                             var userRole = Context.Session.GetString("Role");
                             bool isAuthenticated = !string.IsNullOrEmpty(userId);
                         }
-                        
+
                         @if (isAuthenticated)
                         {
                             <li class="nav-item">
@@ -55,36 +55,45 @@
                                     <span>Vehicles</span>
                                 </a>
                                 <ul class="dropdown-menu vehicles-dropdown">
-                                    <li><a class="dropdown-item" href="#vehicles">
-                                        <i class="fas fa-search"></i>
-                                        <div>
-                                            <div class="item-title">Browse All Vehicles</div>
-                                            <div class="item-desc">Explore our complete catalog</div>
-                                        </div>
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="#vehicles?type=sedan">
-                                        <i class="fas fa-car-side"></i>
-                                        <div>
-                                            <div class="item-title">Sedans</div>
-                                            <div class="item-desc">Luxury electric sedans</div>
-                                        </div>
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="#vehicles?type=suv">
-                                        <i class="fas fa-truck"></i>
-                                        <div>
-                                            <div class="item-title">SUVs</div>
-                                            <div class="item-desc">Family-friendly electric SUVs</div>
-                                        </div>
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="#vehicles?type=sports">
-                                        <i class="fas fa-bolt"></i>
-                                        <div>
-                                            <div class="item-title">Sports Cars</div>
-                                            <div class="item-desc">High-performance electric sports cars</div>
-                                        </div>
-                                    </a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#vehicles">
+                                            <i class="fas fa-search"></i>
+                                            <div>
+                                                <div class="item-title">Browse All Vehicles</div>
+                                                <div class="item-desc">Explore our complete catalog</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#vehicles?type=sedan">
+                                            <i class="fas fa-car-side"></i>
+                                            <div>
+                                                <div class="item-title">Sedans</div>
+                                                <div class="item-desc">Luxury electric sedans</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#vehicles?type=suv">
+                                            <i class="fas fa-truck"></i>
+                                            <div>
+                                                <div class="item-title">SUVs</div>
+                                                <div class="item-desc">Family-friendly electric SUVs</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#vehicles?type=sports">
+                                            <i class="fas fa-bolt"></i>
+                                            <div>
+                                                <div class="item-title">Sports Cars</div>
+                                                <div class="item-desc">High-performance electric sports cars</div>
+                                            </div>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
+
                             <li class="nav-item dropdown">
                                 <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
                                     <i class="fas fa-calendar-check"></i>
@@ -92,37 +101,55 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" asp-page="/BookTestDrive">
-                                        <i class="fas fa-calendar-plus"></i>
-                                        <span>Book Appointment</span>
-                                    </a></li>
+                                        <a class="dropdown-item" href="#appointments">
+                                            <i class="fas fa-calendar-plus"></i>
+                                            <span>Schedule Test Drive</span>
+                                        </a>
+                                    </li>
                                     <li>
-                                        <a class="dropdown-item" asp-page="/MyAppointment">
-                                        <i class="fas fa-list"></i>
-                                        <span>My Appointments</span>
-                                    </a></li>
+                                        <a class="dropdown-item" href="#appointments?view=my">
+                                            <i class="fas fa-list"></i>
+                                            <span>My Appointments</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#appointments?view=history">
+                                            <i class="fas fa-history"></i>
+                                            <span>Test Drive History</span>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
-                                    <i class="fas fa-shopping-bag"></i>
-                                    <span>Orders</span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#orders">
-                                        <i class="fas fa-shopping-cart"></i>
-                                        <span>Current Orders</span>
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="#orders?view=history">
-                                        <i class="fas fa-receipt"></i>
-                                        <span>Order History</span>
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="#orders?view=wishlist">
-                                        <i class="fas fa-heart"></i>
-                                        <span>Wishlist</span>
-                                    </a></li>
-                                </ul>
-                            </li>
+
+                            @if (userRole == "customer")
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link modern-nav-link dropdown-toggle" href="javascript:void(0)" role="button" aria-expanded="false">
+                                        <i class="fas fa-shopping-bag"></i>
+                                        <span>Orders</span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Order/MyOrders">
+                                                <i class="fas fa-receipt"></i>
+                                                <span>My Orders</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Order/PendingOrders">
+                                                <i class="fas fa-hourglass-half"></i>
+                                                <span>Processing Orders</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Order/History">
+                                                <i class="fas fa-history"></i>
+                                                <span>Order History</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
                         }
                         else
                         {
@@ -140,12 +167,12 @@
                             </li>
                         }
                     </ul>
-                    
+
                     @if (isAuthenticated)
                     {
                         <ul class="navbar-nav">
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle modern-user-menu" href="#" id="navbarDropdown" 
+                                <a class="nav-link dropdown-toggle modern-user-menu" href="#" id="navbarDropdown"
                                    role="button" aria-expanded="false">
                                     <div class="user-avatar">
                                         <i class="fas fa-user-circle"></i>
@@ -156,18 +183,24 @@
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end modern-dropdown" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item modern-dropdown-item" href="#profile">
-                                        <i class="fas fa-user-edit"></i>
-                                        <span>Profile</span>
-                                    </a></li>
-                                    <li><a class="dropdown-item modern-dropdown-item" href="#settings">
-                                        <i class="fas fa-cog"></i>
-                                        <span>Settings</span>
-                                    </a></li>
-                                    <li><a class="dropdown-item modern-dropdown-item" href="#notifications">
-                                        <i class="fas fa-bell"></i>
-                                        <span>Notifications</span>
-                                    </a></li>
+                                    <li>
+                                        <a class="dropdown-item modern-dropdown-item" href="#profile">
+                                            <i class="fas fa-user-edit"></i>
+                                            <span>Profile</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item modern-dropdown-item" href="#settings">
+                                            <i class="fas fa-cog"></i>
+                                            <span>Settings</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item modern-dropdown-item" href="#notifications">
+                                            <i class="fas fa-bell"></i>
+                                            <span>Notifications</span>
+                                        </a>
+                                    </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form method="post" asp-page="/Logout" class="d-inline w-100">
@@ -185,7 +218,7 @@
             </div>
         </nav>
     </header>
-    
+
     @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
     {
         <!-- Notification container for authenticated users -->
@@ -193,7 +226,7 @@
             <!-- Notifications will be inserted here -->
         </div>
     }
-    
+
     <main style="padding-top: 100px; min-height: calc(100vh - 160px);">
         <div class="container-fluid">
             @RenderBody()
@@ -224,15 +257,15 @@
         </div>
     </footer>
 
-    <!-- <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> -->
-    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
     {
         <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
         <script src="~/js/signalr-notifications.js" asp-append-version="true"></script>
     }
-    
+
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
@@ -285,7 +318,7 @@
         // Enhanced dropdown hover functionality
         document.addEventListener('DOMContentLoaded', function() {
             const dropdownItems = document.querySelectorAll('.nav-item.dropdown');
-            
+
             dropdownItems.forEach(function(item) {
                 const dropdownMenu = item.querySelector('.dropdown-menu');
                 const dropdownToggle = item.querySelector('.dropdown-toggle');
@@ -301,7 +334,7 @@
                         dropdownMenu.style.pointerEvents = 'auto';
                     }
                 });
-                
+
                 item.addEventListener('mouseleave', function() {
                     if (window.innerWidth > 991) {
                         hoverTimeout = setTimeout(function() {
@@ -309,7 +342,7 @@
                             dropdownMenu.style.visibility = 'hidden';
                             dropdownMenu.style.transform = 'translateX(-50%) translateY(-10px)';
                             dropdownMenu.style.pointerEvents = 'none';
-                        }, 300); // 300ms delay before hiding
+                        }, 300);
                     }
                 });
 
