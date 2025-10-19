@@ -16,6 +16,9 @@ namespace Business_Logic_Layer.DTOs
         public string DealerName { get; set; } = string.Empty;
         public Guid VehicleId { get; set; }
         public string VehicleName { get; set; } = string.Empty;
+        public string VehicleBrand { get; set; } = string.Empty;
+        public string VehicleModel { get; set; } = string.Empty;
+        public string VehicleImage { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = string.Empty;
         public string PaymentStatus { get; set; } = string.Empty;
