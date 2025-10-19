@@ -3,42 +3,38 @@ using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Services;
 using DataAccess_Layer;
 using DataAccess_Layer.Repositories;
-<<<<<<< HEAD
-=======
-using DataAccess_Layer.Repositories.Implement;
-using DataAccess_Layer.Repositories.Interface;
->>>>>>> Baoo
 using EVDealerDbContext;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Razor Pages & SignalR
+// ===============================
+// 🔧 Add Razor Pages & SignalR
+// ===============================
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
-<<<<<<< HEAD
+// ===============================
+// 🗄️ Configure Entity Framework DbContext
+// ===============================
 builder.Services.AddDbContext<EVDealerSystemContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection")));
 
-// Register repositories and services (they will use EVDealerSystemContext's own connection)
+// ===============================
+// 💡 Register Repositories & Services
+// ===============================
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ICustomerTestDriveAppointment, CustomerTestDriveAppointment>();
-builder.Services.AddScoped<ICustomerTestDriveAppointmentService, CustomerTestDriveAppointmentService>();
-=======
-// Add EF DbContext
-builder.Services.AddDbContext<EVDealerSystemContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection")));
 
-// Register Repositories & Services
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
->>>>>>> Baoo
 
-// Session Configuration
+builder.Services.AddScoped<ICustomerTestDriveAppointment, CustomerTestDriveAppointment>();
+builder.Services.AddScoped<ICustomerTestDriveAppointmentService, CustomerTestDriveAppointmentService>();
+
+// ===============================
+// 💾 Session Configuration
+// ===============================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -47,7 +43,9 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Configure authentication
+// ===============================
+// 🔐 Authentication & Authorization
+// ===============================
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
     {
@@ -60,9 +58,14 @@ builder.Services.AddAuthentication("Cookies")
 
 builder.Services.AddAuthorization();
 
+// ===============================
+// 🚀 Build App
+// ===============================
 var app = builder.Build();
 
-// Error Handling
+// ===============================
+// ⚙️ Middleware Configuration
+// ===============================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -98,7 +101,9 @@ app.Use(async (context, next) =>
 
 app.UseAuthorization();
 
-// ✅ Map Routes & Hubs
+// ===============================
+// 🌐 Map Razor Pages & SignalR Hubs
+// ===============================
 app.MapRazorPages();
 app.MapHub<ChatHub>("/chathub");
 app.MapHub<NotificationHub>("/notificationhub");
