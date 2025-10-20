@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Assignment02.Pages.Vehicles
 {
-    public class EditModel : PageModel
+    public class EditModel : AuthenticatedPageModel
     {
         private readonly IVehicleService _vehicleService;
 
@@ -23,6 +23,10 @@ namespace Assignment02.Pages.Vehicles
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {
+            if (!IsAuthenticated || (!string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) && !string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RedirectToPage("/Login");
+            }
             try
             {
                 // Validate ID
@@ -52,6 +56,10 @@ namespace Assignment02.Pages.Vehicles
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (!IsAuthenticated || (!string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) && !string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RedirectToPage("/Login");
+            }
             if (!ModelState.IsValid || Vehicle == null)
             {
                 return Page();

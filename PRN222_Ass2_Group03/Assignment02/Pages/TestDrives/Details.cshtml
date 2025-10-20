@@ -1,0 +1,70 @@
+@page "/TestDrives/Details/{id}"
+@model Assignment02.Pages.TestDrives.DetailsModel
+@{
+    ViewData["Title"] = "Appointment Details";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/myAppointments.css" asp-append-version="true" />
+    <style>
+        .details-wrap { max-width: 900px; margin: 0 auto; }
+        .details-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .details-header { background: linear-gradient(135deg,#2196F3 0%,#4CAF50 100%); color: #fff; padding: 2rem; }
+        .details-body { padding: 2rem; }
+        .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .meta .item { background:#f8f9fa; padding:1rem; border-radius:12px; border-left:4px solid #2196F3; }
+        .actions { padding: 1.5rem 2rem; background:#f8f9fa; display:flex; gap: .75rem; }
+    </style>
+}
+
+<div class="details-wrap">
+    @if (Model.Appointment != null)
+    {
+        <div class="details-card">
+            <div class="details-header">
+                <h2 class="mb-1">@Model.Appointment.Vehicle?.Name</h2>
+                <div>@Model.Appointment.Dealer?.Name</div>
+            </div>
+            <div class="details-body">
+                <div class="meta mb-3">
+                    <div class="item"><strong>Date</strong><div>@Model.Appointment.AppointmentDate.ToString("dd/MM/yyyy HH:mm")</div></div>
+                    <div class="item"><strong>Status</strong><div>@(Model.Appointment.Status?.ToLower()=="pending"?"Processing":Model.Appointment.Status)</div></div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Appointment.Notes))
+                {
+                    <div class="item" style="background:#f8f9fa;padding:1rem;border-radius:12px;border-left:4px solid #4CAF50;">
+                        <strong>Notes</strong>
+                        <div>@Model.Appointment.Notes</div>
+                    </div>
+                }
+            </div>
+            <div class="actions">
+                <a asp-page="/MyAppointment" class="btn btn-secondary">Back</a>
+                @if ((Model.Appointment.Status?.ToLower()=="pending" || Model.Appointment.Status?.ToLower()=="processing"))
+                {
+                    <form method="post" asp-page="/MyAppointment" asp-page-handler="Cancel" asp-route-id="@Model.Appointment.Id" class="d-inline">
+                        <input type="hidden" name="CancelNote" value="Cancelled from details page" />
+                        <button type="submit" class="btn btn-danger">Cancel</button>
+                    </form>
+                }
+                @if ((Model.Appointment.Status?.ToLower()=="completed"))
+                {
+                    <form method="post" asp-page-handler="MarkDone" asp-route-id="@Model.Appointment.Id" class="d-inline">
+                        <button type="submit" class="btn btn-primary">Mark as DONE</button>
+                    </form>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>Appointment not found.</p>
+    }
+</div>
+
+

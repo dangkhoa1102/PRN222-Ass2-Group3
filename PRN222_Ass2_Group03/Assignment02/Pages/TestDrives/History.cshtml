@@ -1,0 +1,48 @@
+@page
+@model Assignment02.Pages.TestDrives.HistoryModel
+@{
+    ViewData["Title"] = "Test Drive History";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/myAppointments.css" asp-append-version="true" />
+    <style>
+        .history-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(340px,1fr)); gap:1.25rem; }
+        .history-card { background:#fff; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.12); overflow:hidden; border:1px solid #eee; }
+        .history-head { padding:1rem 1.25rem; background:linear-gradient(135deg,#4e54c8,#8f94fb); color:#fff; display:flex; justify-content:space-between; }
+        .history-body { padding:1.25rem; }
+        .history-actions { padding:1rem 1.25rem; background:#f8f9fa; display:flex; gap:.5rem; }
+        .badge-soft { background: rgba(255,255,255,.25); border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:.25rem .75rem; }
+    </style>
+}
+
+<div class="container">
+    <h1>My Test Drive History</h1>
+    @if (Model.History.Any())
+    {
+        <div class="history-grid">
+        @foreach (var a in Model.History)
+        {
+            <div class="history-card">
+                <div class="history-head">
+                    <div>@a.Vehicle?.Name</div>
+                    <span class="badge-soft">@a.Status</span>
+                </div>
+                <div class="history-body">
+                    <div class="mb-1"><strong>Dealer:</strong> @a.Dealer?.Name</div>
+                    <div><strong>Date:</strong> @a.AppointmentDate.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+                <div class="history-actions">
+                    <a asp-page="/TestDrives/Details" asp-route-id="@a.Id" class="btn btn-primary btn-sm">View Details</a>
+                </div>
+            </div>
+        }
+        </div>
+    }
+    else
+    {
+        <p>No history yet.</p>
+    }
+</div>
+
+

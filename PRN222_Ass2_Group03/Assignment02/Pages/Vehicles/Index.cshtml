@@ -30,10 +30,15 @@
                 </h2>
                 <p class="card-subtitle">Quản lý và theo dõi tất cả xe trong hệ thống</p>
             </div>
-            <a href="/Vehicles/Add" class="btn-add">
-                <i class="fas fa-plus"></i>
-                Thêm xe mới
-            </a>
+            @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+            @{ var role = HttpContextAccessor.HttpContext?.Session.GetString("Role"); }
+            @if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
+            {
+                <a href="/Vehicles/Add" class="btn-add">
+                    <i class="fas fa-plus"></i>
+                    Thêm xe mới
+                </a>
+            }
         </div>
 
         <div class="card-body">
@@ -76,12 +81,15 @@
                             <a href="/Vehicles/Details/@vehicle.Id.ToString()" class="btn-action view-btn" title="Xem chi tiết">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="/Vehicles/Edit/@vehicle.Id.ToString()" class="btn-action edit-btn" title="Chỉnh sửa">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="/Vehicles/Delete/@vehicle.Id.ToString()" class="btn-action delete-btn" title="Xóa">
-                                <i class="fas fa-trash"></i>
-                            </a>
+                            @if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <a href="/Vehicles/Edit/@vehicle.Id.ToString()" class="btn-action edit-btn" title="Chỉnh sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="/Vehicles/Delete/@vehicle.Id.ToString()" class="btn-action delete-btn" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            }
                         </div>
                             </div>
                             <div class="vehicle-info">
@@ -113,10 +121,13 @@
                     </div>
                     <h3>Chưa có xe nào</h3>
                     <p>Hãy thêm xe đầu tiên để bắt đầu quản lý</p>
-                    <a href="/Vehicles/Add" class="btn-add-empty">
-                        <i class="fas fa-plus"></i>
-                        Thêm xe ngay
-                    </a>
+                    @if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <a href="/Vehicles/Add" class="btn-add-empty">
+                            <i class="fas fa-plus"></i>
+                            Thêm xe ngay
+                        </a>
+                    }
                 </div>
             }
         </div>

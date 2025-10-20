@@ -394,14 +394,19 @@
                     <i class="fas fa-car-side"></i>
                     Đặt lịch lái thử
                 </a>
-                <a href="/Vehicles/Edit/@Model.Vehicle.Id" class="btn-action btn-edit">
-                    <i class="fas fa-edit"></i>
-                    Chỉnh sửa
-                </a>
-                <a href="/Vehicles/Delete/@Model.Vehicle.Id" class="btn-action btn-delete">
-                    <i class="fas fa-trash"></i>
-                    Xóa
-                </a>
+                @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+                @{ var role = HttpContextAccessor.HttpContext?.Session.GetString("Role"); }
+                @if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
+                {
+                    <a href="/Vehicles/Edit/@Model.Vehicle.Id" class="btn-action btn-edit">
+                        <i class="fas fa-edit"></i>
+                        Chỉnh sửa
+                    </a>
+                    <a href="/Vehicles/Delete/@Model.Vehicle.Id" class="btn-action btn-delete">
+                        <i class="fas fa-trash"></i>
+                        Xóa
+                    </a>
+                }
                 <a href="/Vehicles/Index" class="btn-action btn-back">
                     <i class="fas fa-arrow-left"></i>
                     Quay lại

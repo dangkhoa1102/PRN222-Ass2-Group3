@@ -4,178 +4,432 @@
     ViewData["Title"] = "My Orders";
 }
 
+@section Styles {
 <style>
     body {
-        background-color: #f4f6f9;
+        background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+        min-height: 100vh;
+        margin: 0;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    .orders-hero {
+        background: linear-gradient(135deg, #1976D2 0%, #388E3C 100%);
+        color: white;
+        padding: 80px 0 60px 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .orders-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .orders-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 2;
+    }
+
+    .orders-hero p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin: 0;
+        position: relative;
+        z-index: 2;
     }
 
     .orders-container {
-        width: 95%;
-        margin: 40px auto;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        padding: 20px 30px;
+        max-width: 1200px;
+        margin: -40px auto 60px auto;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        position: relative;
+        z-index: 10;
     }
 
-    h2 {
-        font-weight: 700;
-        color: #007bff;
+    .orders-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+    }
+
+    .orders-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem;
         text-align: center;
-        margin-bottom: 25px;
+        border-bottom: 1px solid #e9ecef;
     }
 
-    .table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 8px;
+    .orders-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
     }
 
-        .table thead th {
-            background-color: #2c3e50;
-            color: white;
-            font-weight: 600;
-            text-align: center;
-            padding: 14px;
-            border: none;
-        }
+    .orders-header h2 i {
+        color: #2196F3;
+        font-size: 1.8rem;
+    }
 
-        .table tbody tr {
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-            transition: 0.2s;
-        }
+    .orders-header p {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin: 0;
+    }
 
-            .table tbody tr:hover {
-                transform: scale(1.01);
-                background-color: #f9fbff;
-            }
+    .orders-content {
+        padding: 2rem;
+    }
 
-        .table td {
-            text-align: center;
-            padding: 14px;
-            border: none;
-            vertical-align: middle;
-        }
+    .orders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
 
-    /* Badge styles */
-    .badge {
-        padding: 7px 14px;
+    .order-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        border: 2px solid #f1f3f4;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        border-color: #2196F3;
+    }
+
+    .order-card-header {
+        background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+        color: white;
+        padding: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .order-number {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .order-date {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .order-card-body {
+        padding: 1.5rem;
+    }
+
+    .vehicle-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 12px;
+        border-left: 4px solid #2196F3;
+    }
+
+    .vehicle-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #2196F3, #4CAF50);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .vehicle-details h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .vehicle-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #4CAF50;
+        margin: 0;
+    }
+
+    .order-status-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .status-item {
+        text-align: center;
+        padding: 0.75rem;
+        border-radius: 12px;
+        background: #f8f9fa;
+    }
+
+    .status-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
         border-radius: 20px;
         font-size: 0.9rem;
         font-weight: 600;
-        text-transform: capitalize;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .badge-success {
-        background-color: #d4edda;
-        color: #198754;
+    .status-completed { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #198754; }
+    .status-processing { background: linear-gradient(135deg, #fff3cd, #ffeaa7); color: #856404; }
+    .status-cancelled { background: linear-gradient(135deg, #f8d7da, #f5c6cb); color: #842029; }
+    .status-pending { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+
+    .payment-paid { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #198754; }
+    .payment-unpaid { background: linear-gradient(135deg, #f8d7da, #f5c6cb); color: #842029; }
+    .payment-refunded { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+
+    .order-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
     }
 
-    .badge-warning {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    .badge-danger {
-        background-color: #f8d7da;
-        color: #842029;
-    }
-
-    .badge-info {
-        background-color: #d1ecf1;
-        color: #0c5460;
-    }
-
-    /* Button style */
     .btn-details {
-        background: linear-gradient(45deg, #007bff, #0056b3);
-        border: none;
+        background: linear-gradient(135deg, #2196F3, #4CAF50);
         color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
         font-weight: 600;
-        border-radius: 8px;
-        padding: 6px 14px;
-        transition: 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-        .btn-details:hover {
-            transform: scale(1.05);
-            background: linear-gradient(45deg, #0056b3, #007bff);
-        }
+    .btn-details:hover {
+        background: linear-gradient(135deg, #4CAF50, #2196F3);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6c757d;
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem auto;
+        font-size: 2.5rem;
+        color: #adb5bd;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-create-order {
+        background: linear-gradient(135deg, #2196F3, #4CAF50);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .btn-create-order:hover {
+        background: linear-gradient(135deg, #4CAF50, #2196F3);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        color: white;
+    }
 
     @@media (max-width: 768px) {
-        .orders-container {
-            padding: 10px;
+        .orders-hero h1 {
+            font-size: 2rem;
         }
-
-        .table td, .table th {
-            font-size: 0.85rem;
-            padding: 10px;
+        
+        .orders-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .order-status-section {
+            grid-template-columns: 1fr;
+        }
+        
+        .orders-content {
+            padding: 1rem;
         }
     }
 </style>
+}
 
-<div class="orders-container">
-    <h2>My Orders</h2>
+<!-- Hero Section -->
+<div class="orders-hero">
+    <div class="container">
+        <h1>
+            <i class="fas fa-shopping-bag"></i>
+            My Orders
+        </h1>
+        <p>Theo dõi và quản lý tất cả đơn hàng của bạn</p>
+    </div>
+</div>
 
-    <table class="table align-middle">
-        <thead>
-            <tr>
-                <th>Order #</th>
-                <th>Vehicle</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Payment</th>
-                <th>Created</th>
-                <th>Details</th>
-            </tr>
-        </thead>
-        <tbody>
+<!-- Main Content -->
+<div class="container">
+    <div class="orders-container">
+        <div class="orders-header">
+            <h2>
+                <i class="fas fa-list-alt"></i>
+                Danh sách đơn hàng
+            </h2>
+            <p>Quản lý và theo dõi trạng thái đơn hàng của bạn</p>
+        </div>
+
+        <div class="orders-content">
             @if (Model.Orders != null && Model.Orders.Any())
             {
-                foreach (var order in Model.Orders)
-                {
-                    var status = order.Status?.ToLowerInvariant();
-                    var payment = order.PaymentStatus?.ToLowerInvariant();
-
-                    var statusBadge = status switch
+                <div class="orders-grid">
+                    @foreach (var order in Model.Orders)
                     {
-                        "completed" => "badge-success",
-                        "processing" => "badge-warning",
-                        "rejected" or "cancelled" => "badge-danger",
-                        _ => "badge-info"
-                    };
+                        var status = order.Status?.ToLowerInvariant();
+                        var payment = order.PaymentStatus?.ToLowerInvariant();
 
-                    var paymentBadge = payment switch
-                    {
-                        "paid" => "badge-success",
-                        "unpaid" => "badge-danger",
-                        "refunded" => "badge-info",
-                        _ => "badge-info"
-                    };
+                        var statusClass = status switch
+                        {
+                            "completed" => "status-completed",
+                            "processing" => "status-processing",
+                            "rejected" or "cancelled" => "status-cancelled",
+                            _ => "status-pending"
+                        };
 
-                    <tr>
-                        <td>@order.OrderNumber</td>
-                        <td>@order.VehicleName</td>
-                        <td>@order.TotalAmount.ToString("N0") ₫</td>
-                        <td><span class="badge @statusBadge">@order.Status</span></td>
-                        <td><span class="badge @paymentBadge">@order.PaymentStatus</span></td>
-                        <td>@order.CreatedAt?.ToString("dd/MM/yyyy")</td>
-                        <td>
-                            <a asp-page="/Orders/Details" asp-route-id="@order.Id" class="btn btn-details">
-                                <i class="fas fa-info-circle"></i> Details
-                            </a>
-                        </td>
-                    </tr>
-                }
+                        var paymentClass = payment switch
+                        {
+                            "paid" => "payment-paid",
+                            "unpaid" => "payment-unpaid",
+                            "refunded" => "payment-refunded",
+                            _ => "payment-unpaid"
+                        };
+
+                        <div class="order-card">
+                            <div class="order-card-header">
+                                <div class="order-number">#@order.OrderNumber</div>
+                                <div class="order-date">@order.CreatedAt?.ToString("dd/MM/yyyy")</div>
+                            </div>
+                            
+                            <div class="order-card-body">
+                                <div class="vehicle-info">
+                                    <div class="vehicle-icon">
+                                        <i class="fas fa-car"></i>
+                                    </div>
+                                    <div class="vehicle-details">
+                                        <h4>@order.VehicleName</h4>
+                                        <div class="vehicle-price">@order.TotalAmount.ToString("N0") ₫</div>
+                                    </div>
+                                </div>
+
+                                <div class="order-status-section">
+                                    <div class="status-item">
+                                        <div class="status-label">Trạng thái</div>
+                                        <div class="status-badge @statusClass">@order.Status</div>
+                                    </div>
+                                    <div class="status-item">
+                                        <div class="status-label">Thanh toán</div>
+                                        <div class="status-badge @paymentClass">@order.PaymentStatus</div>
+                                    </div>
+                                </div>
+
+                                <div class="order-actions">
+                                    <a asp-page="/Orders/Details" asp-route-id="@order.Id" class="btn-details">
+                                        <i class="fas fa-info-circle"></i>
+                                        Chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
             }
             else
             {
-                <tr>
-                    <td colspan="7" class="text-center text-muted py-4">No orders found.</td>
-                </tr>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3>Chưa có đơn hàng nào</h3>
+                    <p>Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
+                    <a asp-page="/Orders/Create" class="btn-create-order">
+                        <i class="fas fa-plus"></i>
+                        Tạo đơn hàng mới
+                    </a>
+                </div>
             }
-        </tbody>
-    </table>
+        </div>
+    </div>
 </div>

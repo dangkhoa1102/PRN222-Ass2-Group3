@@ -38,7 +38,15 @@ namespace Assignment02.Pages
             }
 
             // Lấy danh sách các cuộc hẹn của khách hàng
-            Appointments = await _appointmentService.GetCustomerAppointmentsAsync(customerId);
+            var allAppointments = await _appointmentService.GetCustomerAppointmentsAsync(customerId);
+
+            // Hiển thị các lịch hiện tại/đang xử lý + Completed (để user mark Done)
+            Appointments = allAppointments
+                .Where(a =>
+                    (a.Status != null && a.Status.ToLower() != "cancelled" && a.Status.ToLower() != "done")
+                    && a.AppointmentDate >= DateTime.Now.AddDays(-1))
+                .OrderBy(a => a.AppointmentDate)
+                .ToList();
         }
 
         public async Task<IActionResult> OnPostCancelAsync(Guid id)
@@ -56,7 +64,7 @@ namespace Assignment02.Pages
             }
 
             // Kiểm tra phân quyền: Chỉ cho phép cancel appointment của chính mình (trừ admin/staff)
-            if (UserRole == "Customer")
+            if (string.Equals(UserRole, "Customer", StringComparison.OrdinalIgnoreCase))
             {
                 // Kiểm tra xem appointment có thuộc về user này không
                 var appointment = Appointments.FirstOrDefault(a => a.Id == id);
@@ -70,7 +78,7 @@ namespace Assignment02.Pages
 
             try
             {
-                // Gọi hàm CancelAppointmentAsync với note
+                // Gọi hàm CancelAppointmentAsync với note từ form
                 var success = await _appointmentService.CancelAppointmentAsync(id, userId, CancelNote);
                 if (!success)
                 {
@@ -86,9 +94,31 @@ namespace Assignment02.Pages
                 ModelState.AddModelError("", ex.Message);
             }
 
-            // Làm mới danh sách lịch hẹn
-            Appointments = await _appointmentService.GetCustomerAppointmentsAsync(userId);
-            return Page();
+            // Làm mới danh sách và quay lại trang với thông báo
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostMarkDoneAsync(Guid id)
+        {
+            if (!IsAuthenticated)
+            {
+                return RedirectToPage("/Login");
+            }
+            if (!Guid.TryParse(UserId, out var userId))
+            {
+                return RedirectToPage("/Login");
+            }
+
+            var success = await _appointmentService.MarkDoneByCustomerAsync(id, userId);
+            if (!success)
+            {
+                TempData["ErrorMessage"] = "Không thể đánh dấu hoàn thành.";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Đã đánh dấu hoàn thành!";
+            }
+            return RedirectToPage();
         }
 
         // Helper method để kiểm tra quyền cancel
@@ -98,11 +128,11 @@ namespace Assignment02.Pages
                 return false;
 
             // Admin và Staff có thể cancel bất kỳ appointment nào
-            if (UserRole == "Admin" || UserRole == "Staff")
+            if (string.Equals(UserRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(UserRole, "Staff", StringComparison.OrdinalIgnoreCase))
                 return true;
 
             // Customer chỉ có thể cancel appointment của mình
-            if (UserRole == "Customer")
+            if (string.Equals(UserRole, "Customer", StringComparison.OrdinalIgnoreCase))
                 return appointment.CustomerId.ToString() == UserId;
 
             return false;

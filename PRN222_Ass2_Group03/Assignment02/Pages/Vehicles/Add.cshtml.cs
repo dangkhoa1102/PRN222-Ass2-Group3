@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Assignment02.Pages.Vehicles
 {
-    public class AddModel : PageModel
+    public class AddModel : AuthenticatedPageModel
     {
         private readonly IVehicleService _vehicleService;
 
@@ -21,14 +21,21 @@ namespace Assignment02.Pages.Vehicles
         [BindProperty]
         public IFormFile? ImageFile { get; set; }
 
-        public Task OnGetAsync()
+        public IActionResult OnGet()
         {
-            // No need to load dealers for vehicle creation
-            return Task.CompletedTask;
+            if (!IsAuthenticated || (!string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) && !string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RedirectToPage("/Login");
+            }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (!IsAuthenticated || (!string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) && !string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RedirectToPage("/Login");
+            }
             if (!ModelState.IsValid)
             {
                 return Page();

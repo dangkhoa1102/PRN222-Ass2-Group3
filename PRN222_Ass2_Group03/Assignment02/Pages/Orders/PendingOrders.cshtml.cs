@@ -28,7 +28,7 @@ namespace Assignment02.Pages.Orders
             return Page();
         }
 
-        // ? X? l� khi ng??i d�ng nh?n n�t Cancel
+        // Handle cancel click
         public async Task<IActionResult> OnPostCancelAsync(Guid id)
         {
             if (!IsAuthenticated)
@@ -38,24 +38,42 @@ namespace Assignment02.Pages.Orders
 
             try
             {
-                // G?i h�m CancelOrderAsync trong Service
+                var userIdStr = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userIdStr))
+                {
+                    return RedirectToPage("/Login");
+                }
+
+                // Owner-or-admin check before cancelling
+                var order = await _orderService.GetOrderByIdAsync(id);
+                var isPrivileged = string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase);
+                if (order == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
+                    return RedirectToPage();
+                }
+                if (!isPrivileged && order.CustomerId.ToString() != userIdStr)
+                {
+                    return Forbid();
+                }
+
                 bool result = await _orderService.CancelOrderAsync(id, "Cancelled by user");
 
                 if (result)
                 {
-                    TempData["SuccessMessage"] = "??n h�ng ?� ???c h?y th�nh c�ng.";
+                    TempData["SuccessMessage"] = "Đơn hàng đã được hủy thành công.";
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Kh�ng th? h?y ??n h�ng n�y.";
+                    TempData["ErrorMessage"] = "Không thể hủy đơn hàng này.";
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"?� x?y ra l?i: {ex.Message}";
+                TempData["ErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
             }
 
-            // Redirect l?i trang hi?n t?i ?? c?p nh?t danh s�ch
+            // Refresh current page to update list
             return RedirectToPage();
         }
     }

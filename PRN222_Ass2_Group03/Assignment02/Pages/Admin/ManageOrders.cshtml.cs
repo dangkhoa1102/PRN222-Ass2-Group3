@@ -28,12 +28,11 @@ namespace Assignment02.Pages.Admin
         [BindProperty(SupportsGet = true)]
         public DateTime? ToDate { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
-            if (!IsAuthenticated || (CurrentUserRole != "Admin" && CurrentUserRole != "Staff"))
+            if (!IsAuthenticated || (!string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) && !string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase)))
             {
-                Response.Redirect("/Login");
-                return;
+                return RedirectToPage("/Login");
             }
 
             // Get all orders (you might need to implement GetAllOrdersAsync in IOrderService)
@@ -53,11 +52,12 @@ namespace Assignment02.Pages.Admin
                 allOrders = allOrders.Where(o => o.CreatedAt <= ToDate).ToList();
 
             Orders = allOrders;
+            return Page();
         }
 
         public async Task<IActionResult> OnPostUpdateStatusAsync(Guid orderId, string newStatus)
         {
-            if (!IsAuthenticated || (CurrentUserRole != "Admin" && CurrentUserRole != "Staff"))
+            if (!IsAuthenticated || (!string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) && !string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase)))
             {
                 return RedirectToPage("/Login");
             }

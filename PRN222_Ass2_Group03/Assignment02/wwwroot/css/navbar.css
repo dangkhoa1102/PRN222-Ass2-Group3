@@ -221,6 +221,31 @@
     pointer-events: auto;
 }
 
+/* Bootstrap dropdown show class support */
+.nav-item.dropdown .dropdown-menu.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateX(-50%) translateY(0) !important;
+    pointer-events: auto !important;
+    display: block !important;
+}
+
+/* Force dropdown to work on click for mobile */
+@media (max-width: 991px) {
+    .nav-item.dropdown .dropdown-menu {
+        position: static;
+        transform: none;
+        box-shadow: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.95);
+        margin: 0.5rem 0 0 0;
+    }
+    
+    .nav-item.dropdown .dropdown-menu.show {
+        display: block !important;
+    }
+}
+
 /* Extend hover area to prevent dropdown from closing */
 .nav-item.dropdown::after {
     content: '';
