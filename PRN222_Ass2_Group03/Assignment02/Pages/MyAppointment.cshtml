@@ -3,14 +3,13 @@
 @{
     ViewData["Title"] = "My Test Drive Appointments";
 }
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EV Dealer System</title>
-    <link rel="stylesheet" href="~/css/myAppointments.css" asp-append-version="true" />
-</head>
 
-<h1>My Test Drive Appointments</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/myAppointments.css" asp-append-version="true" />
+}
+
+<div class="container">
+    <h1>My Test Drive Appointments</h1>
 
 <!-- Hiển thị thông báo lỗi nếu có -->
 @if (!ModelState.IsValid)
@@ -103,7 +102,8 @@ else
     <p>No appointments found.</p>
 }
 
-<a asp-page="/BookTestDrive" class="btn btn-success">Book New Appointment</a>
+    <a asp-page="/BookTestDrive" class="btn btn-success">Book New Appointment</a>
+</div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

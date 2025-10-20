@@ -1,0 +1,315 @@
+@page "/Vehicles/Edit/{id}"
+@model Assignment02.Pages.Vehicles.EditModel
+@{
+    ViewData["Title"] = "Chỉnh sửa xe";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/vehicles.css" asp-append-version="true" />
+    <style>
+        .edit-vehicle-page {
+            background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+            min-height: 100vh;
+            padding: 120px 0 60px 0;
+        }
+        
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .form-title i {
+            color: #2196F3;
+            font-size: 1.8rem;
+        }
+        
+        .form-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin: 0;
+            font-weight: 400;
+        }
+        
+        .form-body {
+            padding: 2.5rem;
+        }
+        
+        .form-actions {
+            background: #f8f9fa;
+            padding: 1.5rem 2.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .btn-back:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+            background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+        }
+    </style>
+}
+
+<div class="edit-vehicle-page">
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1 class="form-title">
+                    <i class="fas fa-edit"></i>
+                    Chỉnh sửa xe
+                </h1>
+                <p class="form-subtitle">Cập nhật thông tin xe trong hệ thống</p>
+            </div>
+            
+            <form method="post" class="vehicle-form" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Vehicle.Id" />
+                
+                <div class="form-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="Name" class="form-label">
+                                <i class="fas fa-car"></i>
+                                Tên xe
+                            </label>
+                            <input type="text" class="form-control" id="Name" asp-for="Vehicle.Name" required placeholder="Nhập tên xe...">
+                        </div>
+                        <div class="form-group">
+                            <label for="Model" class="form-label">
+                                <i class="fas fa-cog"></i>
+                                Model
+                            </label>
+                            <input type="text" class="form-control" id="Model" asp-for="Vehicle.Model" required placeholder="Nhập model...">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="Year" class="form-label">
+                                <i class="fas fa-calendar"></i>
+                                Năm sản xuất
+                            </label>
+                            <input type="number" class="form-control" id="Year" asp-for="Vehicle.Year" min="2000" max="2030" required placeholder="2024">
+                        </div>
+                        <div class="form-group">
+                            <label for="Price" class="form-label">
+                                <i class="fas fa-dollar-sign"></i>
+                                Giá (₫)
+                            </label>
+                            <input type="number" class="form-control" id="Price" asp-for="Vehicle.Price" min="0" required placeholder="1000000000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="Brand" class="form-label">
+                            <i class="fas fa-tag"></i>
+                            Thương hiệu
+                        </label>
+                        <input type="text" class="form-control" id="Brand" asp-for="Vehicle.Brand" required placeholder="Tesla, BMW, Mercedes...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ImageFile" class="form-label">
+                            <i class="fas fa-image"></i>
+                            Hình ảnh xe
+                        </label>
+                        <input type="file" class="form-control" id="ImageFile" name="ImageFile" accept="image/*" onchange="previewImage(this)">
+                        <div class="image-preview-container" id="imagePreview" style="display: none; margin-top: 1rem;">
+                            <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Vehicle.Images))
+                        {
+                            <div class="current-image" style="margin-top: 1rem;">
+                                <p><strong>Hình ảnh hiện tại:</strong></p>
+                                <img src="@Model.Vehicle.Images" alt="Current image" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            </div>
+                        }
+                        <small class="form-text text-muted">Chọn hình ảnh mới từ máy tính của bạn (JPG, PNG, GIF)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="Description" class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            Mô tả
+                        </label>
+                        <textarea class="form-control" id="Description" asp-for="Vehicle.Description" rows="4" placeholder="Nhập mô tả về xe..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/Vehicles/Index" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                        Quay lại
+                    </a>
+                    <button type="button" class="btn-delete" onclick="confirmDelete()">
+                        <i class="fas fa-trash"></i>
+                        Xóa xe
+                    </button>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i>
+                        Cập nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Form validation
+        document.querySelector('.vehicle-form').addEventListener('submit', function(e) {
+            const name = document.getElementById('Name').value.trim();
+            const model = document.getElementById('Model').value.trim();
+            const year = document.getElementById('Year').value;
+            const price = document.getElementById('Price').value;
+            const brand = document.getElementById('Brand').value.trim();
+            
+            if (!name || !model || !year || !price || !brand) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+                return;
+            }
+            
+            if (parseInt(year) < 2000 || parseInt(year) > 2030) {
+                e.preventDefault();
+                alert('Năm sản xuất phải từ 2000 đến 2030!');
+                return;
+            }
+            
+            if (parseInt(price) < 0) {
+                e.preventDefault();
+                alert('Giá xe phải lớn hơn 0!');
+                return;
+            }
+        });
+        
+        // Format price input
+        document.getElementById('Price').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            e.target.value = value;
+        });
+        
+        // Image preview function
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+        
+        // Delete confirmation
+        function confirmDelete() {
+            if (confirm('Bạn có chắc chắn muốn xóa xe này không? Hành động này không thể hoàn tác!')) {
+                // Redirect to delete action
+                window.location.href = '/Vehicles/Delete/@Model.Vehicle.Id';
+            }
+        }
+    </script>
+}

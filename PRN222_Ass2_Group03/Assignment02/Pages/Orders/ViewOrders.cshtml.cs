@@ -1,11 +1,11 @@
-﻿using Business_Logic_Layer.DTOs;
+using Business_Logic_Layer.DTOs;
 using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Assignment02.Pages.Orders
+namespace Assignment02.Pages.Order
 {
-    public class IndexModel : PageModel
+    public class ViewOrdersModel : PageModel
     {
         private readonly IOrderService _orderService;
 
@@ -23,23 +23,23 @@ namespace Assignment02.Pages.Orders
         [BindProperty(SupportsGet = true)]
         public DateTime? ToDate { get; set; }
 
-        public IndexModel(IOrderService orderService)
+        public ViewOrdersModel(IOrderService orderService)
         {
             _orderService = orderService;
         }
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdStr))
             {
-                Response.Redirect("/Login");
-                return;
+                return RedirectToPage("/Login");
             }
 
             var userId = Guid.Parse(userIdStr);
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);
 
+            // Apply filters
             if (!string.IsNullOrEmpty(Status))
                 orders = orders.Where(o => o.Status == Status).ToList();
 
@@ -52,7 +52,40 @@ namespace Assignment02.Pages.Orders
             if (ToDate.HasValue)
                 orders = orders.Where(o => o.CreatedAt <= ToDate).ToList();
 
+            // Sort by created date descending
+            orders = orders.OrderByDescending(o => o.CreatedAt).ToList();
+
             Orders = orders;
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostCancelAsync(Guid id)
+        {
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdStr))
+            {
+                return RedirectToPage("/Login");
+            }
+
+            try
+            {
+                bool result = await _orderService.CancelOrderAsync(id);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Đơn hàng đã được hủy thành công.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể hủy đơn hàng này.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
+            }
+
+            return RedirectToPage();
         }
     }
 }

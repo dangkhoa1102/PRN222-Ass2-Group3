@@ -1,44 +1,41 @@
 ﻿using Assignment02.Hubs;
 using Business_Logic_Layer.Services;
-using DataAccess_Layer;
-using DataAccess_Layer.Repositories;
-using EVDealerDbContext;
-using Microsoft.EntityFrameworkCore;
-
+<<<<<<<<< Temporary merge branch 1
+using DataAccess_Layer.Repositories.Implement;
+using DataAccess_Layer.Repositories.Interface;
+=========
+>>>>>>>>> Temporary merge branch 2
+// Add Razor Pages & SignalR
 var builder = WebApplication.CreateBuilder(args);
 
 // ===============================
-// 🔧 Add Razor Pages & SignalR
-// ===============================
+// Add EF DbContext
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
-// ===============================
-// 🗄️ Configure Entity Framework DbContext
-// ===============================
-builder.Services.AddDbContext<EVDealerSystemContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection")));
-
-// ===============================
-// 💡 Register Repositories & Services
-// ===============================
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-
+// Register Service Factory
+builder.Services.AddScoped<ServiceFactory>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-
-builder.Services.AddScoped<ICustomerTestDriveAppointment, CustomerTestDriveAppointment>();
+// Register Services through Factory
+builder.Services.AddScoped<IUserService>(provider => provider.GetRequiredService<ServiceFactory>().CreateUserService());
+builder.Services.AddScoped<IOrderService>(provider => provider.GetRequiredService<ServiceFactory>().CreateOrderService());
+builder.Services.AddScoped<ICustomerTestDriveAppointmentService>(provider => provider.GetRequiredService<ServiceFactory>().CreateCustomerTestDriveAppointmentService());
+builder.Services.AddScoped<IVehicleService>(provider => provider.GetRequiredService<ServiceFactory>().CreateVehicleService());
+// Register repositories and services (they will use EVDealerSystemContext's own connection)
+// ===============================
+// 💾 Session Configuration
+// ===============================
 builder.Services.AddScoped<ICustomerTestDriveAppointmentService, CustomerTestDriveAppointmentService>();
+>>>>>>>>> Temporary merge branch 2
 
 // ===============================
 // 💾 Session Configuration
 // ===============================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
+// ===============================
+// 🔐 Authentication & Authorization
+// ===============================
     options.Cookie.IsEssential = true;
 });
 
@@ -51,14 +48,14 @@ builder.Services.AddAuthentication("Cookies")
         options.LoginPath = "/Login";
         options.LogoutPath = "/Logout";
         options.AccessDeniedPath = "/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.SlidingExpiration = true;
-    });
-
-builder.Services.AddAuthorization();
-
 // ===============================
 // 🚀 Build App
+// ===============================
+
+builder.Services.AddAuthorization();
+// ===============================
+// ⚙️ Middleware Configuration
+// ===============================
 // ===============================
 var app = builder.Build();
 

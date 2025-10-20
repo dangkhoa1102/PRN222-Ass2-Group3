@@ -48,7 +48,7 @@ namespace Business_Logic_Layer.Services
             return await _repository.CreateAsync(appointment);
         }
 
-        public async Task<TestDriveAppointment> GetAppointmentByIdAsync(Guid id)
+        public async Task<TestDriveAppointment?> GetAppointmentByIdAsync(Guid id)
         {
             return await _repository.GetByIdAsync(id);
         }

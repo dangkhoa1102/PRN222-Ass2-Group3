@@ -11,7 +11,7 @@ namespace Business_Logic_Layer.Services
     {
         Task<IEnumerable<TestDriveAppointment>> GetCustomerAppointmentsAsync(Guid customerId);
         Task<TestDriveAppointment> BookAppointmentAsync(Guid customerId, Guid dealerId, Guid vehicleId, DateTime appointmentDate, string notes);
-        Task<TestDriveAppointment> GetAppointmentByIdAsync(Guid id);
+        Task<TestDriveAppointment?> GetAppointmentByIdAsync(Guid id);
         Task<bool> CancelAppointmentAsync(Guid appointmentId, Guid customerId, string note);
         Task<IEnumerable<TestDriveAppointment>> GetAvailableTimeSlotsAsync(Guid dealerId, DateTime date);
         Task<IEnumerable<Vehicle>> GetAvailableVehiclesAsync(Guid dealerId);
