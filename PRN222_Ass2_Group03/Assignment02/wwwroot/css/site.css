@@ -21,14 +21,17 @@ html {
 body {
     margin: 0;
     padding-bottom: 80px; 
-    background-color: #f4f6f9; 
+    background: linear-gradient(135deg, #E3F2FD 0%, #E8F5E8 100%);
+    min-height: 100vh;
+}
 
 footer.footer {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background-color: #ffffff;
-    border-top: 1px solid #ddd;
+    background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+    color: white;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     text-align: center;
     padding: 8px 0;
     font-size: 0.9rem;

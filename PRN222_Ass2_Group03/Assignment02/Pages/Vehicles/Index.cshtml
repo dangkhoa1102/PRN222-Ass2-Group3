@@ -1,0 +1,153 @@
+@page
+@model Assignment02.Pages.Vehicles.IndexModel
+@{
+    ViewData["Title"] = "Vehicle Management";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/vehicles.css" asp-append-version="true" />
+}
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-car-side"></i>
+            Quản lý xe
+        </h1>
+        <p class="hero-subtitle">Quản lý danh sách xe điện của bạn một cách dễ dàng</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-container">
+    <div class="management-card">
+        <div class="card-header">
+            <div class="header-content">
+                <h2 class="card-title">
+                    <i class="fas fa-list"></i>
+                    Danh sách xe
+                </h2>
+                <p class="card-subtitle">Quản lý và theo dõi tất cả xe trong hệ thống</p>
+            </div>
+            <a href="/Vehicles/Add" class="btn-add">
+                <i class="fas fa-plus"></i>
+                Thêm xe mới
+            </a>
+        </div>
+
+        <div class="card-body">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (Model.Vehicles.Any())
+            {
+                <div class="vehicles-grid">
+                    @foreach (var vehicle in Model.Vehicles)
+                    {
+                        <div class="vehicle-card">
+                            <div class="vehicle-image-container">
+                                @if (!string.IsNullOrEmpty(vehicle.Images))
+                                {
+                                    <img src="@vehicle.Images" alt="@vehicle.Name" class="vehicle-image" />
+                                }
+                                else
+                                {
+                                    <div class="no-image">
+                                        <i class="fas fa-car"></i>
+                                    </div>
+                                }
+                        <div class="vehicle-overlay">
+                            <a href="/Vehicles/Details/@vehicle.Id.ToString()" class="btn-action view-btn" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="/Vehicles/Edit/@vehicle.Id.ToString()" class="btn-action edit-btn" title="Chỉnh sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/Vehicles/Delete/@vehicle.Id.ToString()" class="btn-action delete-btn" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                            </div>
+                            <div class="vehicle-info">
+                                <h3 class="vehicle-name">@vehicle.Name</h3>
+                                <p class="vehicle-model">@vehicle.Model</p>
+                                <div class="vehicle-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>@vehicle.Year</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-tag"></i>
+                                        <span>@vehicle.Brand</span>
+                                    </div>
+                                </div>
+                                <div class="vehicle-price">
+                                    <span class="price">@vehicle.Price.ToString("N0") ₫</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3>Chưa có xe nào</h3>
+                    <p>Hãy thêm xe đầu tiên để bắt đầu quản lý</p>
+                    <a href="/Vehicles/Add" class="btn-add-empty">
+                        <i class="fas fa-plus"></i>
+                        Thêm xe ngay
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        // Add smooth animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const vehicleCards = document.querySelectorAll('.vehicle-card');
+            vehicleCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Auto-hide alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    if (alert && alert.parentNode) {
+                        alert.style.transition = 'opacity 0.5s ease';
+                        alert.style.opacity = '0';
+                        setTimeout(() => {
+                            if (alert.parentNode) {
+                                alert.remove();
+                            }
+                        }, 500);
+                    }
+                }, 5000);
+            });
+        });
+    </script>
+}

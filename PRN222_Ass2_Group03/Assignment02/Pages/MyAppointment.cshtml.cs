@@ -17,7 +17,7 @@ namespace Assignment02.Pages
         public IEnumerable<TestDriveAppointment> Appointments { get; set; } = new List<TestDriveAppointment>();
 
         [BindProperty]
-        public string CancelNote { get; set; }
+        public string CancelNote { get; set; } = string.Empty;
 
         public async Task OnGetAsync()
         {

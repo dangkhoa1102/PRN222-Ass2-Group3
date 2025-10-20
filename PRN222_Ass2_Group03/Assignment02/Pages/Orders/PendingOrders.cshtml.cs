@@ -1,22 +1,21 @@
-﻿using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+﻿using Business_Logic_Layer.DTOs;
+using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Assignment02.Pages.Orders
+namespace Assignment02.Pages.Order
 {
     public class PendingOrdersModel : PageModel
     {
         private readonly IOrderService _orderService;
 
-        public IEnumerable<Order> PendingOrders { get; set; } = Enumerable.Empty<Order>();
+        public List<OrderDTO> PendingOrders { get; set; } = new();
 
         public PendingOrdersModel(IOrderService orderService)
         {
             _orderService = orderService;
         }
 
-        // ✅ Lấy danh sách đơn đang xử lý
         public async Task<IActionResult> OnGetAsync()
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
@@ -30,8 +29,8 @@ namespace Assignment02.Pages.Orders
             return Page();
         }
 
-        // ✅ Nhận thêm tham số Notes từ form
-        public async Task<IActionResult> OnPostCancelAsync(Guid id, string Notes)
+        // ? X? l� khi ng??i d�ng nh?n n�t Cancel
+        public async Task<IActionResult> OnPostCancelAsync(Guid id)
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdStr))
@@ -39,32 +38,26 @@ namespace Assignment02.Pages.Orders
                 return RedirectToPage("/Login");
             }
 
-            // 🔸 Kiểm tra người dùng có nhập lý do không
-            if (string.IsNullOrWhiteSpace(Notes))
-            {
-                TempData["ErrorMessage"] = "Bạn phải nhập lý do hủy đơn hàng.";
-                return RedirectToPage();
-            }
-
             try
             {
-                // ✅ Gọi service mới có tham số Notes
-                bool result = await _orderService.CancelOrderAsync(id, Notes);
+                // G?i h�m CancelOrderAsync trong Service
+                bool result = await _orderService.CancelOrderAsync(id);
 
                 if (result)
                 {
-                    TempData["SuccessMessage"] = "Đơn hàng đã được hủy thành công.";
+                    TempData["SuccessMessage"] = "??n h�ng ?� ???c h?y th�nh c�ng.";
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Không thể hủy đơn hàng này.";
+                    TempData["ErrorMessage"] = "Kh�ng th? h?y ??n h�ng n�y.";
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
+                TempData["ErrorMessage"] = $"?� x?y ra l?i: {ex.Message}";
             }
 
+            // Redirect l?i trang hi?n t?i ?? c?p nh?t danh s�ch
             return RedirectToPage();
         }
     }

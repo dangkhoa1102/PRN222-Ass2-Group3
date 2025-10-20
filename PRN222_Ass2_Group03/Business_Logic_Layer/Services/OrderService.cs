@@ -1,9 +1,12 @@
-﻿using DataAccess_Layer.Repositories;
+﻿using Business_Logic_Layer.DTOs;
+using DataAccess_Layer.Repositories.Interface;
 using EVDealerDbContext.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace Business_Logic_Layer.Services
 {
@@ -16,72 +19,76 @@ namespace Business_Logic_Layer.Services
             _orderRepository = orderRepository;
         }
 
-        // 🔹 Tất cả đơn hàng của user
-        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId)
-        {
-            return await _orderRepository.GetByCustomerId(userId);
-        }
-
-        // 🔹 Lịch sử đơn hàng (đã hoàn thành hoặc hủy)
-        public async Task<IEnumerable<Order>> GetOrderHistoryAsync(Guid userId)
+        // 🔹 Danh sách tất cả đơn hàng của người dùng
+        public async Task<List<OrderDTO>> GetOrdersByUserIdAsync(Guid userId)
         {
             var orders = await _orderRepository.GetByCustomerId(userId);
-            return orders.Where(o => o.Status == "Completed" || o.Status == "Cancelled");
+            return orders.Select(MapToDTO).ToList();
+        }
+
+        // 🔹 Lịch sử đơn hàng (đã hoàn thành hoặc bị hủy)
+        public async Task<List<OrderDTO>> GetOrderHistoryAsync(Guid userId)
+        {
+            var orders = await _orderRepository.GetByCustomerId(userId);
+            return orders
+                .Where(o => o.Status == "Completed" || o.Status == "Cancelled")
+                .Select(MapToDTO)
+                .ToList();
         }
 
         // 🔹 Đơn hàng đang chờ xử lý
-        public async Task<IEnumerable<Order>> GetPendingOrdersByUserIdAsync(Guid userId)
+        public async Task<List<OrderDTO>> GetPendingOrdersByUserIdAsync(Guid userId)
         {
             var orders = await _orderRepository.GetByCustomerId(userId);
-            return orders.Where(o => o.Status == "Pending" || o.Status == "Processing");
+            return orders
+                .Where(o => o.Status == "Pending" || o.Status == "Processing")
+                .Select(MapToDTO)
+                .ToList();
         }
 
-        // 🔹 Lấy chi tiết đơn hàng
-        public async Task<Order?> GetOrderByIdAsync(Guid orderId)
+        // 🔹 Chi tiết đơn hàng
+        public async Task<OrderDTO?> GetOrderByIdAsync(Guid orderId)
         {
-            return await _orderRepository.GetById(orderId);
+            var order = await _orderRepository.GetById(orderId);
+            return order == null ? null : MapToDTO(order);
         }
 
-        // 🔹 Hủy đơn hàng
-        public async Task<bool> CancelOrderAsync(Guid orderId, string Notes)
+        // ✅ Map entity sang DTO
+        private static OrderDTO MapToDTO(Order o)
+        {
+            return new OrderDTO
+            {
+                Id = o.Id,
+                OrderNumber = o.OrderNumber,
+                CustomerId = o.CustomerId,
+                CustomerName = o.Customer?.FullName ?? string.Empty,
+                DealerId = o.DealerId,
+                DealerName = o.Dealer?.Name ?? string.Empty,
+                VehicleId = o.VehicleId,
+                VehicleName = o.Vehicle?.Name ?? string.Empty,
+                VehicleBrand = o.Vehicle?.Brand ?? string.Empty,
+                VehicleModel = o.Vehicle?.Model ?? string.Empty,
+                VehicleImage = o.Vehicle?.Images ?? string.Empty,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status,
+                PaymentStatus = o.PaymentStatus,
+                Notes = o.Notes,
+                CreatedAt = o.CreatedAt,
+                UpdatedAt = o.UpdatedAt
+            };
+        }
+        public async Task<bool> CancelOrderAsync(Guid orderId)
         {
             var order = await _orderRepository.GetById(orderId);
             if (order == null) return false;
-
             if (order.Status != "Processing") return false;
 
             order.Status = "Cancelled";
-            order.Notes = Notes; 
-            order.UpdatedAt = DateTime.Now;
+            order.UpdatedAt = DateTime.UtcNow;
 
             return await _orderRepository.Update(order);
         }
-        public async Task<Order> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes)
-        {
-            var now = DateTime.Now;
-            string orderNumber = $"ORD-{now:yyyyMMdd-HHmm}";
-
-            var vehiclePrice = await _orderRepository.GetVehiclePriceById(vehicleId);
-            decimal total = vehiclePrice ?? 0;
-
-            var newOrder = new Order
-            {
-                Id = Guid.NewGuid(),
-                OrderNumber = orderNumber,      
-                CustomerId = customerId,
-                DealerId = dealerId,
-                VehicleId = vehicleId,
-                Notes = notes,
-                Status = "Processing",          
-                PaymentStatus = "Unpaid",
-                TotalAmount = total,         
-                CreatedAt = now,
-                UpdatedAt = now
-            };
-
-            await _orderRepository.Add(newOrder);
-            return newOrder;
-        }
-
     }
 }
+
+

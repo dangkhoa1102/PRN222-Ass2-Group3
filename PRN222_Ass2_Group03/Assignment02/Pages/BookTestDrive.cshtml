@@ -3,12 +3,8 @@
 @{
     ViewData["Title"] = "Đặt lịch hẹn lái thử";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EV Dealer System</title>
+
+@section Styles {
     <link rel="stylesheet" href="~/css/appointments.css" asp-append-version="true" />
     <style>
         #toastContainer {
@@ -42,222 +38,262 @@
             border-radius: 4px;
         }
     </style>
-</head>
-<body>
-    <h2>Đặt lịch hẹn lái thử</h2>
+}
 
-    <form method="post" id="bookingForm">
-        <div class="form-group">
-            <label for="DealerId">Chọn đại lý</label>
-            <select asp-for="Appointment.DealerId" class="form-control" id="DealerId" required>
-                <option value="">-- Chọn đại lý --</option>
-                @foreach (var dealer in Model.Dealers)
-                {
-                    <option value="@dealer.Id">@dealer.Name - @dealer.Address</option>
-                }
-            </select>
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-calendar-check"></i>
+            Đặt lịch hẹn lái thử
+        </h1>
+        <p class="hero-subtitle">Trải nghiệm xe điện với chúng tôi</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-container">
+    <div class="booking-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-car"></i>
+                Thông tin đặt lịch
+            </h2>
+            <p class="card-subtitle">Vui lòng điền đầy đủ thông tin bên dưới</p>
         </div>
 
-        <div class="form-group">
-            <label for="VehicleId">Chọn xe</label>
-            <select asp-for="Appointment.VehicleId" class="form-control" id="VehicleId" required>
-                <option value="">-- Chọn xe --</option>
-                @foreach (var vehicle in Model.Vehicles)
-                {
-                    <option value="@vehicle.Id" data-image="@vehicle.Images">@vehicle.Name @vehicle.Model</option>
-                }
-            </select>
-        </div>
+        <form method="post" id="bookingForm" class="booking-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="DealerId" class="form-label">
+                        <i class="fas fa-building"></i>
+                        Chọn đại lý
+                    </label>
+                    <select asp-for="Appointment.DealerId" class="form-control" id="DealerId" required>
+                        <option value="">-- Chọn đại lý --</option>
+                        @foreach (var dealer in Model.Dealers)
+                        {
+                            <option value="@dealer.Id">@dealer.Name - @dealer.Address</option>
+                        }
+                    </select>
+                </div>
 
-        <div class="form-group">
-            <label>Hình ảnh xe</label>
-            <div>
-                <img id="vehicleImage" src="" alt="Hình ảnh xe" style="max-width: 300px; max-height: 200px; display: none;" />
+                <div class="form-group">
+                    <label for="VehicleId" class="form-label">
+                        <i class="fas fa-car-side"></i>
+                        Chọn xe
+                    </label>
+                    <select asp-for="Appointment.VehicleId" class="form-control" id="VehicleId" required>
+                        <option value="">-- Chọn xe --</option>
+                        @foreach (var vehicle in Model.Vehicles)
+                        {
+                            <option value="@vehicle.Id" data-image="@vehicle.Images">@vehicle.Name @vehicle.Model</option>
+                        }
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label for="AppointmentDate">Chọn ngày</label>
-            <input asp-for="Appointment.AppointmentDate" type="date" class="form-control" id="AppointmentDate" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
-        </div>
+            <div class="form-group vehicle-image-group">
+                <label class="form-label">
+                    <i class="fas fa-image"></i>
+                    Hình ảnh xe
+                </label>
+                <div class="vehicle-image-container">
+                    <img id="vehicleImage" src="" alt="Hình ảnh xe" class="vehicle-image" />
+                    <div class="no-image-placeholder">
+                        <i class="fas fa-car"></i>
+                        <p>Chọn xe để xem hình ảnh</p>
+                    </div>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="TimeSlot">Chọn giờ</label>
-            <select asp-for="SelectedTimeSlot" class="form-control" id="TimeSlot" required>
-                <option value="">-- Chọn giờ --</option>
-                @foreach (var slot in Model.AvailableTimeSlots)
-                {
-                    <option value="@slot.AppointmentDate.ToString("HH:mm")">@slot.AppointmentDate.ToString("hh:mm tt")</option>
-                }
-            </select>
-        </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="AppointmentDate" class="form-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        Chọn ngày
+                    </label>
+                    <input asp-for="Appointment.AppointmentDate" type="date" class="form-control" id="AppointmentDate" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
 
-        <div class="form-group">
-            <label for="Notes">Ghi chú</label>
-            <textarea asp-for="Appointment.Notes" class="form-control" id="Notes" rows="4"></textarea>
-        </div>
+                <div class="form-group">
+                    <label for="TimeSlot" class="form-label">
+                        <i class="fas fa-clock"></i>
+                        Chọn giờ
+                    </label>
+                    <select asp-for="SelectedTimeSlot" class="form-control" id="TimeSlot" required>
+                        <option value="">-- Chọn giờ --</option>
+                        @foreach (var slot in Model.AvailableTimeSlots)
+                        {
+                            <option value="@slot.AppointmentDate.ToString("HH:mm")">@slot.AppointmentDate.ToString("hh:mm tt")</option>
+                        }
+                    </select>
+                </div>
+            </div>
 
-        <button type="submit" class="btn btn-primary">Đặt lịch</button>
-    </form>
+            <div class="form-group">
+                <label for="Notes" class="form-label">
+                    <i class="fas fa-sticky-note"></i>
+                    Ghi chú
+                </label>
+                <textarea asp-for="Appointment.Notes" class="form-control" id="Notes" rows="4" placeholder="Nhập ghi chú của bạn..."></textarea>
+            </div>
 
-    @section Scripts {
-        <script>
-            // Function to show toast notification
-            function showToast(message, isSuccess) {
-                let toastContainer = document.getElementById('toastContainer');
-                if (!toastContainer) {
-                    toastContainer = document.createElement('div');
-                    toastContainer.id = 'toastContainer';
-                    toastContainer.style.position = 'fixed';
-                    toastContainer.style.top = '20px';
-                    toastContainer.style.right = '20px';
-                    toastContainer.style.zIndex = '1000';
-                    document.body.appendChild(toastContainer);
-                }
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-calendar-check"></i>
+                    Đặt lịch ngay
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
-                const toast = document.createElement('div');
-                toast.className = `toast ${isSuccess ? 'toast-success' : 'toast-error'}`;
-                toast.textContent = message;
-                toast.style.padding = '12px 20px';
-                toast.style.marginBottom = '10px';
-                toast.style.borderRadius = '4px';
-                toast.style.color = '#fff';
-                toast.style.backgroundColor = isSuccess ? '#28a745' : '#dc3545';
-                toast.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+@section Scripts {
+    <script>
+        // Function to show toast notification
+        function showToast(message, isSuccess) {
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.style.position = 'fixed';
+                toastContainer.style.top = '20px';
+                toastContainer.style.right = '20px';
+                toastContainer.style.zIndex = '1000';
+                document.body.appendChild(toastContainer);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${isSuccess ? 'toast-success' : 'toast-error'}`;
+            toast.textContent = message;
+            toast.style.padding = '12px 20px';
+            toast.style.marginBottom = '10px';
+            toast.style.borderRadius = '4px';
+            toast.style.color = '#fff';
+            toast.style.backgroundColor = isSuccess ? '#28a745' : '#dc3545';
+            toast.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease-in-out';
+
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '1';
+            }, 100);
+
+            setTimeout(() => {
                 toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s ease-in-out';
-
-                toastContainer.appendChild(toast);
-
                 setTimeout(() => {
-                    toast.style.opacity = '1';
-                }, 100);
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
 
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 300);
-                }, 3000);
+        // Replace showModal with showToast
+        function showModal(message, isSuccess) {
+            showToast(message, isSuccess);
+        }
+
+        // Existing JavaScript code
+        document.getElementById("DealerId").addEventListener("change", async function () {
+            const dealerId = this.value;
+            const date = document.getElementById("AppointmentDate").value;
+
+            // Chỉ cập nhật time slots khi chọn đại lý, không load lại danh sách xe
+            // Vì tất cả xe đều có thể được lái thử ở bất kỳ đại lý nào
+            if (date) {
+                await updateTimeSlots(dealerId, date);
             }
+        });
 
-            // Replace showModal with showToast
-            function showModal(message, isSuccess) {
-                showToast(message, isSuccess);
+        document.getElementById("VehicleId").addEventListener("change", function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const imageUrl = selectedOption.getAttribute("data-image");
+            const vehicleImage = document.getElementById("vehicleImage");
+            const placeholder = document.querySelector('.no-image-placeholder');
+
+            if (imageUrl && imageUrl !== "null" && imageUrl !== "") {
+                vehicleImage.src = imageUrl;
+                vehicleImage.style.display = "block";
+                placeholder.style.display = "none";
+            } else {
+                vehicleImage.src = "";
+                vehicleImage.style.display = "none";
+                placeholder.style.display = "flex";
             }
+        });
 
-            // Existing JavaScript code
-            document.getElementById("DealerId").addEventListener("change", async function () {
-                const dealerId = this.value;
-                const date = document.getElementById("AppointmentDate").value;
+        document.getElementById("AppointmentDate").addEventListener("change", async function () {
+            const dealerId = document.getElementById("DealerId").value;
+            const date = this.value;
+            if (dealerId && date) {
+                await updateTimeSlots(dealerId, date);
+            }
+        });
 
-                try {
-                    const vehicleResponse = await fetch(`/BookTestDrive?handler=Vehicles&dealerId=${dealerId}`);
-                    if (!vehicleResponse.ok) {
-                        throw new Error('Lỗi tải danh sách xe');
-                    }
-                    const vehicles = await vehicleResponse.json();
-                    const vehicleSelect = document.getElementById("VehicleId");
-                    vehicleSelect.innerHTML = '<option value="">-- Chọn xe --</option>';
-                    vehicles.forEach(v => {
-                        const imageUrl = v.images && v.images.startsWith('[') ? JSON.parse(v.images)[0] : v.images;
-                        vehicleSelect.innerHTML += `<option value="${v.id}" data-image="${imageUrl}">${v.brand} ${v.model} (${v.year})</option>`;
-                    });
-
-                    const vehicleImage = document.getElementById("vehicleImage");
-                    vehicleImage.src = "";
-                    vehicleImage.style.display = "none";
-
-                    if (date) {
-                        await updateTimeSlots(dealerId, date);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showModal('Lỗi khi tải danh sách xe. Vui lòng thử lại.', false);
+        async function updateTimeSlots(dealerId, date) {
+            try {
+                const timeSlotResponse = await fetch(`/BookTestDrive?handler=TimeSlots&dealerId=${dealerId}&date=${date}`);
+                if (!timeSlotResponse.ok) {
+                    throw new Error('Lỗi tải danh sách khung giờ');
                 }
-            });
-
-            document.getElementById("VehicleId").addEventListener("change", function () {
-                const selectedOption = this.options[this.selectedIndex];
-                const imageUrl = selectedOption.getAttribute("data-image");
-                const vehicleImage = document.getElementById("vehicleImage");
-
-                if (imageUrl && imageUrl !== "null" && imageUrl !== "") {
-                    vehicleImage.src = imageUrl;
-                    vehicleImage.style.display = "block";
-                } else {
-                    vehicleImage.src = "";
-                    vehicleImage.style.display = "none";
-                }
-            });
-
-            document.getElementById("AppointmentDate").addEventListener("change", async function () {
-                const dealerId = document.getElementById("DealerId").value;
-                const date = this.value;
-                if (dealerId && date) {
-                    await updateTimeSlots(dealerId, date);
-                }
-            });
-
-            async function updateTimeSlots(dealerId, date) {
-                try {
-                    const timeSlotResponse = await fetch(`/BookTestDrive?handler=TimeSlots&dealerId=${dealerId}&date=${date}`);
-                    if (!timeSlotResponse.ok) {
-                        throw new Error('Lỗi tải danh sách khung giờ');
-                    }
-                    const timeSlots = await timeSlotResponse.json();
-                    const timeSlotSelect = document.getElementById("TimeSlot");
-                    timeSlotSelect.innerHTML = '<option value="">-- Chọn giờ --</option>';
-                    timeSlots.forEach(slot => {
+                const timeSlots = await timeSlotResponse.json();
+                const timeSlotSelect = document.getElementById("TimeSlot");
+                timeSlotSelect.innerHTML = '<option value="">-- Chọn giờ --</option>';
+                timeSlots.forEach(slot => {
+                    try {
                         const time = new Date(slot.appointmentDate).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                         timeSlotSelect.innerHTML += `<option value="${time}">${time}</option>`;
-                    });
-                } catch (error) {
-                    console.error('Error:', error);
-                    showModal('Lỗi khi tải khung giờ. Vui lòng thử lại.', false);
-                }
+                    } catch (e) {
+                        console.error('Error parsing time slot:', e);
+                    }
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                showModal('Lỗi khi tải khung giờ. Vui lòng thử lại.', false);
+            }
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const form = this;
+            const formData = new FormData(form);
+
+            const dateInput = document.getElementById('AppointmentDate').value;
+            const selectedDate = new Date(dateInput);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (selectedDate < today) {
+                showModal('Ngày hẹn không thể là ngày trong quá khứ.', false);
+                return;
             }
 
-            document.getElementById('bookingForm').addEventListener('submit', async function (event) {
-                event.preventDefault();
-                const form = this;
-                const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
 
-                const dateInput = document.getElementById('AppointmentDate').value;
-                const selectedDate = new Date(dateInput);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                if (selectedDate < today) {
-                    showModal('Ngày hẹn không thể là ngày trong quá khứ.', false);
-                    return;
+                if (!response.ok) {
+                    throw new Error('Lỗi mạng hoặc server');
                 }
 
-                try {
-                    const response = await fetch(form.action, {
-                        method: 'POST',
-                        body: formData
-                    });
+                const result = await response.json();
+                showModal(result.message, result.success);
 
-                    if (!response.ok) {
-                        throw new Error('Lỗi mạng hoặc server');
-                    }
-
-                    const result = await response.json();
-                    showModal(result.message, result.success);
-
-                    if (result.success) {
-                        form.reset();
-                        document.getElementById('VehicleId').innerHTML = '<option value="">-- Chọn xe --</option>';
-                        document.getElementById('TimeSlot').innerHTML = '<option value="">-- Chọn giờ --</option>';
-                        document.getElementById('vehicleImage').src = "";
-                        document.getElementById('vehicleImage').style.display = "none";
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showModal('Đã xảy ra lỗi khi đặt lịch. Vui lòng thử lại.', false);
+                if (result.success) {
+                    form.reset();
+                    document.getElementById('VehicleId').innerHTML = '<option value="">-- Chọn xe --</option>';
+                    document.getElementById('TimeSlot').innerHTML = '<option value="">-- Chọn giờ --</option>';
+                    document.getElementById('vehicleImage').src = "";
+                    document.getElementById('vehicleImage').style.display = "none";
+                    document.querySelector('.no-image-placeholder').style.display = "flex";
                 }
-            });
-        </script>
-    }
-</body>
-</html>
+            } catch (error) {
+                console.error('Error:', error);
+                showModal('Đã xảy ra lỗi khi đặt lịch. Vui lòng thử lại.', false);
+            }
+        });
+    </script>
+}
