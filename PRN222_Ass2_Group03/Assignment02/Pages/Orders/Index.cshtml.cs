@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Orders
 {
-    public class IndexModel : PageModel
+    public class IndexModel : AuthenticatedPageModel
     {
         private readonly IOrderService _orderService;
 
@@ -30,14 +30,13 @@ namespace Assignment02.Pages.Orders
 
         public async Task OnGetAsync()
         {
-            var userIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdStr))
+            if (!IsAuthenticated)
             {
                 Response.Redirect("/Login");
                 return;
             }
 
-            var userId = Guid.Parse(userIdStr);
+            var userId = Guid.Parse(UserId!);
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);
 
             if (!string.IsNullOrEmpty(Status))

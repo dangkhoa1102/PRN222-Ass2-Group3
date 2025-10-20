@@ -1,63 +1,49 @@
-using DataAccess_Layer;
 using DataAccess_Layer.Repositories;
-using DataAccess_Layer.Repositories.Implement;
-using DataAccess_Layer.Repositories.Interface;
 using EVDealerDbContext;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Business_Logic_Layer.Services
 {
     public class ServiceFactory
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IConfiguration _configuration;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public ServiceFactory(IServiceProvider serviceProvider)
+        public ServiceFactory(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
-            _serviceProvider = serviceProvider;
+            _configuration = configuration;
+            _loggerFactory = loggerFactory;
         }
 
-        public EVDealerSystemContext CreateDbContext()
+        private EVDealerSystemContext CreateDbContext()
         {
-            var options = _serviceProvider.GetRequiredService<DbContextOptions<EVDealerSystemContext>>();
-            return new EVDealerSystemContext(options);
-        }
-
-        public IUserRepository CreateUserRepository()
-        {
-            var logger = _serviceProvider.GetRequiredService<ILogger<UserRepository>>();
-            return new UserRepository(logger);
-        }
-
-        public IOrderRepository CreateOrderRepository()
-        {
-            var context = CreateDbContext();
-            return new OrderRepository(context);
-        }
-
-        public ICustomerTestDriveAppointment CreateCustomerTestDriveAppointmentRepository()
-        {
-            var context = CreateDbContext();
-            return new CustomerTestDriveAppointment(context);
+            // Create a new context instance with connection string
+            var optionsBuilder = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<EVDealerSystemContext>();
+            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MyDbConnection"));
+            return new EVDealerSystemContext(optionsBuilder.Options);
         }
 
         public IUserService CreateUserService()
         {
-            var userRepository = CreateUserRepository();
-            var logger = _serviceProvider.GetRequiredService<ILogger<UserService>>();
+            var context = CreateDbContext();
+            var userRepository = new UserRepository(context, _loggerFactory.CreateLogger<UserRepository>());
+            var logger = _loggerFactory.CreateLogger<UserService>();
             return new UserService(userRepository, logger);
         }
 
         public IOrderService CreateOrderService()
         {
-            var orderRepository = CreateOrderRepository();
+            var context = CreateDbContext();
+            var orderRepository = new OrderRepository(context);
             return new OrderService(orderRepository);
         }
 
         public ICustomerTestDriveAppointmentService CreateCustomerTestDriveAppointmentService()
         {
-            var appointmentRepository = CreateCustomerTestDriveAppointmentRepository();
+            var context = CreateDbContext();
+            var appointmentRepository = new CustomerTestDriveAppointment(context);
             return new CustomerTestDriveAppointmentService(appointmentRepository);
         }
 

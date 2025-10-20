@@ -1,10 +1,6 @@
 ﻿using Assignment02.Hubs;
 using Business_Logic_Layer.Services;
-<<<<<<<<< Temporary merge branch 1
-using DataAccess_Layer.Repositories.Implement;
-using DataAccess_Layer.Repositories.Interface;
-=========
->>>>>>>>> Temporary merge branch 2
+
 // Add Razor Pages & SignalR
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,27 +11,23 @@ builder.Services.AddSignalR();
 
 // Register Service Factory
 builder.Services.AddScoped<ServiceFactory>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
 // Register Services through Factory
 builder.Services.AddScoped<IUserService>(provider => provider.GetRequiredService<ServiceFactory>().CreateUserService());
 builder.Services.AddScoped<IOrderService>(provider => provider.GetRequiredService<ServiceFactory>().CreateOrderService());
 builder.Services.AddScoped<ICustomerTestDriveAppointmentService>(provider => provider.GetRequiredService<ServiceFactory>().CreateCustomerTestDriveAppointmentService());
 builder.Services.AddScoped<IVehicleService>(provider => provider.GetRequiredService<ServiceFactory>().CreateVehicleService());
-// Register repositories and services (they will use EVDealerSystemContext's own connection)
+
 // ===============================
 // 💾 Session Configuration
 // ===============================
-builder.Services.AddScoped<ICustomerTestDriveAppointmentService, CustomerTestDriveAppointmentService>();
->>>>>>>>> Temporary merge branch 2
 
 // ===============================
 // 💾 Session Configuration
 // ===============================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
-// ===============================
-// 🔐 Authentication & Authorization
-// ===============================
+{
     options.Cookie.IsEssential = true;
 });
 
@@ -48,9 +40,7 @@ builder.Services.AddAuthentication("Cookies")
         options.LoginPath = "/Login";
         options.LogoutPath = "/Logout";
         options.AccessDeniedPath = "/Login";
-// ===============================
-// 🚀 Build App
-// ===============================
+    });
 
 builder.Services.AddAuthorization();
 // ===============================

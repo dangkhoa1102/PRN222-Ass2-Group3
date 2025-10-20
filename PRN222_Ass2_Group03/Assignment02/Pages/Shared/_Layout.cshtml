@@ -91,27 +91,27 @@
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Order/ViewOrders">
+                                            <a class="dropdown-item" asp-page="/Orders/ViewOrders">
                                                 <i class="fas fa-eye"></i>
                                                 <span>View Orders</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Order/MyOrders">
+                                            <a class="dropdown-item" asp-page="/Orders/MyOrders">
                                                 <i class="fas fa-receipt"></i>
                                                 <span>My Orders</span>
                                             </a>
                                         </li>
 
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Order/PendingOrders">
+                                            <a class="dropdown-item" asp-page="/Orders/PendingOrders">
                                                 <i class="fas fa-hourglass-half"></i>
                                                 <span>Processing Orders</span>
                                             </a>
                                         </li>
 
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Order/History">
+                                            <a class="dropdown-item" asp-page="/Orders/History">
                                                 <i class="fas fa-history"></i>
                                                 <span>Order History</span>
                                             </a>
@@ -152,6 +152,28 @@
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end modern-dropdown" aria-labelledby="navbarDropdown">
+                                    @if (userRole == "Admin" || userRole == "Staff")
+                                    {
+                                        <li>
+                                            <a class="dropdown-item modern-dropdown-item" href="/Admin/ManageAppointments">
+                                                <i class="fas fa-cogs"></i>
+                                                <span>Manage Appointments</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item modern-dropdown-item" href="/Admin/ManageOrders">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                <span>Manage Orders</span>
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    }
+                                    <li>
+                                        <a class="dropdown-item modern-dropdown-item" href="/MyAppointment">
+                                            <i class="fas fa-calendar"></i>
+                                            <span>My Appointments</span>
+                                        </a>
+                                    </li>
                                     <li>
                                         <a class="dropdown-item modern-dropdown-item" href="#profile">
                                             <i class="fas fa-user-edit"></i>

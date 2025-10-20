@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Orders
 {
-    public class CreateModel : PageModel
+    public class CreateModel : AuthenticatedPageModel
     {
         private readonly IOrderService _orderService;
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
@@ -23,13 +23,13 @@ namespace Assignment02.Pages.Orders
         public Guid SelectedVehicleId { get; set; }
 
         [BindProperty]
-        public string Notes { get; set; }
+        public string Notes { get; set; } = string.Empty;
 
-        public List<SelectListItem> DealersList { get; set; }
-        public List<SelectListItem> VehiclesList { get; set; }
+        public List<SelectListItem> DealersList { get; set; } = new();
+        public List<SelectListItem> VehiclesList { get; set; } = new();
 
-        public string SuccessMessage { get; set; }
-        public string ErrorMessage { get; set; }
+        public string SuccessMessage { get; set; } = string.Empty;
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public async Task OnGetAsync()
         {
@@ -50,14 +50,13 @@ namespace Assignment02.Pages.Orders
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var customerIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(customerIdStr))
+            if (!IsAuthenticated)
             {
                 ErrorMessage = "Please log in to create an order.";
                 return Page();
             }
 
-            var customerId = Guid.Parse(customerIdStr);
+            var customerId = Guid.Parse(UserId!);
 
             try
             {

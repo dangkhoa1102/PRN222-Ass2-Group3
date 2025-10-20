@@ -78,7 +78,7 @@ else
         <h2 class="details-header">Order Details</h2>
 
         <div class="detail-item"><strong>Order #:</strong> @Model.Order.OrderNumber</div>
-        <div class="detail-item"><strong>Vehicle:</strong> @Model.Order.Vehicle?.Name</div>
+        <div class="detail-item"><strong>Vehicle:</strong> @Model.Order.VehicleName</div>
         <div class="detail-item"><strong>Total:</strong> @Model.Order.TotalAmount.ToString("N0") ₫</div>
 
         <div class="detail-item">

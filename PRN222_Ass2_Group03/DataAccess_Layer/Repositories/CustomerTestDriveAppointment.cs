@@ -114,6 +114,19 @@ namespace DataAccess_Layer.Repositories
 
         public async Task<IEnumerable<TestDriveAppointment>> GetAllAppointmentsAsync(Guid userId)
         {
+            // If userId is empty, return all appointments (for admin)
+            if (userId == Guid.Empty)
+            {
+                return await _context.TestDriveAppointments
+                    .Include(t => t.Customer)
+                    .Include(t => t.Dealer)
+                    .Include(t => t.Vehicle)
+                    .OrderByDescending(t => t.AppointmentDate)
+                    .AsNoTracking()
+                    .ToListAsync();
+            }
+            
+            // Otherwise return appointments for specific user
             return await _context.TestDriveAppointments
                 .Include(t => t.Customer)
                 .Include(t => t.Dealer)
@@ -121,8 +134,7 @@ namespace DataAccess_Layer.Repositories
                 .Where(t => t.CustomerId == userId)
                 .OrderByDescending(t => t.AppointmentDate)
                 .AsNoTracking()
-                .ToListAsync()
-                .ContinueWith(t => (IEnumerable<TestDriveAppointment>)t.Result);
+                .ToListAsync();
         }
     }
 }

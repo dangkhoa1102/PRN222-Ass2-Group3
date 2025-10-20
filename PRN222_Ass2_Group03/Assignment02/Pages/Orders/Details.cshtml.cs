@@ -3,9 +3,9 @@ using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Assignment02.Pages.Order
+namespace Assignment02.Pages.Orders
 {
-    public class DetailsModel : PageModel
+    public class DetailsModel : AuthenticatedPageModel
     {
         private readonly IOrderService _orderService;
 
@@ -18,8 +18,7 @@ namespace Assignment02.Pages.Order
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {
-            var userIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdStr))
+            if (!IsAuthenticated)
             {
                 return RedirectToPage("/Login");
             }
