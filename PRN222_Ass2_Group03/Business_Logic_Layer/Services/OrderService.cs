@@ -1,5 +1,5 @@
 ﻿using Business_Logic_Layer.DTOs;
-using DataAccess_Layer.Repositories.Interface;
+using DataAccess_Layer.Repositories;
 using EVDealerDbContext.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -77,13 +77,71 @@ namespace Business_Logic_Layer.Services
                 UpdatedAt = o.UpdatedAt
             };
         }
-        public async Task<bool> CancelOrderAsync(Guid orderId)
+        public async Task<bool> CancelOrderAsync(Guid orderId, string Notes)
         {
             var order = await _orderRepository.GetById(orderId);
             if (order == null) return false;
             if (order.Status != "Processing") return false;
 
             order.Status = "Cancelled";
+            order.UpdatedAt = DateTime.UtcNow;
+            order.Notes = Notes;
+
+            return await _orderRepository.Update(order);
+        }
+
+        public async Task<Order> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes)
+        {
+            // Get vehicle price
+            var vehiclePrice = await _orderRepository.GetVehiclePriceById(vehicleId);
+            if (vehiclePrice == null)
+            {
+                throw new InvalidOperationException("Vehicle not found or price unavailable");
+            }
+
+            var order = new Order
+            {
+                Id = Guid.NewGuid(),
+                OrderNumber = GenerateOrderNumber(),
+                CustomerId = customerId,
+                DealerId = dealerId,
+                VehicleId = vehicleId,
+                TotalAmount = vehiclePrice.Value,
+                Status = "Pending",
+                PaymentStatus = "Pending",
+                Notes = notes,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var success = await _orderRepository.Add(order);
+            if (!success)
+            {
+                throw new InvalidOperationException("Failed to create order");
+            }
+
+            return order;
+        }
+
+        private string GenerateOrderNumber()
+        {
+            return "ORD" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + Guid.NewGuid().ToString("N")[..8].ToUpper();
+        }
+
+        // 🔹 Get all orders (for admin)
+        public async Task<List<OrderDTO>> GetAllOrdersAsync()
+        {
+            var orders = await _orderRepository.GetAll();
+            return orders.Select(MapToDTO).ToList();
+        }
+
+        // 🔹 Update order status (for admin)
+        public async Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus)
+        {
+            var order = await _orderRepository.GetById(orderId);
+            if (order == null) return false;
+
+            order.Status = newStatus;
             order.UpdatedAt = DateTime.UtcNow;
 
             return await _orderRepository.Update(order);

@@ -115,5 +115,27 @@ namespace Business_Logic_Layer.Services
         {
             return await _repository.GetAllAppointmentsAsync(userId);
         }
+
+        public async Task<IEnumerable<TestDriveAppointment>> GetAppointmentsByStatusAsync(string status)
+        {
+            // This would need to be implemented in the repository
+            // For now, we'll get all appointments and filter by status
+            var allAppointments = await _repository.GetAllAppointmentsAsync(Guid.Empty);
+            return allAppointments.Where(a => a.Status?.ToLower() == status.ToLower());
+        }
+
+        public async Task<bool> UpdateAppointmentStatusAsync(Guid appointmentId, string status)
+        {
+            var appointment = await _repository.GetByIdAsync(appointmentId);
+            if (appointment == null)
+            {
+                return false;
+            }
+
+            appointment.Status = status;
+            appointment.UpdatedAt = DateTime.Now;
+            await _repository.UpdateAsync(appointment);
+            return true;
+        }
     }
 }

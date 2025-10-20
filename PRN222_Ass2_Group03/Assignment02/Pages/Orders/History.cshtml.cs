@@ -3,9 +3,9 @@ using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Assignment02.Pages.Order
+namespace Assignment02.Pages.Orders
 {
-    public class HistoryModel : PageModel
+    public class HistoryModel : AuthenticatedPageModel
     {
         private readonly IOrderService _orderService;
 
@@ -18,13 +18,12 @@ namespace Assignment02.Pages.Order
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var userIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdStr))
+            if (!IsAuthenticated)
             {
                 return RedirectToPage("/Login");
             }
 
-            Guid userId = Guid.Parse(userIdStr);
+            Guid userId = Guid.Parse(UserId!);
             OrderHistories = await _orderService.GetOrderHistoryAsync(userId);
             return Page();
         }

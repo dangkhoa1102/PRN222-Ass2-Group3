@@ -18,5 +18,7 @@ namespace Business_Logic_Layer.Services
         Task<bool> RescheduleAppointmentAsync(Guid appointmentId, DateTime newDateTime, Guid customerId);
         Task<IEnumerable<Dealer>> GetAllDealersAsync();
         Task<IEnumerable<TestDriveAppointment>> GetAllAppointmentsAsync(Guid userId);
+        Task<IEnumerable<TestDriveAppointment>> GetAppointmentsByStatusAsync(string status);
+        Task<bool> UpdateAppointmentStatusAsync(Guid appointmentId, string status);
     }
 }

@@ -1,0 +1,315 @@
+@page
+@model Assignment02.Pages.Admin.ManageAppointmentsModel
+@{
+    ViewData["Title"] = "Manage Appointments";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/myAppointments.css" asp-append-version="true" />
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .admin-btn {
+            background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-btn:hover {
+            background: linear-gradient(135deg, #E91E63 0%, #9C27B0 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(156, 39, 176, 0.4);
+            color: white;
+        }
+        
+        .appointment-card.admin-view {
+            border-left: 5px solid #9C27B0;
+        }
+        
+        .customer-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid #9C27B0;
+        }
+        
+        .customer-info h4 {
+            color: #9C27B0;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .customer-info p {
+            margin: 0.25rem 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .admin-actions-card {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-approve {
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="admin-header">
+        <h1><i class="fas fa-cogs"></i> Manage Appointments</h1>
+        <p>Administrative control panel for managing all test drive appointments</p>
+    </div>
+
+    <div class="admin-actions">
+        <a href="/Admin/ManageAppointments?status=all" class="admin-btn">
+            <i class="fas fa-list"></i>
+            All Appointments
+        </a>
+        <a href="/Admin/ManageAppointments?status=pending" class="admin-btn">
+            <i class="fas fa-clock"></i>
+            Pending
+        </a>
+        <a href="/Admin/ManageAppointments?status=confirmed" class="admin-btn">
+            <i class="fas fa-check"></i>
+            Confirmed
+        </a>
+        <a href="/Admin/ManageAppointments?status=cancelled" class="admin-btn">
+            <i class="fas fa-ban"></i>
+            Cancelled
+        </a>
+    </div>
+
+    @if (Model.Appointments.Any())
+    {
+        <div class="appointments-grid">
+            @foreach (var appointment in Model.Appointments)
+            {
+                <div class="appointment-card admin-view @(appointment.Status?.ToLower())">
+                    <div class="card-header">
+                        <div class="status-badge status-@(appointment.Status?.ToLower())">
+                            @appointment.Status
+                        </div>
+                        <div class="appointment-date">
+                            @appointment.AppointmentDate.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="vehicle-info">
+                            <div class="vehicle-image">
+                                @if (!string.IsNullOrEmpty(appointment.Vehicle?.Images))
+                                {
+                                    <img src="@appointment.Vehicle.Images" alt="Vehicle Image" />
+                                }
+                                else
+                                {
+                                    <div class="no-image">
+                                        <i class="fas fa-car"></i>
+                                        <span>No Image</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="vehicle-details">
+                                <h3>@appointment.Vehicle?.Name</h3>
+                                <p class="dealer-name">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    @appointment.Dealer?.Name
+                                </p>
+                                <p class="appointment-time">
+                                    <i class="fas fa-clock"></i>
+                                    @appointment.AppointmentDate.ToString("HH:mm")
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="customer-info">
+                            <h4><i class="fas fa-user"></i> Customer Information</h4>
+                            <p><strong>Name:</strong> @appointment.Customer?.FullName</p>
+                            <p><strong>Email:</strong> @appointment.Customer?.Email</p>
+                            <p><strong>Phone:</strong> @appointment.Customer?.Phone</p>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(appointment.Notes))
+                        {
+                            <div class="notes">
+                                <strong>Notes:</strong> @appointment.Notes
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="admin-actions-card">
+                            @if (appointment.Status == "Pending")
+                            {
+                                <button type="button" class="btn btn-approve" onclick="updateStatus('@appointment.Id', 'Confirmed')">
+                                    <i class="fas fa-check"></i>
+                                    Approve
+                                </button>
+                                <button type="button" class="btn btn-reject" onclick="updateStatus('@appointment.Id', 'Cancelled')">
+                                    <i class="fas fa-times"></i>
+                                    Reject
+                                </button>
+                            }
+                            else if (appointment.Status == "Confirmed")
+                            {
+                                <button type="button" class="btn btn-reject" onclick="updateStatus('@appointment.Id', 'Cancelled')">
+                                    <i class="fas fa-ban"></i>
+                                    Cancel
+                                </button>
+                            }
+                            
+                            <button type="button" class="btn btn-edit" onclick="editAppointment('@appointment.Id')">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </button>
+                            
+                            @if (Model.CanCancelAppointment(appointment))
+                            {
+                                <button type="button" class="btn btn-cancel" onclick="openCancelModal('@appointment.Id', '@appointment.Vehicle?.Name')">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-appointments">
+            <div class="no-appointments-icon">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <h3>No Appointments Found</h3>
+            <p>No appointments match the current filter criteria.</p>
+        </div>
+    }
+</div>
+
+<!-- Cancel Appointment Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Cancel Appointment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="cancelForm" method="post">
+                <div class="modal-body">
+                    <div class="appointment-preview" id="appointmentPreview">
+                        <!-- Appointment details will be populated here -->
+                    </div>
+                    <p class="confirmation-text">Are you sure you want to cancel this appointment?</p>
+                    <div class="mb-3">
+                        <label for="cancelNote" class="form-label">
+                            <i class="fas fa-comment"></i>
+                            Reason for cancellation
+                        </label>
+                        <textarea class="form-control" id="cancelNote" name="CancelNote" rows="4" 
+                                  placeholder="Please provide a reason for cancelling this appointment..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-check"></i>
+                        Confirm Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openCancelModal(appointmentId, vehicleName) {
+            document.getElementById('cancelForm').action = '?handler=Cancel&id=' + appointmentId;
+            document.getElementById('appointmentPreview').innerHTML = 
+                '<div class="preview-item"><strong>Vehicle:</strong> ' + vehicleName + '</div>';
+            document.getElementById('cancelNote').value = '';
+            var modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+            modal.show();
+        }
+        
+        function updateStatus(appointmentId, newStatus) {
+            if (confirm('Are you sure you want to change the status to ' + newStatus + '?')) {
+                // Create a form and submit it
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '?handler=UpdateStatus&id=' + appointmentId + '&status=' + newStatus;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        function editAppointment(appointmentId) {
+            // Redirect to edit page or open edit modal
+            window.location.href = '/Admin/EditAppointment?id=' + appointmentId;
+        }
+    </script>
+}

@@ -3,9 +3,9 @@ using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Assignment02.Pages.Order
+namespace Assignment02.Pages.Orders
 {
-    public class PendingOrdersModel : PageModel
+    public class PendingOrdersModel : AuthenticatedPageModel
     {
         private readonly IOrderService _orderService;
 
@@ -18,13 +18,12 @@ namespace Assignment02.Pages.Order
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var userIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdStr))
+            if (!IsAuthenticated)
             {
                 return RedirectToPage("/Login");
             }
 
-            Guid userId = Guid.Parse(userIdStr);
+            Guid userId = Guid.Parse(UserId!);
             PendingOrders = await _orderService.GetPendingOrdersByUserIdAsync(userId);
             return Page();
         }
@@ -32,8 +31,7 @@ namespace Assignment02.Pages.Order
         // ? X? l� khi ng??i d�ng nh?n n�t Cancel
         public async Task<IActionResult> OnPostCancelAsync(Guid id)
         {
-            var userIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdStr))
+            if (!IsAuthenticated)
             {
                 return RedirectToPage("/Login");
             }
@@ -41,7 +39,7 @@ namespace Assignment02.Pages.Order
             try
             {
                 // G?i h�m CancelOrderAsync trong Service
-                bool result = await _orderService.CancelOrderAsync(id);
+                bool result = await _orderService.CancelOrderAsync(id, "Cancelled by user");
 
                 if (result)
                 {

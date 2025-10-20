@@ -7,10 +7,12 @@ namespace DataAccess_Layer.Repositories
 {
     public class UserRepository : IUserRepository
     {
+        private readonly EVDealerSystemContext _context;
         private readonly ILogger<UserRepository> _logger;
 
-        public UserRepository(ILogger<UserRepository> logger)
+        public UserRepository(EVDealerSystemContext context, ILogger<UserRepository> logger)
         {
+            _context = context;
             _logger = logger;
         }
 
@@ -18,7 +20,6 @@ namespace DataAccess_Layer.Repositories
         {
             try
             {
-                using var _context = new EVDealerSystemContext();
                 return await _context.Users
                     .Include(u => u.Dealer)
                     .FirstOrDefaultAsync(u => u.Id == id);
@@ -34,7 +35,6 @@ namespace DataAccess_Layer.Repositories
         {
             try
             {
-                using var _context = new EVDealerSystemContext();
                 return await _context.Users
                     .Include(u => u.Dealer)
                     .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
@@ -50,7 +50,6 @@ namespace DataAccess_Layer.Repositories
         {
             try
             {
-                using var _context = new EVDealerSystemContext();
                 return await _context.Users
                     .Include(u => u.Dealer)
                     .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
@@ -66,7 +65,6 @@ namespace DataAccess_Layer.Repositories
         {
             try
             {
-                using var _context = new EVDealerSystemContext();
                 return await _context.Users
                     .Include(u => u.Dealer)
                     .Where(u => u.IsActive.GetValueOrDefault())
@@ -83,7 +81,6 @@ namespace DataAccess_Layer.Repositories
         {
             try
             {
-                using var _context = new EVDealerSystemContext();
                 user.Id = Guid.NewGuid();
                 user.CreatedAt = DateTime.Now;
                 user.IsActive = true;
@@ -103,7 +100,6 @@ namespace DataAccess_Layer.Repositories
         {
             try
             {
-                using var _context = new EVDealerSystemContext();
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
                 return user;
@@ -119,7 +115,6 @@ namespace DataAccess_Layer.Repositories
         {
             try
             {
-                using var _context = new EVDealerSystemContext();
                 var user = await _context.Users.FindAsync(id);
                 if (user != null)
                 {
@@ -140,7 +135,6 @@ namespace DataAccess_Layer.Repositories
         {
             try
             {
-                using var _context = new EVDealerSystemContext();
                 return await _context.Users
                     .AnyAsync(u => u.Username.ToLower() == username.ToLower() || 
                                   u.Email.ToLower() == email.ToLower());

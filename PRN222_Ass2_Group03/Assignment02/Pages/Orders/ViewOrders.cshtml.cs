@@ -3,9 +3,9 @@ using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Assignment02.Pages.Order
+namespace Assignment02.Pages.Orders
 {
-    public class ViewOrdersModel : PageModel
+    public class ViewOrdersModel : AuthenticatedPageModel
     {
         private readonly IOrderService _orderService;
 
@@ -30,13 +30,12 @@ namespace Assignment02.Pages.Order
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var userIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdStr))
+            if (!IsAuthenticated)
             {
                 return RedirectToPage("/Login");
             }
 
-            var userId = Guid.Parse(userIdStr);
+            var userId = Guid.Parse(UserId!);
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);
 
             // Apply filters
@@ -69,7 +68,7 @@ namespace Assignment02.Pages.Order
 
             try
             {
-                bool result = await _orderService.CancelOrderAsync(id);
+                bool result = await _orderService.CancelOrderAsync(id, "Cancelled by user");
 
                 if (result)
                 {
