@@ -61,10 +61,26 @@ namespace Business_Logic_Layer.Services
                 return false;
             }
 
-            // Only allow cancellation if appointment is more than 24 hours away
-            if (appointment.AppointmentDate <= DateTime.Now.AddHours(24))
+            // Allow cancellation only when appointment is in processing/pending status
+            var status = appointment.Status?.ToLower();
+            if (status != "pending" && status != "processing")
             {
-                throw new InvalidOperationException("Không thể hủy lịch hẹn trong vòng 24 giờ trước giờ hẹn.");
+                throw new InvalidOperationException("Chỉ có thể hủy lịch hẹn khi đang ở trạng thái Processing.");
+            }
+
+            appointment.Status = "Cancelled";
+            appointment.Notes = note;
+            appointment.UpdatedAt = DateTime.Now;
+            await _repository.UpdateAsync(appointment);
+            return true;
+        }
+
+        public async Task<bool> CancelAppointmentByStaffAsync(Guid appointmentId, string note)
+        {
+            var appointment = await _repository.GetByIdAsync(appointmentId);
+            if (appointment == null)
+            {
+                return false;
             }
 
             appointment.Status = "Cancelled";
@@ -133,6 +149,36 @@ namespace Business_Logic_Layer.Services
             }
 
             appointment.Status = status;
+            appointment.UpdatedAt = DateTime.Now;
+            await _repository.UpdateAsync(appointment);
+            return true;
+        }
+
+        public async Task<bool> CompleteAppointmentAsync(Guid appointmentId)
+        {
+            var appointment = await _repository.GetByIdAsync(appointmentId);
+            if (appointment == null)
+            {
+                return false;
+            }
+            appointment.Status = "Completed";
+            appointment.UpdatedAt = DateTime.Now;
+            await _repository.UpdateAsync(appointment);
+            return true;
+        }
+
+        public async Task<bool> MarkDoneByCustomerAsync(Guid appointmentId, Guid customerId)
+        {
+            var appointment = await _repository.GetByIdAsync(appointmentId);
+            if (appointment == null || appointment.CustomerId != customerId)
+            {
+                return false;
+            }
+            if (!string.Equals(appointment.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            appointment.Status = "Done";
             appointment.UpdatedAt = DateTime.Now;
             await _repository.UpdateAsync(appointment);
             return true;

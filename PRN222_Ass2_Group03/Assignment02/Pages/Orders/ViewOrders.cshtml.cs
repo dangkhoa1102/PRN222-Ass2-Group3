@@ -68,6 +68,19 @@ namespace Assignment02.Pages.Orders
 
             try
             {
+                // Owner-or-admin check
+                var order = await _orderService.GetOrderByIdAsync(id);
+                var isPrivileged = string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase);
+                if (order == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
+                    return RedirectToPage();
+                }
+                if (!isPrivileged && order.CustomerId.ToString() != userIdStr)
+                {
+                    return Forbid();
+                }
+
                 bool result = await _orderService.CancelOrderAsync(id, "Cancelled by user");
 
                 if (result)

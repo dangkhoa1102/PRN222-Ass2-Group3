@@ -31,20 +31,13 @@ namespace Assignment02.Pages.Admin
                 return;
             }
 
-            FilterStatus = status;
-            
-            // Lấy tất cả appointments hoặc filter theo status
-            if (string.IsNullOrEmpty(status) || status == "all")
-            {
-                Appointments = await _appointmentService.GetAllAppointmentsAsync(Guid.Empty);
-            }
-            else
-            {
-                Appointments = await _appointmentService.GetAppointmentsByStatusAsync(status);
-            }
+            // Bỏ filter: luôn tải tất cả lịch hẹn, sắp xếp mới nhất trước
+            FilterStatus = null;
+            var list = await _appointmentService.GetAllAppointmentsAsync(Guid.Empty);
+            Appointments = list.OrderByDescending(a => a.AppointmentDate).ToList();
         }
 
-        public async Task<IActionResult> OnPostUpdateStatusAsync(Guid id, string status)
+        public async Task<IActionResult> OnPostAsync(string handler, Guid id, string status)
         {
             // Kiểm tra quyền Admin hoặc Staff
             if (UserRole != "Admin" && UserRole != "Staff")
@@ -52,21 +45,63 @@ namespace Assignment02.Pages.Admin
                 return Forbid();
             }
 
+            if (handler == "UpdateStatus")
+            {
+                return await HandleUpdateStatus(id, status);
+            }
+            else if (handler == "Cancel")
+            {
+                return await HandleCancel(id);
+            }
+
+            return RedirectToPage();
+        }
+
+        private async Task<IActionResult> HandleUpdateStatus(Guid id, string status)
+        {
             try
             {
-                var success = await _appointmentService.UpdateAppointmentStatusAsync(id, status);
+                bool success = await _appointmentService.UpdateAppointmentStatusAsync(id, status);
+                
                 if (success)
                 {
-                    TempData["SuccessMessage"] = $"Appointment status updated to {status} successfully.";
+                    TempData["SuccessMessage"] = $"Cập nhật trạng thái thành {status} thành công.";
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Failed to update appointment status.";
+                    TempData["ErrorMessage"] = "Không thể cập nhật trạng thái.";
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error updating appointment: {ex.Message}";
+                TempData["ErrorMessage"] = $"Lỗi: {ex.Message}";
+            }
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostUpdateStatusAsync(Guid id, string status)
+        {
+            return await HandleUpdateStatus(id, status);
+        }
+
+        private async Task<IActionResult> HandleCancel(Guid id)
+        {
+            try
+            {
+                var success = await _appointmentService.CancelAppointmentByStaffAsync(id, CancelNote);
+                if (success)
+                {
+                    TempData["SuccessMessage"] = "Hủy lịch hẹn thành công.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể hủy lịch hẹn.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi: {ex.Message}";
             }
 
             return RedirectToPage();
@@ -74,36 +109,7 @@ namespace Assignment02.Pages.Admin
 
         public async Task<IActionResult> OnPostCancelAsync(Guid id)
         {
-            // Kiểm tra quyền Admin hoặc Staff
-            if (UserRole != "Admin" && UserRole != "Staff")
-            {
-                return Forbid();
-            }
-
-            var userIdString = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
-            {
-                return RedirectToPage("/Login");
-            }
-
-            try
-            {
-                var success = await _appointmentService.CancelAppointmentAsync(id, userId, CancelNote);
-                if (success)
-                {
-                    TempData["SuccessMessage"] = "Appointment cancelled successfully.";
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Failed to cancel appointment.";
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Error cancelling appointment: {ex.Message}";
-            }
-
-            return RedirectToPage();
+            return await HandleCancel(id);
         }
 
         // Helper method để kiểm tra quyền cancel
@@ -113,7 +119,7 @@ namespace Assignment02.Pages.Admin
                 return false;
 
             // Admin và Staff có thể cancel bất kỳ appointment nào
-            return UserRole == "Admin" || UserRole == "Staff";
+            return string.Equals(UserRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(UserRole, "Staff", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

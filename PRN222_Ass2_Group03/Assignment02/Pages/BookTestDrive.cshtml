@@ -87,7 +87,13 @@
                         <option value="">-- Chọn xe --</option>
                         @foreach (var vehicle in Model.Vehicles)
                         {
-                            <option value="@vehicle.Id" data-image="@vehicle.Images">@vehicle.Name @vehicle.Model</option>
+                            <option value="@vehicle.Id" 
+                                    data-image="@(!string.IsNullOrEmpty(vehicle.Images) ? vehicle.Images : "")" 
+                                    data-name="@vehicle.Name" 
+                                    data-model="@vehicle.Model"
+                                    title="Image path: @vehicle.Images">
+                                @vehicle.Name @vehicle.Model (@(!string.IsNullOrEmpty(vehicle.Images) ? "Có hình" : "Không có hình"))
+                            </option>
                         }
                     </select>
                 </div>
@@ -210,18 +216,66 @@
         document.getElementById("VehicleId").addEventListener("change", function () {
             const selectedOption = this.options[this.selectedIndex];
             const imageUrl = selectedOption.getAttribute("data-image");
+            const vehicleName = selectedOption.getAttribute("data-name");
+            const vehicleModel = selectedOption.getAttribute("data-model");
             const vehicleImage = document.getElementById("vehicleImage");
             const placeholder = document.querySelector('.no-image-placeholder');
 
-            if (imageUrl && imageUrl !== "null" && imageUrl !== "") {
-                vehicleImage.src = imageUrl;
+            console.log("=== VEHICLE SELECTION DEBUG ===");
+            console.log("Selected vehicle:", vehicleName, vehicleModel);
+            console.log("Raw image URL from data-image:", imageUrl);
+            console.log("Image URL type:", typeof imageUrl);
+            console.log("Image URL length:", imageUrl ? imageUrl.length : 0);
+            console.log("Title attribute:", selectedOption.title);
+
+            if (imageUrl && imageUrl !== "null" && imageUrl !== "" && imageUrl.trim() !== "") {
+                // Xử lý đường dẫn hình ảnh
+                let finalImageUrl = imageUrl.trim();
+                
+                // Nếu đường dẫn không bắt đầu bằng http hoặc /, thêm / vào đầu
+                if (!finalImageUrl.startsWith('http') && !finalImageUrl.startsWith('/')) {
+                    finalImageUrl = '/' + finalImageUrl;
+                }
+                
+                console.log("Final image URL:", finalImageUrl);
+                
+                // Ẩn placeholder và hiển thị hình ảnh
+                if (placeholder) {
+                    placeholder.style.display = "none";
+                }
                 vehicleImage.style.display = "block";
-                placeholder.style.display = "none";
+                vehicleImage.src = finalImageUrl;
+                
+                // Xử lý khi hình ảnh load thành công
+                vehicleImage.onload = function() {
+                    console.log("✅ Image loaded successfully:", finalImageUrl);
+                    console.log("Image dimensions:", this.naturalWidth, "x", this.naturalHeight);
+                };
+                
+                // Xử lý khi hình ảnh load thất bại
+                vehicleImage.onerror = function() {
+                    console.error("❌ Failed to load image:", finalImageUrl);
+                    this.style.display = "none";
+                    if (placeholder) {
+                        placeholder.style.display = "flex";
+                    }
+                    
+                    // Thử load với đường dẫn khác nếu có thể
+                    if (!finalImageUrl.startsWith('/images/') && !finalImageUrl.includes('://')) {
+                        const alternativeUrl = '/images/vehicles/' + imageUrl.replace(/^\/+/, '');
+                        console.log("Trying alternative URL:", alternativeUrl);
+                        this.src = alternativeUrl;
+                    }
+                };
             } else {
+                console.log("❌ No valid image URL available");
                 vehicleImage.src = "";
                 vehicleImage.style.display = "none";
-                placeholder.style.display = "flex";
+                if (placeholder) {
+                    placeholder.style.display = "flex";
+                }
             }
+            console.log("=== END DEBUG ===");
         });
 
         document.getElementById("AppointmentDate").addEventListener("change", async function () {
@@ -280,16 +334,11 @@
                 }
 
                 const result = await response.json();
-                showModal(result.message, result.success);
-
                 if (result.success) {
-                    form.reset();
-                    document.getElementById('VehicleId').innerHTML = '<option value="">-- Chọn xe --</option>';
-                    document.getElementById('TimeSlot').innerHTML = '<option value="">-- Chọn giờ --</option>';
-                    document.getElementById('vehicleImage').src = "";
-                    document.getElementById('vehicleImage').style.display = "none";
-                    document.querySelector('.no-image-placeholder').style.display = "flex";
+                    window.location.href = '/MyAppointment';
+                    return;
                 }
+                showModal(result.message, false);
             } catch (error) {
                 console.error('Error:', error);
                 showModal('Đã xảy ra lỗi khi đặt lịch. Vui lòng thử lại.', false);

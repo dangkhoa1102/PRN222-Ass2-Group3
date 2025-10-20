@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Vehicles
 {
-    public class DeleteModel : PageModel
+    public class DeleteModel : AuthenticatedPageModel
     {
         private readonly IVehicleService _vehicleService;
 
@@ -19,6 +19,10 @@ namespace Assignment02.Pages.Vehicles
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {
+            if (!IsAuthenticated || (!string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) && !string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RedirectToPage("/Login");
+            }
             try
             {
                 // Validate ID
@@ -48,6 +52,10 @@ namespace Assignment02.Pages.Vehicles
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (!IsAuthenticated || (!string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) && !string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase)))
+            {
+                return RedirectToPage("/Login");
+            }
             try
             {
                 if (Vehicle == null)

@@ -29,6 +29,22 @@ namespace Assignment02.Pages.Orders
                 return NotFound();
             }
 
+            // Authorization: allow Admin/Staff or the owner (CustomerId matches session UserId)
+            var isPrivileged = string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase);
+            if (!isPrivileged)
+            {
+                if (Guid.TryParse(UserId, out var currentUserId))
+                {
+                    if (order.CustomerId != currentUserId)
+                    {
+                        return Forbid();
+                    }
+                }
+                else
+                {
+                    return RedirectToPage("/Login");
+                }
+            }
             Order = order;
             return Page();
         }

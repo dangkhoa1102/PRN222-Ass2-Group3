@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add EF DbContext
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
+builder.Services.AddHttpContextAccessor();
 
 // Register Service Factory
 builder.Services.AddScoped<ServiceFactory>();

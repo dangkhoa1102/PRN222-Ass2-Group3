@@ -57,7 +57,7 @@
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
+                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-calendar-check"></i>
                                     <span>Test Drives</span>
                                 </a>
@@ -75,25 +75,36 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-page="/MyAppointment">
+                                        <a class="dropdown-item" asp-page="/TestDrives/History">
                                             <i class="fas fa-history"></i>
                                             <span>Test Drive History</span>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-                            @if (userRole == "customer")
+                            @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase))
                             {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link modern-nav-link dropdown-toggle" href="javascript:void(0)" role="button" aria-expanded="false">
-                                        <i class="fas fa-shopping-bag"></i>
-                                        <span>Orders</span>
+                                <li class="nav-item">
+                                    <a class="nav-link modern-nav-link" href="/Admin/ManageAppointments">
+                                        <i class="fas fa-clipboard-list"></i>
+                                        <span>Manage Appointments</span>
                                     </a>
-                                    <ul class="dropdown-menu">
+                                </li>
+                            }
+                            
+                            <!-- Orders Menu for all authenticated users -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span>Orders</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @if (string.Equals(userRole, "Customer", StringComparison.OrdinalIgnoreCase))
+                                    {
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Orders/ViewOrders">
-                                                <i class="fas fa-eye"></i>
-                                                <span>View Orders</span>
+                                            <a class="dropdown-item" asp-page="/Orders/Create">
+                                                <i class="fas fa-plus-circle"></i>
+                                                <span>Create New Order</span>
                                             </a>
                                         </li>
                                         <li>
@@ -102,23 +113,36 @@
                                                 <span>My Orders</span>
                                             </a>
                                         </li>
-
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Orders/ViewOrders">
+                                                <i class="fas fa-eye"></i>
+                                                <span>View Orders</span>
+                                            </a>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item" asp-page="/Orders/PendingOrders">
                                                 <i class="fas fa-hourglass-half"></i>
                                                 <span>Processing Orders</span>
                                             </a>
                                         </li>
-
                                         <li>
                                             <a class="dropdown-item" asp-page="/Orders/History">
                                                 <i class="fas fa-history"></i>
                                                 <span>Order History</span>
                                             </a>
                                         </li>
-                                    </ul>
-                                </li>
-                            }
+                                    }
+                                    @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Admin/ManageOrders">
+                                                <i class="fas fa-cogs"></i>
+                                                <span>Manage Orders</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
                         }
                         else
                         {
@@ -142,7 +166,7 @@
                         <ul class="navbar-nav">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle modern-user-menu" href="#" id="navbarDropdown"
-                                   role="button" aria-expanded="false">
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <div class="user-avatar">
                                         <i class="fas fa-user-circle"></i>
                                     </div>
@@ -152,7 +176,7 @@
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end modern-dropdown" aria-labelledby="navbarDropdown">
-                                    @if (userRole == "Admin" || userRole == "Staff")
+                                    @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <li>
                                             <a class="dropdown-item modern-dropdown-item" href="/Admin/ManageAppointments">
@@ -308,6 +332,12 @@
 
         // Enhanced dropdown hover functionality - FORCE DROPDOWN TO WORK
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap dropdowns
+            const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            const dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+
             const dropdownItems = document.querySelectorAll('.nav-item.dropdown');
 
             dropdownItems.forEach(function(item) {
@@ -321,17 +351,25 @@
                     dropdownMenu.style.position = 'absolute';
                 }
 
+                // Click functionality for mobile/tablet
+                if (dropdownToggle) {
+                    dropdownToggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (window.innerWidth <= 991) {
+                            const bsDropdown = bootstrap.Dropdown.getInstance(this) || new bootstrap.Dropdown(this);
+                            bsDropdown.toggle();
+                        }
+                    });
+                }
+
                 // Desktop hover effect
                 item.addEventListener('mouseenter', function() {
                     if (window.innerWidth > 991) {
                         clearTimeout(hoverTimeout);
                         if (dropdownMenu) {
-                            dropdownMenu.style.display = 'block';
-                            dropdownMenu.style.opacity = '1';
-                            dropdownMenu.style.visibility = 'visible';
-                            dropdownMenu.style.transform = 'translateX(-50%) translateY(0)';
-                            dropdownMenu.style.pointerEvents = 'auto';
-                            dropdownMenu.style.zIndex = '999999';
+                            dropdownMenu.classList.add('show');
+                            dropdownToggle.classList.add('show');
+                            dropdownToggle.setAttribute('aria-expanded', 'true');
                         }
                     }
                 });
@@ -340,10 +378,9 @@
                     if (window.innerWidth > 991) {
                         hoverTimeout = setTimeout(function() {
                             if (dropdownMenu) {
-                                dropdownMenu.style.opacity = '0';
-                                dropdownMenu.style.visibility = 'hidden';
-                                dropdownMenu.style.transform = 'translateX(-50%) translateY(-10px)';
-                                dropdownMenu.style.pointerEvents = 'none';
+                                dropdownMenu.classList.remove('show');
+                                dropdownToggle.classList.remove('show');
+                                dropdownToggle.setAttribute('aria-expanded', 'false');
                             }
                         }, 300); // 300ms delay before hiding
                     }
@@ -354,22 +391,15 @@
                     dropdownMenu.addEventListener('mouseenter', function() {
                         if (window.innerWidth > 991) {
                             clearTimeout(hoverTimeout);
-                            this.style.display = 'block';
-                            this.style.opacity = '1';
-                            this.style.visibility = 'visible';
-                            this.style.transform = 'translateX(-50%) translateY(0)';
-                            this.style.pointerEvents = 'auto';
-                            this.style.zIndex = '999999';
                         }
                     });
 
                     dropdownMenu.addEventListener('mouseleave', function() {
                         if (window.innerWidth > 991) {
                             hoverTimeout = setTimeout(() => {
-                                this.style.opacity = '0';
-                                this.style.visibility = 'hidden';
-                                this.style.transform = 'translateX(-50%) translateY(-10px)';
-                                this.style.pointerEvents = 'none';
+                                this.classList.remove('show');
+                                dropdownToggle.classList.remove('show');
+                                dropdownToggle.setAttribute('aria-expanded', 'false');
                             }, 200);
                         }
                     });
