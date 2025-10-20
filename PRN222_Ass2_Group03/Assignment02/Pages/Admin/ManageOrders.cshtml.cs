@@ -51,7 +51,7 @@ namespace Assignment02.Pages.Admin
             if (ToDate.HasValue)
                 allOrders = allOrders.Where(o => o.CreatedAt <= ToDate).ToList();
 
-            Orders = allOrders;
+            Orders = Orders;
             return Page();
         }
 

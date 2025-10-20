@@ -106,12 +106,12 @@
 <div class="orders-container">
     <h2>Order History</h2>
 
-    @if (Model.OrderHistories == null || !Model.OrderHistories.Any())
-    {
+@if (Model.OrderHistories == null || !Model.OrderHistories.Any())
+{
         <div class="text-center text-muted py-4">No order history available.</div>
-    }
-    else
-    {
+}
+else
+{
         <table class="table align-middle">
             <thead>
                 <tr>
@@ -148,7 +148,7 @@
 
                     <tr>
                         <td>@order.OrderNumber</td>
-                        <td>@order.VehicleName</td>
+                        <td>@order.Vehicle?.Name</td>
                         <td>@order.TotalAmount.ToString("N0") ₫</td>
                         <td><span class="badge @statusBadge">@order.Status</span></td>
                         <td><span class="badge @paymentBadge">@order.PaymentStatus</span></td>
@@ -163,5 +163,4 @@
                 }
             </tbody>
         </table>
-    }
-</div>
+}

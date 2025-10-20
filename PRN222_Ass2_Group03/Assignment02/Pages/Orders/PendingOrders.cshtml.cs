@@ -1,63 +1,56 @@
-﻿using Business_Logic_Layer.DTOs;
+﻿
 using Business_Logic_Layer.Services;
+using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Orders
 {
-    public class PendingOrdersModel : AuthenticatedPageModel
+    public class PendingOrdersModel : PageModel
     {
         private readonly IOrderService _orderService;
 
-        public List<OrderDTO> PendingOrders { get; set; } = new();
+        public IEnumerable<Order> PendingOrders { get; set; } = Enumerable.Empty<Order>();
 
         public PendingOrdersModel(IOrderService orderService)
         {
             _orderService = orderService;
         }
 
+        // ✅ Lấy danh sách đơn đang xử lý
         public async Task<IActionResult> OnGetAsync()
         {
-            if (!IsAuthenticated)
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdStr))
             {
                 return RedirectToPage("/Login");
             }
 
-            Guid userId = Guid.Parse(UserId!);
+            Guid userId = Guid.Parse(userIdStr);
             PendingOrders = await _orderService.GetPendingOrdersByUserIdAsync(userId);
             return Page();
         }
 
-        // Handle cancel click
-        public async Task<IActionResult> OnPostCancelAsync(Guid id)
+        // ✅ Nhận thêm tham số Notes từ form
+        public async Task<IActionResult> OnPostCancelAsync(Guid id, string Notes)
         {
-            if (!IsAuthenticated)
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdStr))
             {
                 return RedirectToPage("/Login");
             }
 
+            // 🔸 Kiểm tra người dùng có nhập lý do không
+            if (string.IsNullOrWhiteSpace(Notes))
+            {
+                TempData["ErrorMessage"] = "Bạn phải nhập lý do hủy đơn hàng.";
+                return RedirectToPage();
+            }
+
             try
             {
-                var userIdStr = HttpContext.Session.GetString("UserId");
-                if (string.IsNullOrEmpty(userIdStr))
-                {
-                    return RedirectToPage("/Login");
-                }
-
-                // Owner-or-admin check before cancelling
-                var order = await _orderService.GetOrderByIdAsync(id);
-                var isPrivileged = string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase);
-                if (order == null)
-                {
-                    TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
-                    return RedirectToPage();
-                }
-                if (!isPrivileged && order.CustomerId.ToString() != userIdStr)
-                {
-                    return Forbid();
-                }
-
-                bool result = await _orderService.CancelOrderAsync(id, "Cancelled by user");
+                // ✅ Gọi service mới có tham số Notes
+                bool result = await _orderService.CancelOrderAsync(id, Notes);
 
                 if (result)
                 {
@@ -73,7 +66,6 @@ namespace Assignment02.Pages.Orders
                 TempData["ErrorMessage"] = $"Đã xảy ra lỗi: {ex.Message}";
             }
 
-            // Refresh current page to update list
             return RedirectToPage();
         }
     }

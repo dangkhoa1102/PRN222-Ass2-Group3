@@ -54,7 +54,7 @@ namespace Assignment02.Pages.Orders
             // Sort by created date descending
             orders = orders.OrderByDescending(o => o.CreatedAt).ToList();
 
-            Orders = orders;
+            Orders = Orders;
             return Page();
         }
 

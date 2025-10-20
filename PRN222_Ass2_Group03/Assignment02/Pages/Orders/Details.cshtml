@@ -1,506 +1,123 @@
-﻿@page "{id:guid}"
+﻿@page
 @model Assignment02.Pages.Orders.DetailsModel
 @{
     ViewData["Title"] = "Order Details";
 }
 
-@section Styles {
 <style>
     body {
-        background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
-        min-height: 100vh;
-        margin: 0;
-        font-family: 'Inter', 'Segoe UI', sans-serif;
-    }
-
-    .order-details-hero {
-        background: linear-gradient(135deg, #1976D2 0%, #388E3C 100%);
-        color: white;
-        padding: 80px 0 60px 0;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .order-details-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-        opacity: 0.3;
-    }
-
-    .order-details-hero h1 {
-        font-size: 3rem;
-        font-weight: 800;
-        margin: 0 0 1rem 0;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        position: relative;
-        z-index: 2;
-    }
-
-    .order-details-hero p {
-        font-size: 1.2rem;
-        opacity: 0.9;
-        margin: 0;
-        position: relative;
-        z-index: 2;
+        background-color: #f4f6f9;
     }
 
     .details-container {
-        max-width: 900px;
-        margin: -40px auto 60px auto;
-        background: white;
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-        overflow: hidden;
-        position: relative;
-        z-index: 10;
-    }
-
-    .details-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 6px;
-        background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+        max-width: 800px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px 40px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
     }
 
     .details-header {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 2rem;
         text-align: center;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .details-header h2 {
-        font-size: 2rem;
+        color: #007bff;
         font-weight: 700;
-        color: #2c3e50;
-        margin: 0 0 0.5rem 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-    }
-
-    .details-header h2 i {
-        color: #2196F3;
-        font-size: 1.8rem;
-    }
-
-    .details-header p {
-        font-size: 1.1rem;
-        color: #6c757d;
-        margin: 0;
-    }
-
-    .details-content {
-        padding: 2rem;
-    }
-
-    .order-info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .info-card {
-        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-        border-radius: 16px;
-        padding: 1.5rem;
-        border: 2px solid #f1f3f4;
-        transition: all 0.3s ease;
-    }
-
-    .info-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-        border-color: #2196F3;
-    }
-
-    .info-card-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-        color: #2c3e50;
-        font-weight: 600;
-        font-size: 1.1rem;
-    }
-
-    .info-card-header i {
-        color: #2196F3;
-        font-size: 1.2rem;
-        width: 20px;
-        text-align: center;
+        margin-bottom: 25px;
     }
 
     .detail-item {
-        margin-bottom: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 15px;
+        font-size: 1.05rem;
     }
 
-    .detail-item:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-    }
-
-    .detail-label {
-        font-weight: 600;
-        color: #495057;
-        font-size: 0.95rem;
-    }
-
-    .detail-value {
-        font-weight: 500;
-        color: #2c3e50;
-        text-align: right;
-    }
-
-    .order-id-display {
-        font-family: 'Courier New', monospace;
-        background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-        color: #2196F3;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
+    .badge {
+        padding: 7px 14px;
+        border-radius: 20px;
         font-weight: 600;
         font-size: 0.9rem;
     }
 
-    .amount-display {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #4CAF50;
+    .badge-success {
+        background-color: #d4edda;
+        color: #198754;
     }
 
-    .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-block;
-        min-width: 80px;
-        text-align: center;
+    .badge-warning {
+        background-color: #fff3cd;
+        color: #856404;
     }
 
-    .status-pending { background: linear-gradient(135deg, #fff3cd, #ffeaa7); color: #856404; }
-    .status-confirmed { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
-    .status-processing { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); color: #856404; }
-    .status-shipped { background: linear-gradient(135deg, #e2e3f0, #d1d7f0); color: #6f42c1; }
-    .status-completed { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #198754; }
-    .status-cancelled { background: linear-gradient(135deg, #f8d7da, #f5c6cb); color: #842029; }
-
-    .payment-paid { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #198754; }
-    .payment-unpaid { background: linear-gradient(135deg, #f8d7da, #f5c6cb); color: #842029; }
-    .payment-pending { background: linear-gradient(135deg, #fff3cd, #ffeaa7); color: #856404; }
-
-    .notes-section {
-        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-top: 2rem;
-        border-left: 4px solid #2196F3;
-    }
-
-    .notes-header {
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .notes-header i {
-        color: #2196F3;
-    }
-
-    .notes-content {
-        color: #495057;
-        line-height: 1.6;
-        font-style: italic;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 2rem;
-        padding-top: 2rem;
-        border-top: 1px solid #e9ecef;
-    }
-
-    .btn-action {
-        padding: 0.75rem 2rem;
-        border-radius: 25px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        min-width: 140px;
-        justify-content: center;
-    }
-
-    .btn-back {
-        background: linear-gradient(135deg, #2196F3, #4CAF50);
-        color: white;
-    }
-
-    .btn-back:hover {
-        background: linear-gradient(135deg, #4CAF50, #2196F3);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
-        color: white;
-    }
-
-    .error-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #6c757d;
-    }
-
-    .error-icon {
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem auto;
-        font-size: 2.5rem;
+    .badge-danger {
+        background-color: #f8d7da;
         color: #842029;
     }
 
-    .error-state h3 {
-        font-size: 1.5rem;
+    .btn-back {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: #fff;
+        border: none;
         font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: 0.2s;
     }
 
-    .error-state p {
-        font-size: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    @@media (max-width: 768px) {
-        .order-details-hero h1 {
-            font-size: 2rem;
+        .btn-back:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #0056b3, #007bff);
         }
-        
-        .details-container {
-            margin: -20px 10px 40px 10px;
-        }
-        
-        .details-content {
-            padding: 1rem;
-        }
-        
-        .order-info-grid {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        
-        .info-card {
-            padding: 1rem;
-        }
-        
-        .detail-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-        
-        .detail-value {
-            text-align: left;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .btn-action {
-            min-width: auto;
-            width: 100%;
-        }
-    }
 </style>
-}
 
 @if (Model.Order == null)
 {
-    <!-- Hero Section -->
-    <div class="order-details-hero">
-        <div class="container">
-            <h1>
-                <i class="fas fa-exclamation-triangle"></i>
-                Order Not Found
-            </h1>
-            <p>Không tìm thấy thông tin đơn hàng</p>
-        </div>
-    </div>
-
-    <!-- Error Content -->
-    <div class="container-fluid">
-        <div class="details-container">
-            <div class="error-state">
-                <div class="error-icon">
-                    <i class="fas fa-search"></i>
-                </div>
-                <h3>Đơn hàng không tồn tại</h3>
-                <p>Đơn hàng bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-                <div class="action-buttons">
-                    <a href="javascript:history.back()" class="btn-action btn-back">
-                        <i class="fas fa-arrow-left"></i> Quay lại
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="alert alert-danger text-center mt-5">Order not found.</div>
 }
 else
 {
-    <!-- Hero Section -->
-    <div class="order-details-hero">
-        <div class="container">
-            <h1>
-                <i class="fas fa-receipt"></i>
-                Order Details
-            </h1>
-            <p>Chi tiết thông tin đơn hàng của bạn</p>
+    <div class="details-container">
+        <h2 class="details-header">Order Details</h2>
+
+        <div class="detail-item"><strong>Order #:</strong> @Model.Order.OrderNumber</div>
+        <div class="detail-item"><strong>Vehicle:</strong> @Model.Order.Vehicle?.Name</div>
+        <div class="detail-item"><strong>Total:</strong> @Model.Order.TotalAmount.ToString("N0") ₫</div>
+
+        <div class="detail-item">
+            <strong>Status:</strong>
+            @if (Model.Order.Status?.Equals("completed", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <span class="badge badge-success">Completed</span>
+            }
+            else if (Model.Order.Status?.Equals("processing", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <span class="badge badge-warning">Processing</span>
+            }
+            else if (Model.Order.Status?.Equals("cancelled", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <span class="badge badge-danger">Cancelled</span>
+            }
+            else
+            {
+                <span class="badge badge-info">@Model.Order.Status</span>
+            }
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="container-fluid">
-        <div class="details-container">
-            <div class="details-header">
-                <h2>
-                    <i class="fas fa-clipboard-list"></i>
-                    Thông tin đơn hàng
-                </h2>
-                <p>Xem chi tiết và trạng thái đơn hàng</p>
-            </div>
+        <div class="detail-item">
+            <strong>Payment:</strong>
+            @if (Model.Order.PaymentStatus == "Paid")
+            {
+                <span class="badge badge-success">Paid</span>
+            }
+            else
+            {
+                <span class="badge badge-danger">Unpaid</span>
+            }
+        </div>
 
-            <div class="details-content">
-                <div class="order-info-grid">
-                    <!-- Order Information Card -->
-                    <div class="info-card">
-                        <div class="info-card-header">
-                            <i class="fas fa-shopping-cart"></i>
-                            Thông tin đơn hàng
-                        </div>
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Mã đơn hàng:</span>
-                            <span class="detail-value">
-                                <div class="order-id-display">@Model.Order.OrderNumber</div>
-                            </span>
-                        </div>
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Xe:</span>
-                            <span class="detail-value">@Model.Order.VehicleName</span>
-                        </div>
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Tổng tiền:</span>
-                            <span class="detail-value">
-                                <div class="amount-display">@Model.Order.TotalAmount.ToString("N0") ₫</div>
-                            </span>
-                        </div>
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Ngày tạo:</span>
-                            <span class="detail-value">@Model.Order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</span>
-                        </div>
-                    </div>
+        <div class="detail-item"><strong>Created At:</strong> @Model.Order.CreatedAt?.ToString("dd/MM/yyyy")</div>
+        <div class="detail-item"><strong>Notes:</strong> @(Model.Order.Notes ?? "—")</div>
 
-                    <!-- Status Information Card -->
-                    <div class="info-card">
-                        <div class="info-card-header">
-                            <i class="fas fa-info-circle"></i>
-                            Trạng thái đơn hàng
-                        </div>
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Trạng thái:</span>
-                            <span class="detail-value">
-                                @{
-                                    var statusClass = "status-" + (Model.Order.Status?.ToLower() ?? "pending");
-                                }
-                                <span class="status-badge @statusClass">@Model.Order.Status</span>
-                            </span>
-                        </div>
-                        
-                        <div class="detail-item">
-                            <span class="detail-label">Thanh toán:</span>
-                            <span class="detail-value">
-                                @{
-                                    var paymentClass = "payment-" + (Model.Order.PaymentStatus?.ToLower() ?? "pending");
-                                }
-                                <span class="status-badge @paymentClass">@Model.Order.PaymentStatus</span>
-                            </span>
-                        </div>
-                        
-                        @if (!string.IsNullOrEmpty(Model.Order.DealerName))
-                        {
-                            <div class="detail-item">
-                                <span class="detail-label">Đại lý:</span>
-                                <span class="detail-value">@Model.Order.DealerName</span>
-                            </div>
-                        }
-                        
-                        @if (!string.IsNullOrEmpty(Model.Order.CustomerName))
-                        {
-                            <div class="detail-item">
-                                <span class="detail-label">Khách hàng:</span>
-                                <span class="detail-value">@Model.Order.CustomerName</span>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                @if (!string.IsNullOrEmpty(Model.Order.Notes))
-                {
-                    <div class="notes-section">
-                        <div class="notes-header">
-                            <i class="fas fa-sticky-note"></i>
-                            Ghi chú
-                        </div>
-                        <div class="notes-content">
-                            @Model.Order.Notes
-                        </div>
-                    </div>
-                }
-
-                <div class="action-buttons">
-                    <a href="javascript:history.back()" class="btn-action btn-back">
-                        <i class="fas fa-arrow-left"></i> Quay lại trang trước
-                    </a>
-                </div>
-            </div>
+        <div class="text-center mt-4">
+            <a href="javascript:history.back()" class="btn btn-back">← Back to previous page</a>
         </div>
     </div>
 }

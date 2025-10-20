@@ -210,7 +210,7 @@
                 {
                     <tr>
                         <td>@order.OrderNumber</td>
-                        <td>@order.VehicleName</td>
+                        <td>@order.Vehicle?.Name</td>
                         <td>@order.TotalAmount.ToString("N0") ₫</td>
                         <td><span class="badge badge-warning">@order.Status</span></td>
                         <td>

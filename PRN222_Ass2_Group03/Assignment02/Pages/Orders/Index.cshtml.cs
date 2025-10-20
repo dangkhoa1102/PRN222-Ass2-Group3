@@ -1,27 +1,20 @@
-﻿using Business_Logic_Layer.DTOs;
-using Business_Logic_Layer.Services;
+﻿using Business_Logic_Layer.Services;
+using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Orders
 {
-    public class IndexModel : AuthenticatedPageModel
+    public class IndexModel : PageModel
     {
         private readonly IOrderService _orderService;
 
-        public List<OrderDTO> Orders { get; set; } = new();
+        public List<Order> Orders { get; set; } = new();
 
-        [BindProperty(SupportsGet = true)]
-        public string? Status { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public string? PaymentStatus { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public DateTime? FromDate { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public DateTime? ToDate { get; set; }
+        [BindProperty(SupportsGet = true)] public string? Status { get; set; }
+        [BindProperty(SupportsGet = true)] public string? PaymentStatus { get; set; }
+        [BindProperty(SupportsGet = true)] public DateTime? FromDate { get; set; }
+        [BindProperty(SupportsGet = true)] public DateTime? ToDate { get; set; }
 
         public IndexModel(IOrderService orderService)
         {
@@ -30,14 +23,15 @@ namespace Assignment02.Pages.Orders
 
         public async Task OnGetAsync()
         {
-            if (!IsAuthenticated)
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdStr))
             {
                 Response.Redirect("/Login");
                 return;
             }
 
-            var userId = Guid.Parse(UserId!);
-            var orders = await _orderService.GetOrdersByUserIdAsync(userId);
+            var userId = Guid.Parse(userIdStr);
+            var orders = (await _orderService.GetOrdersByUserIdAsync(userId)).ToList();
 
             if (!string.IsNullOrEmpty(Status))
                 orders = orders.Where(o => o.Status == Status).ToList();
