@@ -25,7 +25,7 @@ namespace Assignment02.Pages.Orders
         public string? StatusFilter { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public string? PaymentStatusFilter { get; set; }   // ✅ thêm filter trạng thái thanh toán
+        public string? PaymentStatusFilter { get; set; }  
 
         [TempData]
         public string? SuccessMessage { get; set; }
@@ -210,5 +210,6 @@ namespace Assignment02.Pages.Orders
                 _ => "badge-secondary"
             };
         }
+
     }
 }

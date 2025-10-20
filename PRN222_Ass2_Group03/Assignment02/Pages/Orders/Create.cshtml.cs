@@ -49,16 +49,18 @@ namespace Assignment02.Pages.Orders
         {
             try
             {
-                // Xóa validation errors cho CustomerName, CustomerPhone và CustomerEmail nếu đã chọn CustomerId
+                // ✅ FIX: DI CHUYỂN LOGIC NÀY LÊN TRƯỚC - TRƯỚC KHI KIỂM TRA ModelState.IsValid
+                // Kiểm tra xem có chọn khách hàng cũ không
                 if (Input.CustomerId.HasValue && Input.CustomerId.Value != Guid.Empty)
                 {
+                    // ✅ Xóa validation errors cho các trường không cần thiết
                     ModelState.Remove("Input.CustomerName");
                     ModelState.Remove("Input.CustomerPhone");
                     ModelState.Remove("Input.CustomerEmail");
                 }
                 else
                 {
-                    // Nếu KHÔNG chọn khách hàng cũ, validate thông tin khách hàng mới
+                    // ✅ Nếu KHÔNG chọn khách hàng cũ, validate thông tin khách hàng mới
                     if (string.IsNullOrWhiteSpace(Input.CustomerName))
                     {
                         ModelState.AddModelError("Input.CustomerName", "Tên khách hàng là bắt buộc");
@@ -84,11 +86,22 @@ namespace Assignment02.Pages.Orders
                     }
                 }
 
-                // Validate form
+                // ✅ BÂY GIỜ MỚI KIỂM TRA ModelState
                 if (!ModelState.IsValid)
                 {
+                    // ✅ DEBUG: Xem lỗi cụ thể là gì
+                    var errors = ModelState
+                        .Where(x => x.Value.Errors.Count > 0)
+                        .Select(x => new {
+                            Key = x.Key,
+                            Errors = string.Join("; ", x.Value.Errors.Select(e => e.ErrorMessage))
+                        })
+                        .ToList();
+
+                    var errorDetails = string.Join(" | ", errors.Select(e => $"{e.Key}: {e.Errors}"));
+
                     AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
-                    ErrorMessage = "Vui lòng điền đầy đủ thông tin bắt buộc.";
+                    ErrorMessage = $"Validation failed: {errorDetails}";
                     return Page();
                 }
 
@@ -188,25 +201,39 @@ namespace Assignment02.Pages.Orders
                 // → Lấy thông tin khách hàng đó luôn, KHÔNG CẦN điền form
                 if (Input.CustomerId.HasValue && Input.CustomerId.Value != Guid.Empty)
                 {
+                    // ✅ DEBUG: Log để xem CustomerId
+                    System.Diagnostics.Debug.WriteLine($"Tìm khách hàng với ID: {Input.CustomerId.Value}");
+
                     var existingCustomer = await _orderService.GetCustomerByIdAsync(Input.CustomerId.Value);
+
+                    // ✅ DEBUG: Kiểm tra kết quả
                     if (existingCustomer != null)
                     {
+                        System.Diagnostics.Debug.WriteLine($"✓ Tìm thấy khách hàng: {existingCustomer.FullName}");
                         return existingCustomer;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("✗ KHÔNG tìm thấy khách hàng trong DB!");
+                        ModelState.AddModelError("", $"Không tìm thấy khách hàng với ID: {Input.CustomerId.Value}");
+                        return null;
                     }
                 }
 
-                // TRƯỜNG HỢP 2: Không chọn từ dropdown (CustomerId = null)
+                // TRƯỜNG HỢP 2: Không chọn từ dropdown (CustomerId = null hoặc Empty)
                 // → Tạo khách hàng MỚI với thông tin đã điền
 
-                // Validate thông tin bắt buộc
+                // ✅ Kiểm tra xem có thông tin để tạo khách mới không
                 if (string.IsNullOrWhiteSpace(Input.CustomerName) ||
                     string.IsNullOrWhiteSpace(Input.CustomerPhone))
                 {
-                    ModelState.AddModelError("", "Tên và số điện thoại khách hàng là bắt buộc.");
+                    ModelState.AddModelError("", "Vui lòng chọn khách hàng cũ HOẶC nhập thông tin khách hàng mới (Tên và SĐT là bắt buộc).");
                     return null;
                 }
 
-                // Tạo khách hàng mới
+                // ✅ Tạo khách hàng mới
+                System.Diagnostics.Debug.WriteLine($"Tạo khách hàng mới: {Input.CustomerName} - {Input.CustomerPhone}");
+
                 var newCustomer = new User
                 {
                     Id = Guid.NewGuid(),
@@ -219,10 +246,22 @@ namespace Assignment02.Pages.Orders
                 };
 
                 var createdCustomer = await _orderService.CreateCustomerAsync(newCustomer);
+
+                if (createdCustomer != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"✓ Tạo khách hàng mới thành công: {createdCustomer.Id}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("✗ Tạo khách hàng mới THẤT BẠI!");
+                }
+
                 return createdCustomer;
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"✗ EXCEPTION: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
                 ModelState.AddModelError("", $"Lỗi xử lý khách hàng: {ex.Message}");
                 return null;
             }

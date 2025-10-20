@@ -129,75 +129,42 @@ namespace Business_Logic_Layer.Services
         }
 
         // ==================== CUSTOMER OPERATIONS ====================
-        public async Task<IEnumerable<User>> SearchCustomersAsync(string keyword)
-        {
-            if (string.IsNullOrWhiteSpace(keyword))
-            {
-                return new List<User>();
-            }
-
-            try
-            {
-                using var _context = new EVDealerSystemContext();
-                keyword = keyword.ToLower();
-
-                return await _context.Users
-                    .Where(u => u.Role == "Customer" && u.IsActive == true &&
-                        (u.FullName.ToLower().Contains(keyword) ||
-                         u.Phone.Contains(keyword) ||
-                         u.Email.ToLower().Contains(keyword)))
-                    .ToListAsync();
-            }
-            catch
-            {
-                return new List<User>();
-            }
-        }
-
-        public async Task<User?> GetCustomerByPhoneAsync(string phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-            {
-                return null;
-            }
-
-            try
-            {
-                using var _context = new EVDealerSystemContext();
-                return await _context.Users
-                    .FirstOrDefaultAsync(u => u.Phone == phone && u.Role == "Customer" && u.IsActive == true);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
+        // ✅ FIX 1: GetCustomerByIdAsync - Thêm kiểm tra IsActive
         public async Task<User?> GetCustomerByIdAsync(Guid id)
         {
             try
             {
                 using var _context = new EVDealerSystemContext();
-                var user = await _context.Users.FindAsync(id);
-                return user?.Role == "Customer" ? user : null;
+
+                // ✅ Sử dụng FirstOrDefaultAsync thay vì FindAsync để có thể filter
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == id &&
+                                             u.Role == "Customer" &&
+                                             u.IsActive == true);
+
+                return user;
             }
-            catch
+            catch (Exception ex)
             {
+                // ✅ Log exception để debug
+                System.Diagnostics.Debug.WriteLine($"GetCustomerByIdAsync ERROR: {ex.Message}");
                 return null;
             }
         }
 
-        public async Task<User> CreateCustomerAsync(User user)
+        // ✅ FIX 2: CreateCustomerAsync - KHÔNG throw exception trong try-catch
+        public async Task<User?> CreateCustomerAsync(User user)
         {
             try
             {
                 using var _context = new EVDealerSystemContext();
 
-                // Validate phone exists
+                // ✅ Kiểm tra phone tồn tại - RETURN NULL thay vì throw
                 var phoneExists = await _context.Users.AnyAsync(u => u.Phone == user.Phone);
                 if (phoneExists)
                 {
-                    throw new Exception("Số điện thoại đã tồn tại!");
+                    System.Diagnostics.Debug.WriteLine($"Phone already exists: {user.Phone}");
+                    return null; // ✅ Trả về null thay vì throw exception
                 }
 
                 // Set default values
@@ -220,11 +187,66 @@ namespace Business_Logic_Layer.Services
 
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
+
+                System.Diagnostics.Debug.WriteLine($"✓ Created new customer: {user.Id} - {user.FullName}");
                 return user;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                // ✅ Log và return null
+                System.Diagnostics.Debug.WriteLine($"CreateCustomerAsync ERROR: {ex.Message}");
+                return null;
+            }
+        }
+
+        // ✅ BONUS: Thêm method để kiểm tra khách hàng tồn tại theo phone
+        public async Task<User?> GetCustomerByPhoneAsync(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+            {
+                return null;
+            }
+
+            try
+            {
+                using var _context = new EVDealerSystemContext();
+                return await _context.Users
+                    .FirstOrDefaultAsync(u => u.Phone == phone &&
+                                             u.Role == "Customer" &&
+                                             u.IsActive == true);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetCustomerByPhoneAsync ERROR: {ex.Message}");
+                return null;
+            }
+        }
+
+        // ✅ Method SearchCustomersAsync giữ nguyên
+        public async Task<IEnumerable<User>> SearchCustomersAsync(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                return new List<User>();
+            }
+
+            try
+            {
+                using var _context = new EVDealerSystemContext();
+                keyword = keyword.ToLower();
+
+                return await _context.Users
+                    .Where(u => u.Role == "Customer" &&
+                               u.IsActive == true &&
+                               (u.FullName.ToLower().Contains(keyword) ||
+                                u.Phone.Contains(keyword) ||
+                                (u.Email != null && u.Email.ToLower().Contains(keyword))))
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"SearchCustomersAsync ERROR: {ex.Message}");
+                return new List<User>();
             }
         }
 

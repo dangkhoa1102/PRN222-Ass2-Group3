@@ -11,13 +11,11 @@ namespace Assignment02.Pages.Orders
     {
         private readonly IOrderService _orderService;
         private readonly IUserService _userService;
-        // private readonly IVehicleService _vehicleService; // Chờ bạn khác làm xong
 
         public EditModel(IOrderService orderService, IUserService userService)
         {
             _orderService = orderService;
             _userService = userService;
-            // _vehicleService = vehicleService;
         }
 
         [BindProperty]
@@ -26,6 +24,8 @@ namespace Assignment02.Pages.Orders
         public SelectList Customers { get; set; } = null!;
         public SelectList Vehicles { get; set; } = null!;
         public SelectList StatusList { get; set; } = null!;
+
+        public SelectList PaymentStatusList { get; set; } = null!;
 
         [TempData]
         public string? SuccessMessage { get; set; }
@@ -65,7 +65,7 @@ namespace Assignment02.Pages.Orders
                 var userIdString = HttpContext.Session.GetString("UserId");
                 if (string.IsNullOrEmpty(userIdString))
                 {
-                    TempData["ErrorMessage"] = "Vui lòng đăng nhập!";
+                    TempData["ErrorMessage"] = "Please login!";
                     return RedirectToPage("/Login");
                 }
 
@@ -73,41 +73,55 @@ namespace Assignment02.Pages.Orders
                 var existingOrder = await _orderService.GetOrderByIdAsync(Order.Id);
                 if (existingOrder == null)
                 {
-                    TempData["ErrorMessage"] = "Không tìm thấy đơn hàng!";
+                    TempData["ErrorMessage"] = "Order not found!";
                     return RedirectToPage("./Index");
                 }
 
-                // Chỉ cập nhật những trường được thay đổi (không null/empty)
+                // ✅ Cập nhật CustomerId
                 if (Order.CustomerId != Guid.Empty && Order.CustomerId != existingOrder.CustomerId)
                 {
                     existingOrder.CustomerId = Order.CustomerId;
                 }
 
-                // VehicleId: Chỉ cập nhật nếu có chọn xe mới (khác Empty và khác giá trị cũ)
-                // Nếu không chọn (Empty) thì giữ nguyên xe cũ
+                // ✅ Cập nhật VehicleId
                 if (Order.VehicleId != Guid.Empty && Order.VehicleId != existingOrder.VehicleId)
                 {
                     existingOrder.VehicleId = Order.VehicleId;
                 }
 
+                // ✅ Cập nhật Status (trạng thái đơn hàng)
                 if (!string.IsNullOrWhiteSpace(Order.Status))
                 {
                     existingOrder.Status = Order.Status;
                 }
 
+                // ✅ THÊM: Cập nhật PaymentStatus (trạng thái thanh toán)
+                if (!string.IsNullOrWhiteSpace(Order.PaymentStatus))
+                {
+                    existingOrder.PaymentStatus = Order.PaymentStatus;
+                }
+
+                // ✅ Cập nhật TotalAmount
                 if (Order.TotalAmount > 0)
                 {
                     existingOrder.TotalAmount = Order.TotalAmount;
                 }
 
+                // ✅ Cập nhật CreatedAt (nếu cần)
                 if (Order.CreatedAt != default(DateTime))
                 {
                     existingOrder.CreatedAt = Order.CreatedAt;
                 }
 
+                // ✅ Cập nhật Notes
                 if (!string.IsNullOrWhiteSpace(Order.Notes))
                 {
                     existingOrder.Notes = Order.Notes;
+                }
+                else
+                {
+                    // Nếu Notes bị xóa trống, cho phép cập nhật thành null
+                    existingOrder.Notes = null;
                 }
 
                 // Cập nhật thời gian sửa
@@ -117,19 +131,19 @@ namespace Assignment02.Pages.Orders
 
                 if (success)
                 {
-                    TempData["SuccessMessage"] = "Cập nhật đơn hàng thành công!";
+                    TempData["SuccessMessage"] = "Order updated successfully!";
                     return RedirectToPage("./Index");
                 }
                 else
                 {
-                    ErrorMessage = "Không thể cập nhật đơn hàng!";
+                    ErrorMessage = "Failed to update order!";
                     await LoadSelectListsAsync();
                     return Page();
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Lỗi: {ex.Message}";
+                ErrorMessage = $"Error: {ex.Message}";
                 await LoadSelectListsAsync();
                 return Page();
             }
@@ -146,30 +160,32 @@ namespace Assignment02.Pages.Orders
 
             Customers = new SelectList(customerList, "Id", "FullName", Order?.CustomerId);
 
-            // TODO: Đợi bạn làm VehicleService xong rồi bỏ comment
+            // TODO: Lấy danh sách vehicles
             // var vehicles = await _vehicleService.GetAllVehiclesAsync();
-            // var vehicleList = vehicles
-            //     .Select(v => new { 
-            //         v.Id, 
-            //         DisplayName = $"{v.Make} {v.Model} - {v.Year}" 
-            //     })
-            //     .ToList();
-            // Vehicles = new SelectList(vehicleList, "Id", "DisplayName", Order?.VehicleId);
+            // Vehicles = new SelectList(vehicles, "Id", "DisplayName", Order?.VehicleId);
 
-            // TẠM THỜI dùng list rỗng để không bị lỗi
+            // TẠM THỜI dùng list rỗng
             Vehicles = new SelectList(new List<SelectListItem>(), "Value", "Text");
 
-            // Danh sách trạng thái
+            // ✅ Danh sách Order Status (trạng thái đơn hàng)
             var statuses = new List<SelectListItem>
             {
-                new SelectListItem { Value = "processing", Text = "Đang xử lý" },
-                new SelectListItem { Value = "confirmed", Text = "Đã xác nhận" },
-                new SelectListItem { Value = "shipping", Text = "Đang giao hàng" },
-                new SelectListItem { Value = "completed", Text = "Hoàn thành" },
-                new SelectListItem { Value = "cancelled", Text = "Đã hủy" }
+               
+                new SelectListItem { Value = "confirmed", Text = "Confirmed" },
+                new SelectListItem { Value = "shipping", Text = "Shipping" },
+                new SelectListItem { Value = "completed", Text = "Completed" },
+                new SelectListItem { Value = "cancelled", Text = "Cancelled" }
             };
-
             StatusList = new SelectList(statuses, "Value", "Text", Order?.Status?.ToLower());
+
+            // ✅ THÊM: Danh sách Payment Status (trạng thái thanh toán)
+            var paymentStatuses = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Unpaid", Text = "Unpaid" },
+                new SelectListItem { Value = "Paid", Text = "Paid" },
+               
+            };
+            PaymentStatusList = new SelectList(paymentStatuses, "Value", "Text", Order?.PaymentStatus);
         }
     }
 }
