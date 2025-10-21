@@ -2,7 +2,7 @@ using EVDealerDbContext.Models;
 
 namespace DataAccess_Layer.Repositories
 {
-    public interface IOrderRepository
+    public interface IOrderRepositoryCus
     {
         Task<List<Order>> GetAll();
         Task<Order?> GetById(Guid id);

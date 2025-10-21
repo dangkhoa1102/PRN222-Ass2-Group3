@@ -8,7 +8,7 @@ namespace Assignment02.Pages.Orders
 {
     public class PaymentModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
         private readonly RealTimeNotificationService _notificationService;
 
         public OrderDTO? Order { get; set; }
@@ -18,7 +18,7 @@ namespace Assignment02.Pages.Orders
         [BindProperty]
         public string PaymentMethod { get; set; } = string.Empty;
 
-        public PaymentModel(IOrderService orderService, RealTimeNotificationService notificationService)
+        public PaymentModel(IOrderServiceCus orderService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _notificationService = notificationService;

@@ -7,7 +7,7 @@ namespace Assignment02.Pages.Orders
 {
     public class CreateOrderModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
         private readonly IUserService _userService;
         private readonly IVehicleService _vehicleService;
         private readonly IDealerService _dealerService;
@@ -19,7 +19,7 @@ namespace Assignment02.Pages.Orders
         public List<SelectListItem> Vehicles { get; set; } = new();
         public List<SelectListItem> Dealers { get; set; } = new();
 
-        public CreateOrderModel(IOrderService orderService, IUserService userService, IVehicleService vehicleService, IDealerService dealerService)
+        public CreateOrderModel(IOrderServiceCus orderService, IUserService userService, IVehicleService vehicleService, IDealerService dealerService)
         {
             _orderService = orderService;
             _userService = userService;

@@ -7,7 +7,7 @@ namespace Assignment02.Pages.Orders
 {
     public class IndexModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
 
         public List<OrderDTO> Orders { get; set; } = new();
 
@@ -16,7 +16,7 @@ namespace Assignment02.Pages.Orders
         [BindProperty(SupportsGet = true)] public DateTime? FromDate { get; set; }
         [BindProperty(SupportsGet = true)] public DateTime? ToDate { get; set; }
 
-        public IndexModel(IOrderService orderService)
+        public IndexModel(IOrderServiceCus orderService)
         {
             _orderService = orderService;
         }

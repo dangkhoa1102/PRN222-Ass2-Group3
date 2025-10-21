@@ -10,11 +10,11 @@ namespace Assignment02.Pages.Orders
 {
     public class CreateModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
         private readonly RealTimeNotificationService _notificationService;
 
-        public CreateModel(IOrderService orderService, ICustomerTestDriveAppointmentService testDriveService, RealTimeNotificationService notificationService)
+        public CreateModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _testDriveService = testDriveService;

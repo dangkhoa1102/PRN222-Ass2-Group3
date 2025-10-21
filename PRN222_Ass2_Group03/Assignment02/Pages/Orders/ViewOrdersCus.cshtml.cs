@@ -6,7 +6,7 @@ namespace Assignment02.Pages.Orders
 {
     public class ViewOrdersModel : AuthenticatedPageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
 
         public List<OrderDTO> Orders { get; set; } = new();
 
@@ -22,7 +22,7 @@ namespace Assignment02.Pages.Orders
         [BindProperty(SupportsGet = true)]
         public DateTime? ToDate { get; set; }
 
-        public ViewOrdersModel(IOrderService orderService)
+        public ViewOrdersModel(IOrderServiceCus orderService)
         {
             _orderService = orderService;
         }

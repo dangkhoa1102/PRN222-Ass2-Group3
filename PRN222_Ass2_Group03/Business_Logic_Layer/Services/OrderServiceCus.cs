@@ -4,11 +4,11 @@ using Business_Logic_Layer.DTOs;
 
 namespace Business_Logic_Layer.Services
 {
-    public class OrderService : IOrderService
+    public class OrderServiceCus : IOrderServiceCus
     {
-        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderRepositoryCus _orderRepository;
 
-        public OrderService(IOrderRepository orderRepository)
+        public OrderServiceCus(IOrderRepositoryCus orderRepository)
         {
             _orderRepository = orderRepository;
         }

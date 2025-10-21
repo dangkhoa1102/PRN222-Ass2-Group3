@@ -8,13 +8,13 @@ namespace Assignment02.Pages.Orders
 {
     public class DetailsModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
         private readonly RealTimeNotificationService _notificationService;
 
         public OrderDTO? Order { get; set; }
         public string? CurrentUserRole { get; set; }
 
-        public DetailsModel(IOrderService orderService, RealTimeNotificationService notificationService)
+        public DetailsModel(IOrderServiceCus orderService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _notificationService = notificationService;
