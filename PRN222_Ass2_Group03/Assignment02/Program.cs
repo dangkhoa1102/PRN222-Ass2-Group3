@@ -1,21 +1,26 @@
-using Assignment02.Hubs;
+﻿using Assignment02.Hubs;
 using Business_Logic_Layer.Services;
-using DataAccess_Layer.Repositories;
-using EVDealerDbContext;
-using Microsoft.EntityFrameworkCore;
 
+// Add Razor Pages & SignalR
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<EVDealerSystemContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection"))
 );
 
-// Add services to the container.
+// ===============================
+// Add EF DbContext
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
+builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddDbContext<EVDealerSystemContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection")));
+// Register Service Factory
+builder.Services.AddScoped<ServiceFactory>();
 
+// Register Services through Factory
+builder.Services.AddScoped<IUserService>(provider => provider.GetRequiredService<ServiceFactory>().CreateUserService());
+builder.Services.AddScoped<IOrderServiceCus>(provider => provider.GetRequiredService<ServiceFactory>().CreateOrderService());
+builder.Services.AddScoped<ICustomerTestDriveAppointmentService>(provider => provider.GetRequiredService<ServiceFactory>().CreateCustomerTestDriveAppointmentService());
+builder.Services.AddScoped<IVehicleService>(provider => provider.GetRequiredService<ServiceFactory>().CreateVehicleService());
 // Register repositories and services (they will use EVDealerSystemContext's own connection)
     
 // Register repositories and services
@@ -26,35 +31,43 @@ builder.Services.AddScoped<ICustomerTestDriveAppointmentService, CustomerTestDri
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-// Configure session
+// ===============================
+// 💾 Session Configuration
+// ===============================
+
+// ===============================
+// 💾 Session Configuration
+// ===============================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-// Configure authentication
+// ===============================
+// 🔐 Authentication & Authorization
+// ===============================
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
     {
         options.LoginPath = "/Login";
         options.LogoutPath = "/Logout";
         options.AccessDeniedPath = "/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.SlidingExpiration = true;
     });
 
 builder.Services.AddAuthorization();
-
+// ===============================
+// ⚙️ Middleware Configuration
+// ===============================
+// ===============================
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ===============================
+// ⚙️ Middleware Configuration
+// ===============================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -65,23 +78,19 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseSession();
 
-// Custom middleware to redirect unauthenticated users to login
+// ✅ Redirect unauthenticated users
 app.Use(async (context, next) =>
 {
-    // Check if user is accessing root path
     if (context.Request.Path == "/")
     {
-        // Check if user is authenticated
         var userId = context.Session.GetString("UserId");
         if (string.IsNullOrEmpty(userId))
         {
-            // Redirect to login page
             context.Response.Redirect("/Login");
             return;
         }
         else
         {
-            // Redirect to index page if authenticated
             context.Response.Redirect("/Index");
             return;
         }
@@ -91,6 +100,9 @@ app.Use(async (context, next) =>
 
 app.UseAuthorization();
 
+// ===============================
+// 🌐 Map Razor Pages & SignalR Hubs
+// ===============================
 app.MapRazorPages();
 app.MapHub<ChatHub>("/chathub");
 app.MapHub<NotificationHub>("/notificationhub");

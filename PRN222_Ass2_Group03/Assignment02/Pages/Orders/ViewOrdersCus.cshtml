@@ -1,0 +1,178 @@
+@page
+@model Assignment02.Pages.Orders.ViewOrdersModel
+@{
+    ViewData["Title"] = "View Orders";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/orders.css" asp-append-version="true" />
+}
+
+<div class="view-orders-page">
+    <div class="page-header">
+        <div class="header-content">
+            <h1 class="page-title">
+                <i class="fas fa-shopping-cart"></i>
+                Đơn hàng của tôi
+            </h1>
+            <p class="page-subtitle">Quản lý và theo dõi tất cả đơn hàng</p>
+        </div>
+    </div>
+
+    <div class="orders-container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-card">
+                <h3 class="filter-title">
+                    <i class="fas fa-filter"></i>
+                    Bộ lọc
+                </h3>
+                <form method="get" class="filter-form">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="status" class="filter-label">Trạng thái</label>
+                            <select name="status" id="status" class="filter-select">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Pending" selected="@(Model.Status == "Pending")">Chờ xử lý</option>
+                                <option value="Processing" selected="@(Model.Status == "Processing")">Đang xử lý</option>
+                                <option value="Completed" selected="@(Model.Status == "Completed")">Hoàn thành</option>
+                                <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="paymentStatus" class="filter-label">Thanh toán</label>
+                            <select name="paymentStatus" id="paymentStatus" class="filter-select">
+                                <option value="">Tất cả thanh toán</option>
+                                <option value="Paid" selected="@(Model.PaymentStatus == "Paid")">Đã thanh toán</option>
+                                <option value="Unpaid" selected="@(Model.PaymentStatus == "Unpaid")">Chưa thanh toán</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="fromDate" class="filter-label">Từ ngày</label>
+                            <input type="date" name="fromDate" id="fromDate" class="filter-input" value="@Model.FromDate?.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="filter-group">
+                            <label for="toDate" class="filter-label">Đến ngày</label>
+                            <input type="date" name="toDate" id="toDate" class="filter-input" value="@Model.ToDate?.ToString("yyyy-MM-dd")">
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-filter">
+                            <i class="fas fa-search"></i>
+                            Lọc
+                        </button>
+                        <a href="/Order/ViewOrders" class="btn-clear">
+                            <i class="fas fa-times"></i>
+                            Xóa bộ lọc
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Orders List -->
+        <div class="orders-list">
+            @if (Model.Orders != null && Model.Orders.Any())
+            {
+                @foreach (var order in Model.Orders)
+                {
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <h3 class="order-number">#@order.OrderNumber</h3>
+                                <span class="order-date">@order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <div class="order-status">
+                                @{
+                                    var statusClass = order.Status?.ToLowerInvariant() switch
+                                    {
+                                        "completed" => "status-completed",
+                                        "processing" => "status-processing",
+                                        "pending" => "status-pending",
+                                        "cancelled" => "status-cancelled",
+                                        _ => "status-default"
+                                    };
+                                }
+                                <span class="status-badge @statusClass">@order.Status</span>
+                            </div>
+                        </div>
+
+                        <div class="order-content">
+                            <div class="vehicle-info">
+                                <div class="vehicle-image">
+                                    @if (!string.IsNullOrEmpty(order.VehicleImage))
+                                    {
+                                        <img src="@order.VehicleImage" alt="@order.VehicleName" class="vehicle-img">
+                                    }
+                                    else
+                                    {
+                                        <div class="vehicle-placeholder">
+                                            <i class="fas fa-car"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="vehicle-details">
+                                    <h4 class="vehicle-name">@order.VehicleName</h4>
+                                    <p class="vehicle-specs">@order.VehicleBrand - @order.VehicleModel</p>
+                                </div>
+                            </div>
+
+                            <div class="order-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Tổng tiền:</span>
+                                    <span class="detail-value price">@order.TotalAmount.ToString("N0") ₫</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Thanh toán:</span>
+                                    @{
+                                        var paymentClass = order.PaymentStatus?.ToLowerInvariant() switch
+                                        {
+                                            "paid" => "payment-paid",
+                                            "unpaid" => "payment-unpaid",
+                                            _ => "payment-default"
+                                        };
+                                    }
+                                    <span class="payment-badge @paymentClass">@order.PaymentStatus</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Đại lý:</span>
+                                    <span class="detail-value">@order.DealerName</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="order-actions">
+                            <a href="/Order/Details/@order.Id" class="btn-action btn-view">
+                                <i class="fas fa-eye"></i>
+                                Xem chi tiết
+                            </a>
+                            @if (order.Status == "Pending" || order.Status == "Processing")
+                            {
+                                <form method="post" asp-page-handler="Cancel" asp-route-id="@order.Id" class="cancel-form">
+                                    <button type="submit" class="btn-action btn-cancel" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')">
+                                        <i class="fas fa-times"></i>
+                                        Hủy đơn
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 class="empty-title">Chưa có đơn hàng nào</h3>
+                    <p class="empty-description">Bạn chưa có đơn hàng nào. Hãy khám phá các sản phẩm và tạo đơn hàng đầu tiên!</p>
+                    <a href="/Vehicles/Index" class="btn-primary">
+                        <i class="fas fa-car"></i>
+                        Xem xe
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

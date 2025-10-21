@@ -1,0 +1,271 @@
+﻿@page
+@model Assignment02.Pages.Orders.PendingOrdersModel
+@{
+    ViewData["Title"] = "Processing Orders";
+}
+
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .orders-container {
+        width: 95%;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px 30px;
+    }
+
+    h2 {
+        font-weight: 700;
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+
+        .table thead th {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            padding: 14px;
+            border: none;
+        }
+
+        .table tbody tr {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            transition: 0.2s;
+        }
+
+            .table tbody tr:hover {
+                transform: scale(1.01);
+                background-color: #f9fbff;
+            }
+
+        .table td {
+            text-align: center;
+            padding: 14px;
+            border: none;
+            vertical-align: middle;
+        }
+
+    .badge {
+        padding: 7px 14px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background-color: #d4edda;
+        color: #198754;
+    }
+
+    .badge-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-danger {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .btn-details {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 6px 14px;
+        transition: 0.2s;
+    }
+
+        .btn-details:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #0056b3, #007bff);
+        }
+
+    .btn-cancel {
+        border: none;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 6px 14px;
+        transition: 0.2s;
+        background: linear-gradient(45deg, #dc3545, #a71d2a);
+        color: white;
+    }
+
+        .btn-cancel:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #a71d2a, #dc3545);
+        }
+
+    .alert-success,
+    .alert-danger {
+        display: inline-block;
+        position: relative;
+        left: 10px; 
+        top: 0;
+        width: auto; 
+        max-width: 80%;
+        text-align: left;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-weight: 600;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .alert-success {
+        background-color: #e9fbe9;
+        border: 2px solid #28a745;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #fbeaea;
+        border: 2px solid #dc3545;
+        color: #842029;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@media (max-width: 768px) {
+        .orders-container {
+            padding: 10px;
+        }
+
+        .table td, .table th {
+            font-size: 0.85rem;
+            padding: 10px;
+        }
+    }
+</style>
+
+<div class="orders-container">
+    <h2>Processing Orders</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (Model.PendingOrders == null || !Model.PendingOrders.Any())
+    {
+        <div class="text-center text-muted py-4">No processing orders.</div>
+    }
+    else
+    {
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Vehicle</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Created</th>
+                    <th>Detail</th>
+                    <th>Reason</th>
+                    <th>Cancel</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.PendingOrders)
+                {
+                    <tr>
+                        <td>@order.OrderNumber</td>
+                        <td>@order.Vehicle?.Name</td>
+                        <td>@order.TotalAmount.ToString("N0") ₫</td>
+                        <td><span class="badge badge-warning">@order.Status</span></td>
+                        <td>
+                            @if (order.PaymentStatus == "Paid")
+                            {
+                                <span class="badge badge-success">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">Unpaid</span>
+                            }
+                        </td>
+                        <td>@order.CreatedAt?.ToString("dd/MM/yyyy")</td>
+
+                        <td>
+                            <a asp-page="/Orders/DetailsCus" asp-route-id="@order.Id" class="btn btn-details">
+                                <i class="fas fa-info-circle"></i> Details
+                            </a>
+                        </td>
+
+                        <td>
+                            <input type="text" name="CancelReason" class="form-control"
+                                   placeholder="Enter reason..." required
+                                   form="cancelForm-@order.Id" />
+                        </td>
+
+                        <td>
+                            <form id="cancelForm-@order.Id" method="post" asp-page-handler="Cancel" asp-route-id="@order.Id" class="d-inline">
+                                <input type="hidden" name="Notes" value="" />
+                                <button type="submit" class="btn btn-cancel"
+                                        onclick="return handleCancel(this, '@order.Id');">
+                                    <i class="fas fa-times-circle"></i> Cancel
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
+
+<script>
+    function handleCancel(button, orderId) {
+        const form = document.getElementById(`cancelForm-${orderId}`);
+        const reasonInput = form.parentElement.parentElement.querySelector('input[name="CancelReason"]');
+        const hiddenNotes = form.querySelector('input[name="Notes"]');
+
+        if (!reasonInput.value.trim()) {
+            alert("Please enter a reason before canceling the order.");
+            return false;
+        }
+
+        hiddenNotes.value = reasonInput.value;
+        return confirm("Are you sure you want to cancel this order?");
+    }
+</script>

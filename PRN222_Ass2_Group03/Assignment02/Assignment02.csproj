@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Business_Logic_Layer\Business_Logic_Layer.csproj" />
-    <ProjectReference Include="..\DataAccess_Layer\DataAccess_Layer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

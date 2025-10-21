@@ -1,10 +1,5 @@
 ﻿using DataAccess_Layer.Repositories;
 using EVDealerDbContext.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business_Logic_Layer.Services
 {
@@ -42,13 +37,13 @@ namespace Business_Logic_Layer.Services
                 AppointmentDate = appointmentDate,
                 Status = "pending",
                 Notes = notes,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
 
             return await _repository.CreateAsync(appointment);
         }
 
-        public async Task<TestDriveAppointment> GetAppointmentByIdAsync(Guid id)
+        public async Task<TestDriveAppointment?> GetAppointmentByIdAsync(Guid id)
         {
             return await _repository.GetByIdAsync(id);
         }
@@ -61,15 +56,31 @@ namespace Business_Logic_Layer.Services
                 return false;
             }
 
-            // Only allow cancellation if appointment is more than 24 hours away
-            if (appointment.AppointmentDate <= DateTime.Now.AddHours(24))
+            // Allow cancellation only when appointment is in processing/pending status
+            var status = appointment.Status?.ToLower();
+            if (status != "pending" && status != "processing")
             {
-                throw new InvalidOperationException("Không thể hủy lịch hẹn trong vòng 24 giờ trước giờ hẹn.");
+                throw new InvalidOperationException("Chỉ có thể hủy lịch hẹn khi đang ở trạng thái Processing.");
             }
 
             appointment.Status = "Cancelled";
             appointment.Notes = note;
-            appointment.UpdatedAt = DateTime.UtcNow;
+            appointment.UpdatedAt = DateTime.Now;
+            await _repository.UpdateAsync(appointment);
+            return true;
+        }
+
+        public async Task<bool> CancelAppointmentByStaffAsync(Guid appointmentId, string note)
+        {
+            var appointment = await _repository.GetByIdAsync(appointmentId);
+            if (appointment == null)
+            {
+                return false;
+            }
+
+            appointment.Status = "Cancelled";
+            appointment.Notes = note;
+            appointment.UpdatedAt = DateTime.Now;
             await _repository.UpdateAsync(appointment);
             return true;
         }
@@ -106,7 +117,7 @@ namespace Business_Logic_Layer.Services
 
             appointment.AppointmentDate = newDateTime;
             appointment.Status = "Rescheduled";
-            appointment.UpdatedAt = DateTime.UtcNow;
+            appointment.UpdatedAt = DateTime.Now;
             await _repository.UpdateAsync(appointment);
             return true;
         }
@@ -114,6 +125,58 @@ namespace Business_Logic_Layer.Services
         public async Task<IEnumerable<TestDriveAppointment>> GetAllAppointmentsAsync(Guid userId)
         {
             return await _repository.GetAllAppointmentsAsync(userId);
+        }
+
+        public async Task<IEnumerable<TestDriveAppointment>> GetAppointmentsByStatusAsync(string status)
+        {
+            // This would need to be implemented in the repository
+            // For now, we'll get all appointments and filter by status
+            var allAppointments = await _repository.GetAllAppointmentsAsync(Guid.Empty);
+            return allAppointments.Where(a => a.Status?.ToLower() == status.ToLower());
+        }
+
+        public async Task<bool> UpdateAppointmentStatusAsync(Guid appointmentId, string status)
+        {
+            var appointment = await _repository.GetByIdAsync(appointmentId);
+            if (appointment == null)
+            {
+                return false;
+            }
+
+            appointment.Status = status;
+            appointment.UpdatedAt = DateTime.Now;
+            await _repository.UpdateAsync(appointment);
+            return true;
+        }
+
+        public async Task<bool> CompleteAppointmentAsync(Guid appointmentId)
+        {
+            var appointment = await _repository.GetByIdAsync(appointmentId);
+            if (appointment == null)
+            {
+                return false;
+            }
+            appointment.Status = "Completed";
+            appointment.UpdatedAt = DateTime.Now;
+            await _repository.UpdateAsync(appointment);
+            return true;
+        }
+
+        public async Task<bool> MarkDoneByCustomerAsync(Guid appointmentId, Guid customerId)
+        {
+            var appointment = await _repository.GetByIdAsync(appointmentId);
+            if (appointment == null || appointment.CustomerId != customerId)
+            {
+                return false;
+            }
+            if (!string.Equals(appointment.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            appointment.Status = "Done";
+            appointment.UpdatedAt = DateTime.Now;
+            await _repository.UpdateAsync(appointment);
+            return true;
         }
     }
 }

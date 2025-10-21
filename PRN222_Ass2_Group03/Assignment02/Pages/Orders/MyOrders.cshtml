@@ -1,0 +1,181 @@
+﻿@page
+@model Assignment02.Pages.Orders.MyOrdersModel
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .orders-container {
+        width: 95%;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px 30px;
+    }
+
+    h2 {
+        font-weight: 700;
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+
+        .table thead th {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            padding: 14px;
+            border: none;
+        }
+
+        .table tbody tr {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            transition: 0.2s;
+        }
+
+            .table tbody tr:hover {
+                transform: scale(1.01);
+                background-color: #f9fbff;
+            }
+
+        .table td {
+            text-align: center;
+            padding: 14px;
+            border: none;
+            vertical-align: middle;
+        }
+
+    /* Badge styles */
+    .badge {
+        padding: 7px 14px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .badge-success {
+        background-color: #d4edda;
+        color: #198754;
+    }
+
+    .badge-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-danger {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .badge-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    /* Button style */
+    .btn-details {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 6px 14px;
+        transition: 0.2s;
+    }
+
+        .btn-details:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #0056b3, #007bff);
+        }
+
+    @@media (max-width: 768px) {
+        .orders-container {
+            padding: 10px;
+        }
+
+        .table td, .table th {
+            font-size: 0.85rem;
+            padding: 10px;
+        }
+    }
+</style>
+
+<div class="orders-container">
+    <h2>My Orders</h2>
+
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Order #</th>
+                <th>Vehicle</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Created</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Orders != null && Model.Orders.Any())
+            {
+                foreach (var order in Model.Orders)
+                {
+                    var status = order.Status?.ToLowerInvariant();
+                    var payment = order.PaymentStatus?.ToLowerInvariant();
+
+                    var statusBadge = status switch
+                    {
+                        "completed" => "badge-success",
+                        "processing" => "badge-warning",
+                        "rejected" or "cancelled" => "badge-danger",
+                        _ => "badge-info"
+                    };
+
+                    var paymentBadge = payment switch
+                    {
+                        "paid" => "badge-success",
+                        "unpaid" => "badge-danger",
+                        "refunded" => "badge-info",
+                        _ => "badge-info"
+                    };
+
+                    <tr>
+                        <td>@order.OrderNumber</td>
+                        <td>@order.Vehicle?.Name</td>
+                        <td>@order.TotalAmount.ToString("N0") ₫</td>
+                        <td><span class="badge @statusBadge">@order.Status</span></td>
+                        <td><span class="badge @paymentBadge">@order.PaymentStatus</span></td>
+                        <td>@order.CreatedAt?.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <a asp-page="/Orders/DetailsCus" asp-route-id="@order.Id" class="btn btn-details">
+                                <i class="fas fa-info-circle"></i> Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No orders found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

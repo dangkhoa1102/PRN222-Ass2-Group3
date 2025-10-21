@@ -74,7 +74,7 @@ namespace Business_Logic_Layer.Services
                 
                 // Set default values - using CreatedAt instead of CreatedDate
                 user.Id = Guid.NewGuid();
-                user.CreatedAt = DateTime.UtcNow;
+                user.CreatedAt = DateTime.Now;
                 user.IsActive = true;
 
                 var createdUser = await _userRepository.CreateUserAsync(user);

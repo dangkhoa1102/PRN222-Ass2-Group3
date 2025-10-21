@@ -6,14 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Repositories\Implement\**" />
-    <Compile Remove="Repositories\Interface\**" />
-    <EmbeddedResource Remove="Repositories\Implement\**" />
-    <EmbeddedResource Remove="Repositories\Interface\**" />
-    <None Remove="Repositories\Implement\**" />
-    <None Remove="Repositories\Interface\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />

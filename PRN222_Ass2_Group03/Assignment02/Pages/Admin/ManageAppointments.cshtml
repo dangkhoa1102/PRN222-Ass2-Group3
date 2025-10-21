@@ -1,0 +1,298 @@
+@page
+@model Assignment02.Pages.Admin.ManageAppointmentsModel
+@{
+    ViewData["Title"] = "Manage Appointments";
+}
+
+@section Styles {
+    <style>
+        /* Page */
+        .admin-wrap { max-width: 1280px; margin: 0 auto; padding: 24px 16px 48px; }
+        .admin-hero { background: linear-gradient(135deg,#2196F3 0%,#4CAF50 100%); color:#fff; border-radius:16px; padding:28px 24px; text-align:center; box-shadow:0 12px 30px rgba(33,150,243,.25); margin-bottom:24px; }
+        .admin-hero h1 { font-weight:800; margin:0; letter-spacing:.3px; }
+        .admin-hero p { margin:8px 0 0 0; opacity:.95; }
+
+        /* Grid */
+        .cards { display:grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap:18px; }
+
+        /* Card */
+        .card { background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 10px 26px rgba(0,0,0,.12); border:1px solid #e9eef5; display:flex; flex-direction:column; }
+        .card-head { background: linear-gradient(135deg,#3AA0F6,#5CC26F); color:#fff; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; }
+        .card-date { font-weight:700; opacity:.95; }
+        .badge { background: rgba(255,255,255,.20); border:1px solid rgba(255,255,255,.35); padding:4px 10px; border-radius:999px; font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.4px; }
+        .badge.pending { background:rgba(255,193,7,.2); border-color:rgba(255,193,7,.45); }
+        .badge.confirmed { background:rgba(76,175,80,.22); border-color:rgba(76,175,80,.45); }
+        .badge.cancelled { background:rgba(244,67,54,.22); border-color:rgba(244,67,54,.45); }
+        .badge.completed { background:rgba(33,150,243,.22); border-color:rgba(33,150,243,.45); }
+        .badge.done { background:rgba(156,39,176,.22); border-color:rgba(156,39,176,.45); }
+
+        .card-body { padding:16px; display:grid; grid-template-columns: 88px 1fr; gap:14px; align-items:flex-start; }
+        .thumb { width:88px; height:88px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#f5f7fa,#e8edf4); color:#6a7a90; }
+        .thumb i { font-size:28px; }
+        .v-title { margin:0 0 6px 0; font-weight:800; color:#1d2b3a; }
+        .meta { margin:6px 0; color:#557189; display:flex; gap:14px; flex-wrap:wrap; }
+        .meta i { color:#2196F3; }
+
+        .infobox { margin-top:10px; background:#f7fafc; border-left:4px solid #2196F3; padding:10px 12px; border-radius:10px; color:#40566b; }
+        .note { margin-top:10px; background:#f9fbff; border-left:4px solid #4CAF50; padding:10px 12px; border-radius:10px; color:#40566b; }
+
+        .card-foot { padding:12px 16px; background:#f8fafc; border-top:1px solid #eef3f8; display:flex; gap:8px; flex-wrap:wrap; }
+        .btn { border:none; border-radius:10px; padding:9px 12px; font-weight:700; letter-spacing:.2px; display:inline-flex; align-items:center; gap:8px; cursor:pointer; transition:.18s ease; }
+        .btn i { font-size:.95rem; }
+        .btn-approve { background:linear-gradient(135deg,#4CAF50,#66BB6A); color:#fff; }
+        .btn-approve:hover { filter:brightness(.97); transform:translateY(-1px); }
+        .btn-cancel { background:linear-gradient(135deg,#f44336,#e57373); color:#fff; }
+        .btn-cancel:hover { filter:brightness(.97); transform:translateY(-1px); }
+        .btn-complete { background:linear-gradient(135deg,#2196F3,#42A5F5); color:#fff; }
+        .btn-complete:hover { filter:brightness(.97); transform:translateY(-1px); }
+
+        /* Responsive tweaks */
+        @@media (max-width: 480px){ .card-body{ grid-template-columns:1fr; } .thumb{ width:100%; height:140px; } }
+    </style>
+}
+
+<div class="admin-wrap">
+    <div class="admin-hero">
+        <h1>Manage Appointments</h1>
+        <p>Bảng điều khiển quản trị các lịch hẹn lái thử</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (Model.Appointments.Any())
+    {
+        <div class="cards">
+            @foreach (var a in Model.Appointments)
+            {
+                var statusLower = a.Status?.ToLower();
+                var badgeText = statusLower == "pending" ? "Processing" : a.Status;
+                <div class="card">
+                    <div class="card-head">
+                        <span class="badge @(statusLower)">@badgeText</span>
+                        <span class="card-date">@a.AppointmentDate.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="thumb">
+                            @if (!string.IsNullOrEmpty(a.Vehicle?.Images))
+                            {
+                                <img src="@a.Vehicle.Images" alt="Vehicle" style="width:100%;height:100%;object-fit:cover;" />
+                            }
+                            else { <i class="fas fa-car"></i> }
+                        </div>
+                        <div>
+                            <h3 class="v-title">@a.Vehicle?.Name</h3>
+                            <div class="meta">
+                                <span><i class="fas fa-map-marker-alt"></i> @a.Dealer?.Name</span>
+                                <span><i class="fas fa-clock"></i> @a.AppointmentDate.ToString("HH:mm")</span>
+                            </div>
+                            <div class="infobox">
+                                <strong><i class="fas fa-user"></i> Khách hàng:</strong>
+                                <div>@a.Customer?.FullName</div>
+                                <div>@a.Customer?.Email</div>
+                                <div>@a.Customer?.Phone</div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(a.Notes))
+                            {
+                                <div class="note"><strong>Ghi chú:</strong> @a.Notes</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-foot">
+                        @if (statusLower == "pending" || statusLower == "processing")
+                        {
+                            <button class="btn btn-approve" onclick="updateStatus('@a.Id','Confirmed')"><i class="fas fa-check"></i> Approve</button>
+                            <button class="btn btn-cancel" onclick="openCancelModal('@a.Id','@a.Vehicle?.Name')"><i class="fas fa-times"></i> Reject</button>
+                        }
+                        else if (statusLower == "confirmed")
+                        {
+                            <button class="btn btn-cancel" onclick="openCancelModal('@a.Id','@a.Vehicle?.Name')"><i class="fas fa-ban"></i> Cancel</button>
+                            <button class="btn btn-complete" onclick="updateStatus('@a.Id','Completed')"><i class="fas fa-flag-checkered"></i> Mark Completed</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="admin-hero" style="padding:32px 24px;">
+            Chưa có lịch hẹn nào.
+        </div>
+    }
+</div>
+
+<!-- Staff Cancel Modal - Redesigned -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+        <div class="modal-content" style="border: none; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
+            <!-- Header -->
+            <div class="modal-header border-0 text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px 20px 0 0; padding: 25px;">
+                <div class="w-100">
+                    <div class="mb-2">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #fff; opacity: 0.9;"></i>
+                    </div>
+                    <h4 class="modal-title text-white fw-bold mb-0" id="cancelModalLabel">
+                        Xác Nhận Hủy Lịch Hẹn
+                    </h4>
+                    <p class="text-white-50 mb-0 mt-1">Thao tác này không thể hoàn tác</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white position-absolute" 
+                        data-bs-dismiss="modal" aria-label="Close" 
+                        style="top: 15px; right: 15px; opacity: 0.8;"></button>
+            </div>
+
+            <!-- Body -->
+            <form id="cancelForm" method="post" action="/Admin/ManageAppointments">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="cancelHandler" name="handler" value="Cancel" />
+                <input type="hidden" id="cancelId" name="id" value="" />
+                
+                <div class="modal-body" style="padding: 30px;">
+                    <!-- Appointment Info -->
+                    <div class="appointment-info mb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-wrapper me-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-car text-white" style="font-size: 1.2rem;"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold text-dark">Thông tin lịch hẹn</h6>
+                                <div id="appointmentPreview" class="text-muted small">
+                                    <!-- Vehicle info will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning Message -->
+                    <div class="alert alert-warning border-0 mb-4" style="background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-radius: 15px;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle text-warning me-2" style="font-size: 1.1rem;"></i>
+                            <small class="mb-0 text-dark">
+                                <strong>Lưu ý:</strong> Khách hàng sẽ nhận được thông báo về việc hủy lịch này
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Reason Input -->
+                    <div class="reason-section">
+                        <label for="cancelNote" class="form-label fw-bold text-dark mb-3">
+                            <i class="fas fa-pen-alt me-2 text-primary"></i>
+                            Lý do hủy lịch hẹn
+                        </label>
+                        <div class="input-group-custom">
+                            <textarea class="form-control" 
+                                      id="cancelNote" 
+                                      name="CancelNote" 
+                                      rows="4" 
+                                      placeholder="Vui lòng nhập lý do cụ thể để khách hàng hiểu rõ tình hình..."
+                                      required
+                                      style="border: 2px solid #e9ecef; 
+                                             border-radius: 15px; 
+                                             padding: 15px; 
+                                             font-size: 14px; 
+                                             resize: none;
+                                             transition: all 0.3s ease;"
+                                      onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 0.2rem rgba(102, 126, 234, 0.15)'"
+                                      onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'"></textarea>
+                        </div>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-lightbulb me-1 text-warning"></i>
+                            <small class="text-muted">Ví dụ: "Xe đang bảo trì", "Thời tiết xấu", "Nhân viên bận việc khẩn cấp"...</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer border-0" style="padding: 0 30px 30px 30px;">
+                    <div class="d-grid gap-3 w-100">
+                        <button type="submit" class="btn btn-lg fw-bold" 
+                                style="background: linear-gradient(135deg, #fd79a8, #e84393); 
+                                       color: white; 
+                                       border: none; 
+                                       border-radius: 15px; 
+                                       padding: 12px 20px;
+                                       transition: all 0.3s ease;"
+                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(232, 67, 147, 0.3)'"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            <i class="fas fa-ban me-2"></i>
+                            Xác Nhận Hủy Lịch Hẹn
+                        </button>
+                        <button type="button" class="btn btn-lg fw-bold" 
+                                data-bs-dismiss="modal"
+                                style="background: linear-gradient(135deg, #74b9ff, #0984e3); 
+                                       color: white; 
+                                       border: none; 
+                                       border-radius: 15px; 
+                                       padding: 12px 20px;
+                                       transition: all 0.3s ease;"
+                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(9, 132, 227, 0.3)'"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Quay Lại
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openCancelModal(id, name){
+            document.getElementById('cancelId').value = id;
+            document.getElementById('appointmentPreview').innerHTML = '<strong>Xe:</strong> ' + (name||'');
+            document.getElementById('cancelNote').value = '';
+            const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+            modal.show();
+        }
+        function updateStatus(id, status){
+            if(!confirm('Xác nhận chuyển trạng thái sang ' + status + '?')) return;
+            
+            // Tạo form với CSRF token
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/Admin/ManageAppointments';
+            
+            // Thêm các input ẩn
+            const handlerInput = document.createElement('input');
+            handlerInput.type = 'hidden';
+            handlerInput.name = 'handler';
+            handlerInput.value = 'UpdateStatus';
+            form.appendChild(handlerInput);
+            
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+            form.appendChild(idInput);
+            
+            const statusInput = document.createElement('input');
+            statusInput.type = 'hidden';
+            statusInput.name = 'status';
+            statusInput.value = status;
+            form.appendChild(statusInput);
+            
+            // Thêm CSRF token nếu có
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (tokenInput) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '__RequestVerificationToken';
+                csrfInput.value = tokenInput.value;
+                form.appendChild(csrfInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+}

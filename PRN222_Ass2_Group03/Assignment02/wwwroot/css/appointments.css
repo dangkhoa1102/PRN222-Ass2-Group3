@@ -1,334 +1,469 @@
-﻿/* Container và Layout */
-body {
-    background: linear-gradient(135deg, 0%, #764ba2 100%);
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 0 0 50px 0;
+﻿/* ========================================
+   BOOK TEST DRIVE - MODERN DESIGN
+   Màu chủ đạo: Xanh lam (#2196F3) và Xanh lục (#4CAF50)
+   ======================================== */
+
+/* Reset và Base Styles */
+* {
+    box-sizing: border-box;
 }
 
-.container {
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #1976D2 0%, #388E3C 100%);
+    padding: 120px 0 80px 0;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
     max-width: 800px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* Header */
-h2 {
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 0 0 1rem 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-title i {
+    font-size: 3rem;
+    color: #FFD700;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    font-weight: 300;
+    opacity: 0.9;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Main Container */
+.main-container {
+    max-width: 1000px;
+    margin: -40px auto 60px auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Booking Card */
+.booking-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    position: relative;
+}
+
+.booking-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 2rem;
     text-align: center;
-    color: #2D3748;
-    font-size: 2.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-title {
+    font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 40px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    letter-spacing: 1px;
-    margin: -100px auto 50px auto;
+    color: #2c3e50;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
 }
 
-/* Form Container */
-#bookingForm {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: fadeInUp 0.6s ease-out;
-    max-width: 600px;
-    margin: -30px auto 200px auto;
+.card-title i {
+    color: #2196F3;
+    font-size: 1.8rem;
 }
 
+.card-subtitle {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Booking Form */
+.booking-form {
+    padding: 2.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group.vehicle-image-group {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label i {
+    color: #2196F3;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.form-control {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: #fff;
+    color: #2c3e50;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+    transform: translateY(-2px);
+}
+
+.form-control:hover {
+    border-color: #4CAF50;
+}
+
+/* Vehicle Image */
+.vehicle-image-container {
+    position: relative;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vehicle-image {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.no-image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: #6c757d;
+}
+
+.no-image-placeholder i {
+    font-size: 3rem;
+    color: #dee2e6;
+}
+
+.no-image-placeholder p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 2.5rem;
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #2196F3 0%, #4CAF50 100%);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-submit:hover::before {
+    left: 100%;
+}
+
+.btn-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(33, 150, 243, 0.4);
+    background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);
+}
+
+.btn-submit:active {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+}
+
+.btn-submit i {
+    font-size: 1.2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .hero-title i {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .main-container {
+        margin: -20px auto 40px auto;
+        padding: 0 15px;
+    }
+    
+    .booking-card {
+        border-radius: 16px;
+    }
+    
+    .card-header {
+        padding: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1.5rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .booking-form {
+        padding: 1.5rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-control {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .btn-submit {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .vehicle-image-container {
+        padding: 1.5rem;
+        min-height: 150px;
+    }
+    
+    .no-image-placeholder i {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 100px 0 60px 0;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-title i {
+        font-size: 2rem;
+    }
+    
+    .main-container {
+        margin: -10px auto 30px auto;
+        padding: 0 10px;
+    }
+    
+    .booking-card {
+        border-radius: 12px;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+    
+    .booking-form {
+        padding: 1rem;
+    }
+    
+    .form-control {
+        padding: 0.75rem 0.875rem;
+    }
+    
+    .btn-submit {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Animation */
 @keyframes fadeInUp {
     from {
         opacity: 0;
         transform: translateY(30px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Form Groups */
-.form-group {
-    margin-bottom: 0px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.booking-card {
+    animation: fadeInUp 0.6s ease-out;
 }
 
-    .form-group:last-of-type {
-        margin-bottom: 35px;
-    }
-
-    /* Labels */
-    .form-group label {
-        display: block;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 10px;
-        font-size: 1rem;
-        letter-spacing: 0.3px;
-        transition: color 0.3s ease;
-        width: 100%;
-        text-align: center;
-    }
-
-    .form-group:focus-within label {
-        color: #667eea;
-    }
-
-/* Input Fields */
-.form-control {
-    width: 70%;
-    max-width: 400px;
-    padding: 14px 18px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
-    color: #2d3748;
-    background-color: #f7fafc;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-    text-align: center;
-}
-
-    .form-control:hover {
-        border-color: #cbd5e0;
-        background-color: #ffffff;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: #667eea;
-        background-color: #ffffff;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        transform: translateY(-2px);
-    }
-
-/* Select Dropdown */
+/* Custom Select Styling */
 select.form-control {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232196F3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 12px center;
+    background-position: right 1rem center;
     background-size: 20px;
-    padding-right: 45px;
+    padding-right: 3rem;
+    appearance: none;
+    cursor: pointer;
 }
 
-/* Textarea */
+/* Textarea Styling */
 textarea.form-control {
     resize: vertical;
     min-height: 120px;
     font-family: inherit;
-    line-height: 1.6;
-    text-align: left;
 }
 
-/* Vehicle Image Container */
-#vehicleImage {
-    margin-top: 15px;
-    border: 3px solid #e2e8f0;
-    border-radius: 16px;
-    max-width: 100%;
-    height: auto;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-    #vehicleImage:hover {
-        transform: scale(1.02);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-    }
-
-.form-group > div {
-    text-align: center;
-    padding: 10px;
-    background: #f7fafc;
-    border-radius: 12px;
-    min-height: 60px;
-}
-
-/* Submit Button */
-.btn-primary {
-    width: 100%;
-    padding: 16px 32px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #ffffff;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-}
-
-    .btn-primary:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-    }
-
-    .btn-primary:active {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-    }
-
-/* Required Field Indicator */
-.form-control:required {
-    background-image: linear-gradient(to right, transparent, transparent);
-}
-
-/* Error State */
-.form-control:invalid:not(:placeholder-shown) {
-    border-color: #fc8181;
-}
-
-/* Placeholder Styling */
-.form-control::placeholder {
-    color: #a0aec0;
-    opacity: 1;
-}
-
-/* Focus Effects */
-.form-group {
-    transition: all 0.3s ease;
-}
-
-    .form-group:focus-within {
-        transform: translateX(5px);
-    }
-
-/* Loading State for Button */
-.btn-primary:disabled {
-    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+/* Loading State */
+.btn-submit:disabled {
+    opacity: 0.7;
     cursor: not-allowed;
     transform: none;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    body {
-        padding: 20px 0 150px 0;
-    }
-
-    h2 {
-        font-size: 2rem;
-        margin-bottom: 30px;
-    }
-
-    #bookingForm {
-        padding: 30px 20px;
-        border-radius: 15px;
-        margin-bottom: 30px;
-    }
-
-    .form-group {
-        margin-bottom: 25px;
-    }
-
-    .form-control {
-        padding: 12px 16px;
-        font-size: 0.95rem;
-    }
-
-    .btn-primary {
-        padding: 14px 28px;
-        font-size: 1rem;
-    }
-
-    #vehicleImage {
-        max-width: 100%;
-    }
+.btn-submit:disabled:hover {
+    transform: none;
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
 }
 
-@media (max-width: 480px) {
-    body {
-        padding: 10px 0 120px 0;
-    }
-
-    h2 {
-        font-size: 1.75rem;
-    }
-
-    #bookingForm {
-        padding: 25px 15px;
-        margin-bottom: 20px;
-    }
-
-    .form-group label {
-        font-size: 0.95rem;
-    }
-
-    .form-control {
-        width: 85%;
-    }
+/* Focus States */
+.form-control:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+    transform: translateY(-2px);
 }
 
-/* Animation for form elements */
-.form-group {
-    animation: slideIn 0.5s ease-out backwards;
+/* Hover Effects */
+.form-control:hover:not(:focus) {
+    border-color: #4CAF50;
+    transform: translateY(-1px);
 }
 
-    .form-group:nth-child(1) {
-        animation-delay: 0.1s;
-    }
-
-    .form-group:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .form-group:nth-child(3) {
-        animation-delay: 0.3s;
-    }
-
-    .form-group:nth-child(4) {
-        animation-delay: 0.4s;
-    }
-
-    .form-group:nth-child(5) {
-        animation-delay: 0.5s;
-    }
-
-    .form-group:nth-child(6) {
-        animation-delay: 0.6s;
-    }
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* Success/Error States */
+.form-control.is-valid {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
 }
 
-/* Button animation */
-.btn-primary {
-    animation: slideIn 0.5s ease-out 0.7s backwards;
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
 }
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
-}
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-    }

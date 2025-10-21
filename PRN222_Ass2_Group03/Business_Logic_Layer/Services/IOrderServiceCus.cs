@@ -1,0 +1,19 @@
+﻿using EVDealerDbContext.Models;
+
+namespace Business_Logic_Layer.Services
+{
+    public interface IOrderServiceCus
+    {
+        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId);
+        Task<IEnumerable<Order>> GetOrderHistoryAsync(Guid userId);
+        Task<IEnumerable<Order>> GetPendingOrdersByUserIdAsync(Guid userId);
+        Task<Order?> GetOrderByIdAsync(Guid orderId);
+        Task<bool> CancelOrderAsync(Guid orderId, string Notes);
+        Task<Order> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes);
+        Task<List<Order>> GetAllOrdersAsync();
+        Task<List<Business_Logic_Layer.DTOs.OrderDTO>> GetAllOrdersDTOAsync();
+        Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus);
+        Task<bool> UpdateOrderAsync(Order order);
+
+    }
+}
