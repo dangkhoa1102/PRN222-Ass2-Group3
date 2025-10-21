@@ -91,17 +91,15 @@
                                     <span>Test Drives</span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#appointments">
+                                    <li>
+                                        <a class="dropdown-item" asp-page="/BookTestDrive">
                                         <i class="fas fa-calendar-plus"></i>
-                                        <span>Schedule Test Drive</span>
+                                        <span>Book Appointment</span>
                                     </a></li>
-                                    <li><a class="dropdown-item" href="#appointments?view=my">
+                                    <li>
+                                        <a class="dropdown-item" asp-page="/MyAppointment">
                                         <i class="fas fa-list"></i>
                                         <span>My Appointments</span>
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="#appointments?view=history">
-                                        <i class="fas fa-history"></i>
-                                        <span>Test Drive History</span>
                                     </a></li>
                                 </ul>
                             </li>
@@ -226,8 +224,8 @@
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> -->
     
     @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
     {
