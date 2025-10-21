@@ -91,7 +91,7 @@ namespace Assignment02.Pages.Orders
                 if (success)
                 {
                     // Chuyển hướng về MyOrders sau khi thanh toán thành công
-                    return RedirectToPage("/Orders/MyOrdersCus");
+                    return RedirectToPage("/Orders/MyOrders");
                 }
                 else
                 {

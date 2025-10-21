@@ -70,7 +70,7 @@ namespace Assignment02.Pages.Orders
             {
                 var newOrder = await _orderService.CreateOrderAsync(customerId, SelectedDealerId, SelectedVehicleId, Notes);
                 SuccessMessage = "Order created successfully!";
-                return RedirectToPage("/Orders/MyOrdersCus");
+                return RedirectToPage("/Orders/MyOrders");
             }
             catch (Exception ex)
             {
