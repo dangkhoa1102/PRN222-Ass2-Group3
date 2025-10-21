@@ -1,5 +1,5 @@
 using Assignment02.Hubs;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Assignment02.Services
@@ -14,23 +14,23 @@ namespace Assignment02.Services
         }
 
         // Wrapper methods for OrderService
-        public async Task NotifyOrderCreated(Order order)
+        public async Task NotifyOrderCreated(OrderDTO order)
         {
             await _hubContext.Clients.Group("staff").SendAsync("OrderCreated", 
                 order.Id.ToString(), 
-                order.Customer?.FullName ?? "Unknown", 
-                order.Vehicle?.Name ?? "Unknown");
+                order.CustomerName ?? "Unknown", 
+                order.VehicleName ?? "Unknown");
         }
 
-        public async Task NotifyOrderCancelled(Order order, string reason)
+        public async Task NotifyOrderCancelled(OrderDTO order, string reason)
         {
             await _hubContext.Clients.Group("staff").SendAsync("OrderCancelled", 
                 order.Id.ToString(), 
-                order.Customer?.FullName ?? "Unknown", 
+                order.CustomerName ?? "Unknown", 
                 reason);
         }
 
-        public async Task NotifyOrderStatusUpdate(Order order, string newStatus)
+        public async Task NotifyOrderStatusUpdate(OrderDTO order, string newStatus)
         {
             await _hubContext.Clients.Group($"customer_{order.CustomerId}").SendAsync("OrderStatusUpdated", 
                 order.Id.ToString(), 
@@ -41,7 +41,7 @@ namespace Assignment02.Services
         }
 
         // Wrapper methods for VehicleService
-        public async Task NotifyVehicleAdded(Vehicle vehicle)
+        public async Task NotifyVehicleAdded(VehicleDTO vehicle)
         {
             await _hubContext.Clients.All.SendAsync("VehicleAdded", 
                 vehicle.Id.ToString(), 
@@ -49,7 +49,7 @@ namespace Assignment02.Services
                 vehicle.Brand);
         }
 
-        public async Task NotifyVehicleUpdated(Vehicle vehicle)
+        public async Task NotifyVehicleUpdated(VehicleDTO vehicle)
         {
             await _hubContext.Clients.All.SendAsync("VehicleUpdated", 
                 vehicle.Id.ToString(), 
@@ -57,23 +57,23 @@ namespace Assignment02.Services
                 vehicle.Brand);
         }
 
-        public async Task NotifyVehicleDeleted(Vehicle vehicle)
+        public async Task NotifyVehicleDeleted(VehicleDTO vehicle)
         {
             await _hubContext.Clients.All.SendAsync("VehicleDeleted", 
                 vehicle.Id.ToString(), 
                 vehicle.Name);
         }
 
-        public async Task NotifyVehicleStockUpdate(Vehicle vehicle)
+        public async Task NotifyVehicleStockUpdate(VehicleDTO vehicle)
         {
             await _hubContext.Clients.All.SendAsync("VehicleStockUpdated", 
                 vehicle.Id.ToString(), 
                 vehicle.Name, 
-                vehicle.StockQuantity ?? 0);
+                vehicle.StockQuantity);
         }
 
         // Wrapper methods for UserService
-        public async Task NotifyUserRegistered(User user)
+        public async Task NotifyUserRegistered(UserDTO user)
         {
             await _hubContext.Clients.Group("staff").SendAsync("UserRegistered", 
                 user.Id.ToString(), 
@@ -81,7 +81,7 @@ namespace Assignment02.Services
                 user.Role);
         }
 
-        public async Task NotifyUserUpdated(User user)
+        public async Task NotifyUserUpdated(UserDTO user)
         {
             await _hubContext.Clients.All.SendAsync("UserUpdated", 
                 user.Id.ToString(), 
@@ -89,7 +89,7 @@ namespace Assignment02.Services
         }
 
         // Wrapper methods for TestDriveService
-        public async Task NotifyTestDriveBooked(TestDriveAppointment appointment)
+        public async Task NotifyTestDriveBooked(TestDriveAppointmentDTO appointment)
         {
             await _hubContext.Clients.Group("staff").SendAsync("TestDriveBooked", 
                 appointment.Id.ToString(), 
@@ -98,7 +98,7 @@ namespace Assignment02.Services
                 appointment.AppointmentDate);
         }
 
-        public async Task NotifyTestDriveCancelled(TestDriveAppointment appointment)
+        public async Task NotifyTestDriveCancelled(TestDriveAppointmentDTO appointment)
         {
             await _hubContext.Clients.Group("staff").SendAsync("TestDriveCancelled", 
                 appointment.Id.ToString(), 
@@ -106,7 +106,7 @@ namespace Assignment02.Services
                 appointment.Vehicle?.Name ?? "Unknown");
         }
 
-        public async Task NotifyTestDriveCompleted(TestDriveAppointment appointment)
+        public async Task NotifyTestDriveCompleted(TestDriveAppointmentDTO appointment)
         {
             await _hubContext.Clients.Group("staff").SendAsync("TestDriveCompleted", 
                 appointment.Id.ToString(), 

@@ -13,30 +13,57 @@ namespace Business_Logic_Layer.Services
             _orderRepository = orderRepository;
         }
 
-        // 🔹 Tất cả đơn hàng của user
-        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId)
+        private OrderDTO ConvertToDTO(Order order)
         {
-            return await _orderRepository.GetByCustomerId(userId);
+            return new OrderDTO
+            {
+                Id = order.Id,
+                OrderNumber = order.OrderNumber,
+                CustomerId = order.CustomerId,
+                CustomerName = order.Customer?.FullName ?? order.Customer?.Username ?? "Unknown",
+                CustomerPhone = order.Customer?.Phone ?? "N/A",
+                DealerId = order.DealerId,
+                DealerName = order.Dealer?.Name ?? "Unknown",
+                VehicleId = order.VehicleId,
+                VehicleName = order.Vehicle?.Name ?? "Unknown",
+                VehicleBrand = order.Vehicle?.Brand ?? "",
+                VehicleModel = order.Vehicle?.Model ?? "",
+                VehicleImage = order.Vehicle?.Images ?? "",
+                TotalAmount = order.TotalAmount,
+                Status = order.Status ?? "Unknown",
+                PaymentStatus = order.PaymentStatus ?? "Unknown",
+                Notes = order.Notes ?? "",
+                CreatedAt = order.CreatedAt,
+                UpdatedAt = order.UpdatedAt
+            };
+        }
+
+        // 🔹 Tất cả đơn hàng của user
+        public async Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(Guid userId)
+        {
+            var orders = await _orderRepository.GetByCustomerId(userId);
+            return orders.Select(ConvertToDTO);
         }
 
         // 🔹 Lịch sử đơn hàng (đã hoàn thành hoặc hủy)
-        public async Task<IEnumerable<Order>> GetOrderHistoryAsync(Guid userId)
+        public async Task<IEnumerable<OrderDTO>> GetOrderHistoryAsync(Guid userId)
         {
             var orders = await _orderRepository.GetByCustomerId(userId);
-            return orders.Where(o => o.Status == "Completed" || o.Status == "Cancelled");
+            return orders.Where(o => o.Status == "Completed" || o.Status == "Cancelled").Select(ConvertToDTO);
         }
 
         // 🔹 Đơn hàng đang chờ xử lý
-        public async Task<IEnumerable<Order>> GetPendingOrdersByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<OrderDTO>> GetPendingOrdersByUserIdAsync(Guid userId)
         {
             var orders = await _orderRepository.GetByCustomerId(userId);
-            return orders.Where(o => o.Status == "Pending" || o.Status == "Processing");
+            return orders.Where(o => o.Status == "Pending" || o.Status == "Processing").Select(ConvertToDTO);
         }
 
         // 🔹 Lấy chi tiết đơn hàng với đầy đủ thông tin
-        public async Task<Order?> GetOrderByIdAsync(Guid orderId)
+        public async Task<OrderDTO?> GetOrderByIdAsync(Guid orderId)
         {
-            return await _orderRepository.GetById(orderId);
+            var order = await _orderRepository.GetById(orderId);
+            return order != null ? ConvertToDTO(order) : null;
         }
 
         // 🔹 Hủy đơn hàng
@@ -53,7 +80,7 @@ namespace Business_Logic_Layer.Services
 
             return await _orderRepository.Update(order);
         }
-        public async Task<Order> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes)
+        public async Task<OrderDTO> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes)
         {
             var now = DateTime.Now;
             string orderNumber = $"ORD-{now:yyyyMMdd-HHmm}";
@@ -77,11 +104,12 @@ namespace Business_Logic_Layer.Services
             };
 
             await _orderRepository.Add(newOrder);
-            return newOrder;
+            return ConvertToDTO(newOrder);
         }
-        public async Task<List<Order>> GetAllOrdersAsync()
+        public async Task<List<OrderDTO>> GetAllOrdersAsync()
         {
-            return await _orderRepository.GetAll();
+            var orders = await _orderRepository.GetAll();
+            return orders.Select(ConvertToDTO).ToList();
         }
 
         public async Task<List<OrderDTO>> GetAllOrdersDTOAsync()
@@ -131,11 +159,18 @@ namespace Business_Logic_Layer.Services
         }
 
         // 🔹 Cập nhật toàn bộ đơn hàng
-        public async Task<bool> UpdateOrderAsync(Order order)
+        public async Task<bool> UpdateOrderAsync(OrderDTO orderDto)
         {
+            if (orderDto == null)
+                return false;
+
+            var order = await _orderRepository.GetById(orderDto.Id);
             if (order == null)
                 return false;
 
+            order.Status = orderDto.Status;
+            order.PaymentStatus = orderDto.PaymentStatus;
+            order.Notes = orderDto.Notes;
             order.UpdatedAt = DateTime.Now;
             return await _orderRepository.Update(order);
         }

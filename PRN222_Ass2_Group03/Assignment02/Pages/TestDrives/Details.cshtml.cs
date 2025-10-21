@@ -1,5 +1,5 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Assignment02.Pages.TestDrives
@@ -13,7 +13,7 @@ namespace Assignment02.Pages.TestDrives
             _appointmentService = appointmentService;
         }
 
-        public TestDriveAppointment? Appointment { get; set; }
+        public TestDriveAppointmentDTO? Appointment { get; set; }
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {

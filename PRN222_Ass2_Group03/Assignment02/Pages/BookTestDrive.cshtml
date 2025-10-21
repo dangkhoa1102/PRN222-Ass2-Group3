@@ -293,14 +293,27 @@
                     throw new Error('Lỗi tải danh sách khung giờ');
                 }
                 const timeSlots = await timeSlotResponse.json();
+                console.log('Time slots received:', timeSlots);
                 const timeSlotSelect = document.getElementById("TimeSlot");
                 timeSlotSelect.innerHTML = '<option value="">-- Chọn giờ --</option>';
                 timeSlots.forEach(slot => {
                     try {
-                        const time = new Date(slot.appointmentDate).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                        timeSlotSelect.innerHTML += `<option value="${time}">${time}</option>`;
+                        // Handle both string and object formats
+                        let appointmentDate;
+                        if (typeof slot.appointmentDate === 'string') {
+                            appointmentDate = new Date(slot.appointmentDate);
+                        } else if (slot.appointmentDate) {
+                            appointmentDate = new Date(slot.appointmentDate);
+                        } else {
+                            console.error('Invalid appointment date:', slot);
+                            return;
+                        }
+                        
+                        const time = appointmentDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                        const timeValue = appointmentDate.toTimeString().substring(0, 5); // HH:mm format
+                        timeSlotSelect.innerHTML += `<option value="${timeValue}">${time}</option>`;
                     } catch (e) {
-                        console.error('Error parsing time slot:', e);
+                        console.error('Error parsing time slot:', e, slot);
                     }
                 });
             } catch (error) {

@@ -1,5 +1,5 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,7 +9,7 @@ namespace Assignment02.Pages.Orders
     {
         private readonly IOrderService _orderService;
 
-        public List<Order> OrderHistories { get; set; } = new();
+        public List<OrderDTO> OrderHistories { get; set; } = new();
 
         public HistoryModel(IOrderService orderService)
         {

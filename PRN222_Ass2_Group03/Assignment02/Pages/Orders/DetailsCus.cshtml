@@ -322,37 +322,22 @@ else
         <!-- Customer Information Section -->
         <div class="info-section">
             <h4 class="section-title">👤 Customer Information</h4>
-            <div class="detail-item"><strong>Full Name:</strong> @Model.Order.Customer?.FullName</div>
-            <div class="detail-item"><strong>Username:</strong> @Model.Order.Customer?.Username</div>
-            <div class="detail-item"><strong>Email:</strong> @Model.Order.Customer?.Email</div>
-            <div class="detail-item"><strong>Phone:</strong> @Model.Order.Customer?.Phone</div>
-            <div class="detail-item"><strong>Role:</strong> @Model.Order.Customer?.Role</div>
-            <div class="detail-item"><strong>Customer Since:</strong> @Model.Order.Customer?.CreatedAt?.ToString("dd/MM/yyyy")</div>
+            <div class="detail-item"><strong>Customer Name:</strong> @Model.Order.CustomerName</div>
+            <div class="detail-item"><strong>Customer Phone:</strong> @Model.Order.CustomerPhone</div>
         </div>
 
         <!-- Vehicle Information Section -->
         <div class="info-section">
             <h4 class="section-title">🚗 Vehicle Information</h4>
-            <div class="detail-item"><strong>Vehicle Name:</strong> @Model.Order.Vehicle?.Name</div>
-            <div class="detail-item"><strong>Brand:</strong> @Model.Order.Vehicle?.Brand</div>
-            <div class="detail-item"><strong>Model:</strong> @Model.Order.Vehicle?.Model</div>
-            <div class="detail-item"><strong>Year:</strong> @Model.Order.Vehicle?.Year</div>
-            <div class="detail-item"><strong>Price:</strong> @Model.Order.Vehicle?.Price.ToString("N0") ₫</div>
-            <div class="detail-item"><strong>Stock Quantity:</strong> @Model.Order.Vehicle?.StockQuantity</div>
-            <div class="detail-item"><strong>Description:</strong> @Model.Order.Vehicle?.Description</div>
-            @if (!string.IsNullOrEmpty(Model.Order.Vehicle?.Specifications))
-            {
-                <div class="detail-item"><strong>Specifications:</strong> @Model.Order.Vehicle?.Specifications</div>
-            }
-            @if (!string.IsNullOrEmpty(Model.Order.Vehicle?.Images))
+            <div class="detail-item"><strong>Vehicle Name:</strong> @Model.Order.VehicleName</div>
+            <div class="detail-item"><strong>Brand:</strong> @Model.Order.VehicleBrand</div>
+            <div class="detail-item"><strong>Model:</strong> @Model.Order.VehicleModel</div>
+            @if (!string.IsNullOrEmpty(Model.Order.VehicleImage))
             {
                 <div class="detail-item">
-                    <strong>Images:</strong>
+                    <strong>Image:</strong>
                     <div class="vehicle-images">
-                        @foreach (var image in Model.Order.Vehicle.Images.Split(','))
-                        {
-                            <img src="@image.Trim()" alt="Vehicle Image" class="vehicle-image" />
-                        }
+                        <img src="@Model.Order.VehicleImage" alt="Vehicle Image" class="vehicle-image" />
                     </div>
                 </div>
             }
@@ -361,41 +346,11 @@ else
         <!-- Dealer Information Section -->
         <div class="info-section">
             <h4 class="section-title">🏢 Dealer Information</h4>
-            <div class="detail-item"><strong>Dealer Name:</strong> @Model.Order.Dealer?.Name</div>
+            <div class="detail-item"><strong>Dealer Name:</strong> @Model.Order.DealerName</div>
             <div class="detail-item"><strong>Dealer ID:</strong> @Model.Order.DealerId</div>
         </div>
 
-        <!-- Test Drive Appointments Section -->
-        @if (Model.Order.Customer?.TestDriveAppointments != null && Model.Order.Customer.TestDriveAppointments.Any())
-        {
-            <div class="info-section">
-                <h4 class="section-title">📅 Test Drive Appointments</h4>
-                @foreach (var appointment in Model.Order.Customer.TestDriveAppointments.Where(a => a.VehicleId == Model.Order.VehicleId))
-                {
-                    <div class="appointment-item">
-                        <div class="detail-item"><strong>Appointment Date:</strong> @appointment.AppointmentDate.ToString("dd/MM/yyyy HH:mm")</div>
-                        <div class="detail-item"><strong>Status:</strong> 
-                            @if (appointment.Status?.Equals("completed", StringComparison.OrdinalIgnoreCase) == true)
-                            {
-                                <span class="badge badge-success">Completed</span>
-                            }
-                            else if (appointment.Status?.Equals("scheduled", StringComparison.OrdinalIgnoreCase) == true)
-                            {
-                                <span class="badge badge-warning">Scheduled</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-info">@appointment.Status</span>
-                            }
-                        </div>
-                        @if (!string.IsNullOrEmpty(appointment.Notes))
-                        {
-                            <div class="detail-item"><strong>Notes:</strong> @appointment.Notes</div>
-                        }
-                    </div>
-                }
-            </div>
-        }
+        <!-- Test Drive Appointments Section removed as OrderDTO does not contain nested objects -->
 
         <div class="text-center mt-4">
             @{

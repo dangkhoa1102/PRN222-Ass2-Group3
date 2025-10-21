@@ -1,18 +1,18 @@
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 
 namespace Business_Logic_Layer.Services
 {
     public interface IUserService
     {
-        Task<User?> LoginAsync(string username, string password);
-        Task<User?> GetUserByIdAsync(Guid id);
-        Task<User?> GetUserByUsernameAsync(string username);
-        Task<User?> GetUserByEmailAsync(string email);
-        Task<User?> CreateUserAsync(User user);
+        Task<UserDTO?> LoginAsync(string username, string password);
+        Task<UserDTO?> GetUserByIdAsync(Guid id);
+        Task<UserDTO?> GetUserByUsernameAsync(string username);
+        Task<UserDTO?> GetUserByEmailAsync(string email);
+        Task<UserDTO?> CreateUserAsync(UserDTO user, string password);
         Task<bool> ValidateUserCredentialsAsync(string username, string password);
         Task<bool> IsUsernameAvailableAsync(string username);
         Task<bool> IsEmailAvailableAsync(string email);
-        Task<IEnumerable<User>> GetAllUsersAsync();
-        Task<IEnumerable<User>> GetCustomersAsync();
+        Task<IEnumerable<UserDTO>> GetAllUsersAsync();
+        Task<IEnumerable<UserDTO>> GetCustomersAsync();
     }
 }

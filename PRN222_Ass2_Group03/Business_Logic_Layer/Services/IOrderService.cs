@@ -1,19 +1,18 @@
-﻿using EVDealerDbContext.Models;
+﻿using Business_Logic_Layer.DTOs;
 
 namespace Business_Logic_Layer.Services
 {
     public interface IOrderService
     {
-        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId);
-        Task<IEnumerable<Order>> GetOrderHistoryAsync(Guid userId);
-        Task<IEnumerable<Order>> GetPendingOrdersByUserIdAsync(Guid userId);
-        Task<Order?> GetOrderByIdAsync(Guid orderId);
+        Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(Guid userId);
+        Task<IEnumerable<OrderDTO>> GetOrderHistoryAsync(Guid userId);
+        Task<IEnumerable<OrderDTO>> GetPendingOrdersByUserIdAsync(Guid userId);
+        Task<OrderDTO?> GetOrderByIdAsync(Guid orderId);
         Task<bool> CancelOrderAsync(Guid orderId, string Notes);
-        Task<Order> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes);
-        Task<List<Order>> GetAllOrdersAsync();
-        Task<List<Business_Logic_Layer.DTOs.OrderDTO>> GetAllOrdersDTOAsync();
+        Task<OrderDTO> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes);
+        Task<List<OrderDTO>> GetAllOrdersAsync();
+        Task<List<OrderDTO>> GetAllOrdersDTOAsync();
         Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus);
-        Task<bool> UpdateOrderAsync(Order order);
-
+        Task<bool> UpdateOrderAsync(OrderDTO order);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Assignment02.Services;
@@ -11,7 +11,7 @@ namespace Assignment02.Pages.Orders
         private readonly IOrderService _orderService;
         private readonly OrderNotificationService _notificationService;
 
-        public Order? Order { get; set; }
+        public OrderDTO? Order { get; set; }
         public string? CurrentUserRole { get; set; }
 
         public DetailsModel(IOrderService orderService, OrderNotificationService notificationService)

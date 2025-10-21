@@ -1,6 +1,7 @@
 using EVDealerDbContext.Models;
 using EVDealerDbContext;
 using Microsoft.EntityFrameworkCore;
+using Business_Logic_Layer.DTOs;
 
 namespace Business_Logic_Layer.Services
 {
@@ -13,18 +14,42 @@ namespace Business_Logic_Layer.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Dealer>> GetAllDealersAsync()
+        public async Task<IEnumerable<DealerDTO>> GetAllDealersAsync()
         {
-            return await _context.Dealers
+            var dealers = await _context.Dealers
                 .Where(d => d.IsActive == true)
                 .OrderBy(d => d.Name)
                 .ToListAsync();
+                
+            return dealers.Select(d => new DealerDTO
+            {
+                Id = d.Id,
+                Name = d.Name,
+                Address = d.Address,
+                Phone = d.Phone,
+                Email = d.Email,
+                IsActive = d.IsActive,
+                CreatedAt = d.CreatedAt
+            });
         }
 
-        public async Task<Dealer?> GetDealerByIdAsync(Guid id)
+        public async Task<DealerDTO?> GetDealerByIdAsync(Guid id)
         {
-            return await _context.Dealers
+            var dealer = await _context.Dealers
                 .FirstOrDefaultAsync(d => d.Id == id && d.IsActive == true);
+                
+            if (dealer == null) return null;
+            
+            return new DealerDTO
+            {
+                Id = dealer.Id,
+                Name = dealer.Name,
+                Address = dealer.Address,
+                Phone = dealer.Phone,
+                Email = dealer.Email,
+                IsActive = dealer.IsActive,
+                CreatedAt = dealer.CreatedAt
+            };
         }
     }
 }

@@ -1,5 +1,5 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,7 +9,7 @@ namespace Assignment02.Pages.Orders
     {
         private readonly IOrderService _orderService;
 
-        public Order? Order { get; set; }
+        public OrderDTO? Order { get; set; }
         public string SuccessMessage { get; set; } = string.Empty;
         public string ErrorMessage { get; set; } = string.Empty;
 

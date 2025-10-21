@@ -1,5 +1,5 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
@@ -83,19 +83,18 @@ namespace Assignment02.Pages
                     return Page();
                 }
 
-                // Create new user
-                var newUser = new User
+                // Create new user DTO
+                var newUserDto = new UserDTO
                 {
                     Username = Username,
                     Email = Email,
-                    Password = Password, // Will be hashed in the service
                     FullName = FullName,
                     Phone = Phone,
                     Role = "Customer", // Default role
                     IsActive = true
                 };
 
-                var createdUser = await _userService.CreateUserAsync(newUser);
+                var createdUser = await _userService.CreateUserAsync(newUserDto, Password);
 
                 if (createdUser != null)
                 {

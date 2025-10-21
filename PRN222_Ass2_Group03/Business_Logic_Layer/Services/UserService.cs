@@ -3,6 +3,7 @@ using EVDealerDbContext.Models;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
+using Business_Logic_Layer.DTOs;
 
 namespace Business_Logic_Layer.Services
 {
@@ -17,7 +18,22 @@ namespace Business_Logic_Layer.Services
             _logger = logger;
         }
 
-        public async Task<User?> LoginAsync(string username, string password)
+        private UserDTO ConvertToDTO(User user)
+        {
+            return new UserDTO
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FullName = user.FullName,
+                Phone = user.Phone,
+                Role = user.Role,
+                IsActive = user.IsActive,
+                CreatedAt = user.CreatedAt
+            };
+        }
+
+        public async Task<UserDTO?> LoginAsync(string username, string password)
         {
             try
             {
@@ -32,7 +48,7 @@ namespace Business_Logic_Layer.Services
                 if (VerifyPassword(password, user.Password))
                 {
                     _logger.LogInformation("User logged in successfully - {Username}", username);
-                    return user;
+                    return ConvertToDTO(user);
                 }
 
                 _logger.LogWarning("Login attempt failed: Invalid password - {Username}", username);
@@ -45,45 +61,54 @@ namespace Business_Logic_Layer.Services
             }
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid id)
+        public async Task<UserDTO?> GetUserByIdAsync(Guid id)
         {
-            return await _userRepository.GetUserByIdAsync(id);
+            var user = await _userRepository.GetUserByIdAsync(id);
+            return user != null ? ConvertToDTO(user) : null;
         }
 
-        public async Task<User?> GetUserByUsernameAsync(string username)
+        public async Task<UserDTO?> GetUserByUsernameAsync(string username)
         {
-            return await _userRepository.GetUserByUsernameAsync(username);
+            var user = await _userRepository.GetUserByUsernameAsync(username);
+            return user != null ? ConvertToDTO(user) : null;
         }
 
-        public async Task<User?> GetUserByEmailAsync(string email)
+        public async Task<UserDTO?> GetUserByEmailAsync(string email)
         {
-            return await _userRepository.GetUserByEmailAsync(email);
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            return user != null ? ConvertToDTO(user) : null;
         }
 
-        public async Task<User?> CreateUserAsync(User user)
+        public async Task<UserDTO?> CreateUserAsync(UserDTO userDto, string password)
         {
             try
             {
-                // Hash the password before storing
-                user.Password = HashPassword(user.Password);
+                var user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Username = userDto.Username,
+                    Email = userDto.Email,
+                    FullName = userDto.FullName,
+                    Phone = userDto.Phone,
+                    Role = userDto.Role,
+                    Password = HashPassword(password), // Hash the password
+                    CreatedAt = DateTime.Now,
+                    IsActive = true
+                };
                 
-                // Set default values - using CreatedAt instead of CreatedDate
-                user.Id = Guid.NewGuid();
-                user.CreatedAt = DateTime.Now;
-                user.IsActive = true;
-
                 var createdUser = await _userRepository.CreateUserAsync(user);
                 
                 if (createdUser != null)
                 {
                     _logger.LogInformation("User created successfully - {Username}", user.Username);
+                    return ConvertToDTO(createdUser);
                 }
                 
-                return createdUser;
+                return null;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating user {Username}", user.Username);
+                _logger.LogError(ex, "Error creating user {Username}", userDto.Username);
                 throw;
             }
         }
@@ -106,14 +131,16 @@ namespace Business_Logic_Layer.Services
             return user != null;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
-            return await _userRepository.GetAllUsersAsync();
+            var users = await _userRepository.GetAllUsersAsync();
+            return users.Select(ConvertToDTO);
         }
 
-        public async Task<IEnumerable<User>> GetCustomersAsync()
+        public async Task<IEnumerable<UserDTO>> GetCustomersAsync()
         {
-            return await _userRepository.GetCustomersAsync();
+            var users = await _userRepository.GetCustomersAsync();
+            return users.Select(ConvertToDTO);
         }
 
         private bool VerifyPassword(string password, string storedHash)

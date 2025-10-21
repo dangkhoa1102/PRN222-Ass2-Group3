@@ -1,5 +1,5 @@
 ﻿using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -17,21 +17,21 @@ namespace Assignment02.Pages
         }
 
         [BindProperty]
-        public TestDriveAppointment Appointment { get; set; } = new TestDriveAppointment();
+        public TestDriveAppointmentDTO Appointment { get; set; } = new TestDriveAppointmentDTO();
 
         [BindProperty]
         public string SelectedTimeSlot { get; set; } = string.Empty;
 
-        public IList<Dealer> Dealers { get; set; } = new List<Dealer>();
-        public IList<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
-        public IList<TestDriveAppointment> AvailableTimeSlots { get; set; } = new List<TestDriveAppointment>();
+        public IList<DealerDTO> Dealers { get; set; } = new List<DealerDTO>();
+        public IList<VehicleDTO> Vehicles { get; set; } = new List<VehicleDTO>();
+        public IList<TestDriveAppointmentDTO> AvailableTimeSlots { get; set; } = new List<TestDriveAppointmentDTO>();
         public string ErrorMessage { get; set; } = string.Empty;
         public string SuccessMessage { get; set; } = string.Empty;
 
-        public async Task OnGetAsync(Guid? vehicleId)
+        public async Task OnGetAsync(Guid? vehicleId, Guid? dealerId, DateTime? date)
         {
             Dealers = (await _appointmentService.GetAllDealersAsync()).ToList();
-            AvailableTimeSlots = new List<TestDriveAppointment>();
+            AvailableTimeSlots = new List<TestDriveAppointmentDTO>();
             
             // Always load all vehicles for selection
             var allVehicles = await _vehicleService.GetAllVehiclesAsync();
@@ -44,6 +44,32 @@ namespace Assignment02.Pages
                 if (selectedVehicle != null)
                 {
                     Appointment.VehicleId = selectedVehicle.Id;
+                }
+            }
+            
+            // Pre-select dealer if dealerId is provided
+            if (dealerId.HasValue)
+            {
+                Appointment.DealerId = dealerId.Value;
+            }
+            
+            // Pre-select date if date is provided
+            if (date.HasValue)
+            {
+                Appointment.AppointmentDate = date.Value;
+            }
+            
+            // Load time slots if both dealer and date are provided
+            if (dealerId.HasValue && date.HasValue)
+            {
+                try
+                {
+                    AvailableTimeSlots = (await _appointmentService.GetAvailableTimeSlotsAsync(dealerId.Value, date.Value)).ToList();
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Lỗi khi tải khung giờ: {ex.Message}";
+                    AvailableTimeSlots = new List<TestDriveAppointmentDTO>();
                 }
             }
         }

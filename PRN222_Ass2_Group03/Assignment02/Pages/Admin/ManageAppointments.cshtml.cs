@@ -1,5 +1,5 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Assignment02.Pages.Admin
@@ -13,7 +13,7 @@ namespace Assignment02.Pages.Admin
             _appointmentService = appointmentService;
         }
 
-        public IEnumerable<TestDriveAppointment> Appointments { get; set; } = new List<TestDriveAppointment>();
+        public IEnumerable<TestDriveAppointmentDTO> Appointments { get; set; } = new List<TestDriveAppointmentDTO>();
         public string? FilterStatus { get; set; }
 
         [BindProperty]
@@ -112,7 +112,7 @@ namespace Assignment02.Pages.Admin
         }
 
         // Helper method để kiểm tra quyền cancel
-        public bool CanCancelAppointment(TestDriveAppointment appointment)
+        public bool CanCancelAppointment(TestDriveAppointmentDTO appointment)
         {
             if (appointment.Status == "Cancelled")
                 return false;

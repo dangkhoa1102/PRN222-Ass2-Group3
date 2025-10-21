@@ -1,6 +1,6 @@
 ﻿
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -10,7 +10,7 @@ namespace Assignment02.Pages.Orders
     {
         private readonly IOrderService _orderService;
 
-        public IEnumerable<Order> PendingOrders { get; set; } = Enumerable.Empty<Order>();
+        public IEnumerable<OrderDTO> PendingOrders { get; set; } = Enumerable.Empty<OrderDTO>();
 
         public PendingOrdersModel(IOrderService orderService)
         {

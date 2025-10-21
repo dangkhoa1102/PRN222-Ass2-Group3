@@ -1,5 +1,5 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -14,7 +14,7 @@ namespace Assignment02.Pages.Vehicles
             _vehicleService = vehicleService;
         }
 
-        public Vehicle? Vehicle { get; set; }
+        public VehicleDTO? Vehicle { get; set; }
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {
