@@ -121,6 +121,7 @@ else
                     <th>Status</th>
                     <th>Payment</th>
                     <th>Created</th>
+                    <th>Notes</th>
                     <th>View</th>
                 </tr>
             </thead>
@@ -153,7 +154,18 @@ else
                         <td><span class="badge @statusBadge">@order.Status</span></td>
                         <td><span class="badge @paymentBadge">@order.PaymentStatus</span></td>
                         <td>@order.CreatedAt?.ToString("dd/MM/yyyy")</td>
-
+                        <td>
+                            @if (order.Status?.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) == true && !string.IsNullOrEmpty(order.Notes))
+                            {
+                                <span class="text-danger" style="font-size: 0.9rem;">
+                                    <i class="fas fa-times-circle"></i> @order.Notes
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
                         <td>
                             <a asp-page="/Orders/Details" asp-route-id="@order.Id" class="btn btn-view">
                                 <i class="fas fa-eye"></i> View

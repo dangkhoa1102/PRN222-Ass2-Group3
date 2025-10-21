@@ -35,8 +35,8 @@ namespace Assignment02.Pages.Admin
                 return RedirectToPage("/Login");
             }
 
-            // Get all orders (you might need to implement GetAllOrdersAsync in IOrderService)
-            var allOrders = await _orderService.GetAllOrdersAsync();
+            // Get all orders as DTOs
+            var allOrders = await _orderService.GetAllOrdersDTOAsync();
 
             // Apply filters
             if (!string.IsNullOrEmpty(Status))
@@ -51,7 +51,7 @@ namespace Assignment02.Pages.Admin
             if (ToDate.HasValue)
                 allOrders = allOrders.Where(o => o.CreatedAt <= ToDate).ToList();
 
-            Orders = Orders;
+            Orders = allOrders;
             return Page();
         }
 

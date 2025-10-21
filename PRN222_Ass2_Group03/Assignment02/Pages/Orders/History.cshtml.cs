@@ -23,7 +23,14 @@ namespace Assignment02.Pages.Orders
                 return RedirectToPage("/Login");
 
             Guid userId = Guid.Parse(userIdStr);
-            OrderHistories = (await _orderService.GetOrderHistoryAsync(userId)).ToList();
+            
+            // Lấy các order đã hoàn thành (Completed, Cancelled, Done)
+            var allOrders = await _orderService.GetOrdersByUserIdAsync(userId);
+            OrderHistories = allOrders.Where(o => 
+                o.Status == "Completed" || 
+                o.Status == "Cancelled" || 
+                o.Status == "Done"
+            ).ToList();
 
             return Page();
         }

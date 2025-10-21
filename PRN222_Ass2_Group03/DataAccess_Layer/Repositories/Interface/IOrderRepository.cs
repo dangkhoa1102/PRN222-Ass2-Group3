@@ -1,5 +1,4 @@
-﻿using DataAccess_Layer;
-using EVDealerDbContext.Models;
+﻿using EVDealerDbContext.Models;
 
 namespace DataAccess_Layer.Repositories.Interface
 {

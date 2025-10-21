@@ -1,7 +1,4 @@
 ﻿using EVDealerDbContext.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Business_Logic_Layer.Services
 {
@@ -14,7 +11,9 @@ namespace Business_Logic_Layer.Services
         Task<bool> CancelOrderAsync(Guid orderId, string Notes);
         Task<Order> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes);
         Task<List<Order>> GetAllOrdersAsync();
+        Task<List<Business_Logic_Layer.DTOs.OrderDTO>> GetAllOrdersDTOAsync();
         Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus);
+        Task<bool> UpdateOrderAsync(Order order);
 
     }
 }

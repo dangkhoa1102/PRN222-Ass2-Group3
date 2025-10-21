@@ -233,6 +233,23 @@
             transform: translateY(-2px) scale(1.02);
         }
 
+        .btn-buy {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-buy:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(40, 167, 69, 0.4);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-buy:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
         .btn-action i {
             font-size: 1.1rem;
             transition: transform 0.3s ease;
@@ -396,6 +413,14 @@
                 </a>
                 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
                 @{ var role = HttpContextAccessor.HttpContext?.Session.GetString("Role"); }
+                @{ var userId = HttpContextAccessor.HttpContext?.Session.GetString("UserId"); }
+                @if (!string.IsNullOrEmpty(userId) && string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+                {
+                    <a href="/Orders/Create?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
+                        <i class="fas fa-shopping-cart"></i>
+                        Mua xe
+                    </a>
+                }
                 @if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
                 {
                     <a href="/Vehicles/Edit/@Model.Vehicle.Id" class="btn-action btn-edit">
