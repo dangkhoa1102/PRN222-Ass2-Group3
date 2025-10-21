@@ -1,8 +1,6 @@
 using Business_Logic_Layer.Services;
 using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.IO;
 
 namespace Assignment02.Pages.Vehicles
 {

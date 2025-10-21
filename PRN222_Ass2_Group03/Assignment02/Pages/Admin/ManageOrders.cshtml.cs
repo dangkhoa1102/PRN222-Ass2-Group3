@@ -1,7 +1,6 @@
 using Business_Logic_Layer.DTOs;
 using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Assignment02.Services;
 
 namespace Assignment02.Pages.Admin
