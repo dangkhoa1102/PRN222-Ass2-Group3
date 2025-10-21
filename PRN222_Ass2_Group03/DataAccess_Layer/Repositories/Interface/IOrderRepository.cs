@@ -2,7 +2,7 @@
 
 namespace DataAccess_Layer.Repositories.Interface
 {
-    public interface IOrderRepository
+    public interface IOrderRepositoryCus
     {
         Task<List<Order>> GetAll();
         Task<Order?> GetById(Guid id);
