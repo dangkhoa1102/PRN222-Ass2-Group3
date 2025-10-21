@@ -24,7 +24,7 @@ namespace Assignment02.Pages.Orders
         public Guid SelectedVehicleId { get; set; }
 
         [BindProperty]
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
         public List<SelectListItem> DealersList { get; set; }
         public List<SelectListItem> VehiclesList { get; set; }
@@ -68,7 +68,7 @@ namespace Assignment02.Pages.Orders
 
             try
             {
-                var newOrder = await _orderService.CreateOrderAsync(customerId, SelectedDealerId, SelectedVehicleId, Notes);
+                var newOrder = await _orderService.CreateOrderAsync(customerId, SelectedDealerId, SelectedVehicleId, Notes ?? string.Empty);
                 SuccessMessage = "Order created successfully!";
                 return RedirectToPage("/Orders/MyOrders");
             }

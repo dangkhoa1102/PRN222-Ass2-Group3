@@ -29,7 +29,7 @@ namespace Assignment02.Pages.Orders
             _dealerService = dealerService;
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(Guid? vehicleId)
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdStr))
@@ -47,6 +47,13 @@ namespace Assignment02.Pages.Orders
             }
 
             await LoadDropdownData();
+            
+            // Pre-select vehicle if vehicleId is provided
+            if (vehicleId.HasValue)
+            {
+                OrderViewModel.VehicleId = vehicleId.Value;
+            }
+            
             return Page();
         }
 
@@ -80,7 +87,7 @@ namespace Assignment02.Pages.Orders
                     OrderViewModel.CustomerId,
                     OrderViewModel.DealerId,
                     OrderViewModel.VehicleId,
-                    OrderViewModel.Notes
+                    OrderViewModel.Notes ?? string.Empty
                 );
 
                 TempData["SuccessMessage"] = $"Đơn hàng đã được tạo thành công với mã: {order.OrderNumber}";
@@ -96,30 +103,47 @@ namespace Assignment02.Pages.Orders
 
         private async Task LoadDropdownData()
         {
-            // Load customers
-            var customers = await _userService.GetCustomersAsync();
-            Customers = customers.Select(c => new SelectListItem
+            try
             {
-                Value = c.Id.ToString(),
-                Text = $"{c.FullName} ({c.Username}) - {c.Phone ?? "N/A"}"
-            }).ToList();
-
-            // Load vehicles
-            var vehicles = await _vehicleService.GetAllVehiclesAsync();
-            Vehicles = vehicles.Where(v => v.IsActive == true && v.StockQuantity > 0)
-                .Select(v => new SelectListItem
+                // Load customers
+                var customers = await _userService.GetCustomersAsync();
+                Customers = customers.Select(c => new SelectListItem
                 {
-                    Value = v.Id.ToString(),
-                    Text = $"{v.Name} - {v.Brand} {v.Model} ({v.Year}) - {v.Price:N0} ₫"
+                    Value = c.Id.ToString(),
+                    Text = $"{c.FullName} ({c.Username}) - {c.Phone ?? "N/A"}"
                 }).ToList();
 
-            // Load dealers
-            var dealers = await _dealerService.GetAllDealersAsync();
-            Dealers = dealers.Select(d => new SelectListItem
+                // Load vehicles
+                var vehicles = await _vehicleService.GetAllVehiclesAsync();
+                Vehicles = vehicles.Where(v => v.IsActive == true)
+                    .Select(v => new SelectListItem
+                    {
+                        Value = v.Id.ToString(),
+                        Text = $"{v.Name} - {v.Brand} {v.Model} ({v.Year}) - {v.Price:N0} ₫"
+                    }).ToList();
+
+                // Load dealers
+                var dealers = await _dealerService.GetAllDealersAsync();
+                Dealers = dealers.Select(d => new SelectListItem
+                {
+                    Value = d.Id.ToString(),
+                    Text = $"{d.Name} - {d.Address ?? "N/A"}"
+                }).ToList();
+            }
+            catch (Exception ex)
             {
-                Value = d.Id.ToString(),
-                Text = $"{d.Name} - {d.Address ?? "N/A"}"
-            }).ToList();
+                // Log error for debugging
+                Console.WriteLine($"Error loading dropdown data: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                // Set error message for UI
+                TempData["ErrorMessage"] = $"Lỗi khi tải dữ liệu: {ex.Message}";
+                
+                // Initialize empty lists to prevent null reference
+                Customers = new List<SelectListItem>();
+                Vehicles = new List<SelectListItem>();
+                Dealers = new List<SelectListItem>();
+            }
         }
     }
 
@@ -128,6 +152,6 @@ namespace Assignment02.Pages.Orders
         public Guid CustomerId { get; set; }
         public Guid VehicleId { get; set; }
         public Guid DealerId { get; set; }
-        public string Notes { get; set; } = string.Empty;
+        public string? Notes { get; set; }
     }
 }

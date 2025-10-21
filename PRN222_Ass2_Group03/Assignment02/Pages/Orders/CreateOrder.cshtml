@@ -177,6 +177,13 @@
 
 <div class="create-container">
     <h2 class="create-header">🛒 Create New Order</h2>
+    
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
 
     <form method="post">
         <div class="form-group">
@@ -225,6 +232,10 @@
                 }
             </select>
             <span asp-validation-for="OrderViewModel.VehicleId" class="text-danger"></span>
+            @if (Model.OrderViewModel.VehicleId != Guid.Empty)
+            {
+                <small class="form-text text-muted">Vehicle pre-selected from details page.</small>
+            }
             
             <!-- Vehicle Info Display -->
             <div id="vehicleInfo" class="vehicle-info" style="display: none;">

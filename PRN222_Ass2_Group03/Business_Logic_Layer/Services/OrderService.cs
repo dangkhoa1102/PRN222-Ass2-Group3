@@ -68,7 +68,7 @@ namespace Business_Logic_Layer.Services
                 CustomerId = customerId,
                 DealerId = dealerId,
                 VehicleId = vehicleId,
-                Notes = notes,
+                Notes = string.IsNullOrWhiteSpace(notes) ? "Không có ghi chú" : notes,
                 Status = "Processing",
                 PaymentStatus = "Unpaid",
                 TotalAmount = total,
