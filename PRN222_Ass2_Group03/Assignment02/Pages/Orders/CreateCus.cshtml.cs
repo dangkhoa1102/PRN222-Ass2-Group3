@@ -4,6 +4,7 @@ using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
@@ -11,11 +12,13 @@ namespace Assignment02.Pages.Orders
     {
         private readonly IOrderService _orderService;
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
+        private readonly RealTimeNotificationService _notificationService;
 
-        public CreateModel(IOrderService orderService, ICustomerTestDriveAppointmentService testDriveService)
+        public CreateModel(IOrderService orderService, ICustomerTestDriveAppointmentService testDriveService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _testDriveService = testDriveService;
+            _notificationService = notificationService;
         }
 
         [BindProperty]
@@ -70,6 +73,11 @@ namespace Assignment02.Pages.Orders
             try
             {
                 var newOrder = await _orderService.CreateOrderAsync(customerId, SelectedDealerId, SelectedVehicleId, Notes ?? string.Empty);
+                
+                // Gửi notification real-time
+                await _notificationService.NotifyOrderCreated(newOrder.OrderNumber, newOrder.CustomerName, newOrder.VehicleName);
+                await _notificationService.NotifyPageReload("orders", "new_order");
+                
                 SuccessMessage = "Order created successfully!";
                 return RedirectToPage("/Orders/MyOrders");
             }

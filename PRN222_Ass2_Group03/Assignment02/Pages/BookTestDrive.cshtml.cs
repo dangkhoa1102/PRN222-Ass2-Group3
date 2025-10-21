@@ -2,6 +2,7 @@
 using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages
 {
@@ -9,11 +10,13 @@ namespace Assignment02.Pages
     {
         private readonly ICustomerTestDriveAppointmentService _appointmentService;
         private readonly IVehicleService _vehicleService;
+        private readonly RealTimeNotificationService _notificationService;
         
-        public BookTestDriveModel(ICustomerTestDriveAppointmentService appointmentService, IVehicleService vehicleService)
+        public BookTestDriveModel(ICustomerTestDriveAppointmentService appointmentService, IVehicleService vehicleService, RealTimeNotificationService notificationService)
         {
             _appointmentService = appointmentService;
             _vehicleService = vehicleService;
+            _notificationService = notificationService;
         }
 
         [BindProperty]
@@ -154,6 +157,17 @@ namespace Assignment02.Pages
 
                 // Kiểm tra status của appointment
                 bool isSuccess = appointment.Status == "pending";
+
+                if (isSuccess)
+                {
+                    // Gửi notification real-time
+                    await _notificationService.NotifyTestDriveBooked(
+                        appointment.Customer?.FullName ?? "Unknown Customer",
+                        appointment.Vehicle?.Name ?? "Unknown Vehicle",
+                        appointment.AppointmentDate
+                    );
+                    await _notificationService.NotifyPageReload("appointments", "new_appointment");
+                }
 
                 return new JsonResult(new
                 {

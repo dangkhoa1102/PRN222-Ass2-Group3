@@ -2,12 +2,14 @@ using Business_Logic_Layer.Services;
 using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
     public class PaymentModel : PageModel
     {
         private readonly IOrderService _orderService;
+        private readonly RealTimeNotificationService _notificationService;
 
         public OrderDTO? Order { get; set; }
         public string SuccessMessage { get; set; } = string.Empty;
@@ -16,9 +18,10 @@ namespace Assignment02.Pages.Orders
         [BindProperty]
         public string PaymentMethod { get; set; } = string.Empty;
 
-        public PaymentModel(IOrderService orderService)
+        public PaymentModel(IOrderService orderService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
+            _notificationService = notificationService;
         }
 
         public async Task<IActionResult> OnGetAsync(Guid id)
@@ -90,6 +93,14 @@ namespace Assignment02.Pages.Orders
                 
                 if (success)
                 {
+                    // Gửi SignalR notification về payment update
+                    var updatedOrder = await _orderService.GetOrderByIdAsync(id);
+                    if (updatedOrder != null)
+                    {
+                        await _notificationService.NotifyPaymentUpdated(updatedOrder.OrderNumber, updatedOrder.PaymentStatus, updatedOrder.CustomerName);
+                        await _notificationService.NotifyPageReload("orders", "payment_update");
+                    }
+                    
                     // Chuyển hướng về MyOrders sau khi thanh toán thành công
                     return RedirectToPage("/Orders/MyOrders");
                 }

@@ -8,9 +8,9 @@ namespace Assignment02.Pages.Admin
     public class ManageOrdersModel : AuthenticatedPageModel
     {
         private readonly IOrderService _orderService;
-        private readonly NotificationService _notificationService;
+        private readonly RealTimeNotificationService _notificationService;
 
-        public ManageOrdersModel(IOrderService orderService, NotificationService notificationService)
+        public ManageOrdersModel(IOrderService orderService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _notificationService = notificationService;
@@ -87,11 +87,8 @@ namespace Assignment02.Pages.Admin
                     if (order != null)
                     {
                         // Send SignalR notification
-                        await _notificationService.NotifyOrderStatusUpdateAsync(
-                            orderId.ToString(), 
-                            newStatus, 
-                            order.CustomerId.ToString()
-                        );
+                        await _notificationService.NotifyOrderUpdated(order.OrderNumber, newStatus);
+                        await _notificationService.NotifyPageReload("orders", "status_update");
                     }
                     
                     TempData["SuccessMessage"] = "Order status updated successfully!";

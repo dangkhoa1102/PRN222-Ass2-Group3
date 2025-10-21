@@ -9,12 +9,12 @@ namespace Assignment02.Pages.Orders
     public class DetailsModel : PageModel
     {
         private readonly IOrderService _orderService;
-        private readonly OrderNotificationService _notificationService;
+        private readonly RealTimeNotificationService _notificationService;
 
         public OrderDTO? Order { get; set; }
         public string? CurrentUserRole { get; set; }
 
-        public DetailsModel(IOrderService orderService, OrderNotificationService notificationService)
+        public DetailsModel(IOrderService orderService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _notificationService = notificationService;
@@ -196,11 +196,8 @@ namespace Assignment02.Pages.Orders
                         if (orderForNotification != null)
                         {
                             // Send SignalR notification
-                            await _notificationService.NotifyOrderStatusUpdateAsync(
-                                id.ToString(), 
-                                newStatus, 
-                                orderForNotification.CustomerId.ToString()
-                            );
+                            await _notificationService.NotifyOrderUpdated(orderForNotification.OrderNumber, newStatus);
+                            await _notificationService.NotifyPageReload("orders", "status_update");
                         }
                         
                         TempData["SuccessMessage"] = $"Trạng thái đơn hàng đã được cập nhật thành {newStatus}!";

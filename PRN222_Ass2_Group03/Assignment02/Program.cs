@@ -22,8 +22,7 @@ builder.Services.AddScoped<IVehicleService>(provider => provider.GetRequiredServ
 builder.Services.AddScoped<IDealerService>(provider => provider.GetRequiredService<ServiceFactory>().CreateDealerService());
 
 // Register SignalR Services
-builder.Services.AddScoped<OrderNotificationService>();
-builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<RealTimeNotificationService>();
 
 // ===============================
 // 💾 Session Configuration
@@ -98,8 +97,6 @@ app.UseAuthorization();
 // 🌐 Map Razor Pages & SignalR Hubs
 // ===============================
 app.MapRazorPages();
-app.MapHub<ChatHub>("/chathub");
-app.MapHub<NotificationHub>("/notificationhub");
-app.MapHub<OrderHub>("/orderhub");
+app.MapHub<RealTimeHub>("/realtimehub");
 
 app.Run();

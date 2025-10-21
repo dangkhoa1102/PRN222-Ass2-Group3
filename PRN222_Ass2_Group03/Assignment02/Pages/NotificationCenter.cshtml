@@ -75,7 +75,7 @@
 
     function initializeSignalR() {
         connection = new signalR.HubConnectionBuilder()
-            .withUrl("/orderhub")
+            .withUrl("/realtimehub")
             .build();
 
         connection.start().then(function () {
@@ -140,17 +140,17 @@
         });
 
         // Test drive notifications
-        connection.on("TestDriveBooked", function (appointmentId, customerName, vehicleName, appointmentDate) {
-            const date = new Date(appointmentDate).toLocaleString();
-            addNotification("Test Drive Booked", `${customerName} booked test drive for ${vehicleName} on ${date}`, "info", "fas fa-calendar-plus");
+        connection.on("TestDriveBooked", function (data) {
+            const date = new Date(data.appointmentDate).toLocaleString();
+            addNotification("Test Drive Booked", `${data.customerName} booked test drive for ${data.vehicleName} on ${date}`, "info", "fas fa-calendar-plus");
         });
 
-        connection.on("TestDriveCancelled", function (appointmentId, customerName, vehicleName) {
-            addNotification("Test Drive Cancelled", `${customerName} cancelled test drive for ${vehicleName}`, "warning", "fas fa-calendar-times");
+        connection.on("TestDriveUpdated", function (data) {
+            addNotification("Test Drive Updated", `${data.customerName} test drive for ${data.vehicleName} status: ${data.status}`, "info", "fas fa-calendar-check");
         });
 
-        connection.on("TestDriveCompleted", function (appointmentId, customerName, vehicleName) {
-            addNotification("Test Drive Completed", `${customerName} completed test drive for ${vehicleName}`, "success", "fas fa-check-circle");
+        connection.on("TestDriveCancelled", function (data) {
+            addNotification("Test Drive Cancelled", `${data.customerName} cancelled test drive for ${data.vehicleName}`, "warning", "fas fa-calendar-times");
         });
 
         // General notifications

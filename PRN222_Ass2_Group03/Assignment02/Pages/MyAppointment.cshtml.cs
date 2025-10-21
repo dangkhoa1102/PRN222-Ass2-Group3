@@ -1,16 +1,19 @@
 ﻿using Business_Logic_Layer.Services;
 using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Assignment02.Services;
 
 namespace Assignment02.Pages
 {
     public class MyAppointmentModel : AuthenticatedPageModel
     {
         private readonly ICustomerTestDriveAppointmentService _appointmentService;
+        private readonly RealTimeNotificationService _notificationService;
 
-        public MyAppointmentModel(ICustomerTestDriveAppointmentService appointmentService)
+        public MyAppointmentModel(ICustomerTestDriveAppointmentService appointmentService, RealTimeNotificationService notificationService)
         {
             _appointmentService = appointmentService;
+            _notificationService = notificationService;
         }
 
         public IEnumerable<TestDriveAppointmentDTO> Appointments { get; set; } = new List<TestDriveAppointmentDTO>();
@@ -85,6 +88,17 @@ namespace Assignment02.Pages
                 }
                 else
                 {
+                    // Gửi SignalR notification
+                    var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
+                    if (appointment != null)
+                    {
+                        await _notificationService.NotifyTestDriveCancelled(
+                            appointment.Customer?.FullName ?? "Unknown Customer",
+                            appointment.Vehicle?.Name ?? "Unknown Vehicle"
+                        );
+                        await _notificationService.NotifyPageReload("appointments", "cancelled_by_customer");
+                    }
+                    
                     TempData["SuccessMessage"] = "Lịch hẹn đã được hủy thành công.";
                 }
             }

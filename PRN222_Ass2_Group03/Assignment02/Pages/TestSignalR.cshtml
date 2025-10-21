@@ -56,7 +56,7 @@
 
     function startConnection() {
         connection = new signalR.HubConnectionBuilder()
-            .withUrl("/orderhub")
+            .withUrl("/realtimehub")
             .build();
 
         connection.start().then(function () {
