@@ -1,0 +1,266 @@
+@page
+@model Assignment02.Pages.NotificationCenterModel
+@{
+    ViewData["Title"] = "Notification Center";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3><i class="fas fa-bell"></i> Notification Center</h3>
+                    <div>
+                        <button id="clearAllBtn" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                        <button id="testNotificationBtn" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-test-tube"></i> Test Notification
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div id="notifications" class="notification-list">
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-bell-slash fa-3x mb-3"></i>
+                                    <p>No notifications yet. Real-time notifications will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Connection Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <strong>Status:</strong>
+                                        <span id="connectionStatus" class="badge badge-secondary">Disconnected</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>User Role:</strong>
+                                        <span id="userRole" class="badge badge-info">@Model.CurrentUserRole</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>User ID:</strong>
+                                        <span id="userId" class="text-muted">@Model.CurrentUserId</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Notifications Count:</strong>
+                                        <span id="notificationCount" class="badge badge-primary">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+<script>
+    let connection = null;
+    let notificationCount = 0;
+    const currentUserId = '@Model.CurrentUserId';
+    const currentUserRole = '@Model.CurrentUserRole';
+
+    // Initialize connection when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSignalR();
+    });
+
+    function initializeSignalR() {
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl("/orderhub")
+            .build();
+
+        connection.start().then(function () {
+            console.log("SignalR Connected to Notification Center");
+            updateConnectionStatus("Connected", "success");
+            
+            // Join appropriate groups based on user role
+            if (currentUserRole === "Staff" || currentUserRole === "Admin") {
+                connection.invoke("JoinGroup", "staff");
+            }
+            if (currentUserId) {
+                connection.invoke("JoinGroup", `customer_${currentUserId}`);
+            }
+            
+        }).catch(function (err) {
+            console.error("SignalR Connection Error: ", err.toString());
+            updateConnectionStatus("Disconnected", "danger");
+        });
+
+        // Listen for all types of notifications
+        setupNotificationListeners();
+    }
+
+    function setupNotificationListeners() {
+        // Order notifications
+        connection.on("OrderStatusUpdated", function (orderId, newStatus) {
+            addNotification("Order Update", `Order ${orderId} status changed to ${newStatus}`, "info", "fas fa-shopping-cart");
+        });
+
+        connection.on("OrderCreated", function (orderId, customerName, vehicleName) {
+            addNotification("New Order", `Order ${orderId} created by ${customerName} for ${vehicleName}`, "success", "fas fa-plus-circle");
+        });
+
+        connection.on("OrderCancelled", function (orderId, customerName, reason) {
+            addNotification("Order Cancelled", `Order ${orderId} cancelled by ${customerName}: ${reason}`, "warning", "fas fa-times-circle");
+        });
+
+        // Vehicle notifications
+        connection.on("VehicleAdded", function (vehicleId, vehicleName, brand) {
+            addNotification("New Vehicle", `${brand} ${vehicleName} added to inventory`, "success", "fas fa-car");
+        });
+
+        connection.on("VehicleUpdated", function (vehicleId, vehicleName, brand) {
+            addNotification("Vehicle Updated", `${brand} ${vehicleName} has been updated`, "info", "fas fa-edit");
+        });
+
+        connection.on("VehicleDeleted", function (vehicleId, vehicleName) {
+            addNotification("Vehicle Deleted", `${vehicleName} has been removed from inventory`, "danger", "fas fa-trash");
+        });
+
+        connection.on("VehicleStockUpdated", function (vehicleId, vehicleName, newStock) {
+            addNotification("Stock Update", `${vehicleName} stock updated to ${newStock} units`, "warning", "fas fa-boxes");
+        });
+
+        // User notifications
+        connection.on("UserRegistered", function (userId, username, role) {
+            addNotification("New User", `${username} (${role}) has registered`, "success", "fas fa-user-plus");
+        });
+
+        connection.on("UserUpdated", function (userId, username) {
+            addNotification("User Updated", `${username} profile has been updated`, "info", "fas fa-user-edit");
+        });
+
+        // Test drive notifications
+        connection.on("TestDriveBooked", function (appointmentId, customerName, vehicleName, appointmentDate) {
+            const date = new Date(appointmentDate).toLocaleString();
+            addNotification("Test Drive Booked", `${customerName} booked test drive for ${vehicleName} on ${date}`, "info", "fas fa-calendar-plus");
+        });
+
+        connection.on("TestDriveCancelled", function (appointmentId, customerName, vehicleName) {
+            addNotification("Test Drive Cancelled", `${customerName} cancelled test drive for ${vehicleName}`, "warning", "fas fa-calendar-times");
+        });
+
+        connection.on("TestDriveCompleted", function (appointmentId, customerName, vehicleName) {
+            addNotification("Test Drive Completed", `${customerName} completed test drive for ${vehicleName}`, "success", "fas fa-check-circle");
+        });
+
+        // General notifications
+        connection.on("GeneralNotification", function (title, message, type) {
+            addNotification(title, message, type, "fas fa-info-circle");
+        });
+    }
+
+    function addNotification(title, message, type, icon) {
+        notificationCount++;
+        updateNotificationCount();
+
+        const notificationDiv = document.createElement('div');
+        notificationDiv.className = `alert alert-${type} alert-dismissible fade show notification-item`;
+        notificationDiv.innerHTML = `
+            <div class="d-flex align-items-start">
+                <div class="flex-shrink-0 me-3">
+                    <i class="${icon} fa-lg"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading mb-1">${title}</h6>
+                    <p class="mb-1">${message}</p>
+                    <small class="text-muted">${new Date().toLocaleString()}</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+        const notificationsContainer = document.getElementById('notifications');
+        
+        // Remove "no notifications" message if it exists
+        const noNotificationsMsg = notificationsContainer.querySelector('.text-center.text-muted');
+        if (noNotificationsMsg) {
+            noNotificationsMsg.remove();
+        }
+
+        // Add new notification at the top
+        notificationsContainer.insertBefore(notificationDiv, notificationsContainer.firstChild);
+
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+            if (notificationDiv.parentNode) {
+                notificationDiv.remove();
+                notificationCount--;
+                updateNotificationCount();
+            }
+        }, 10000);
+    }
+
+    function updateConnectionStatus(status, type) {
+        const statusElement = document.getElementById('connectionStatus');
+        statusElement.textContent = status;
+        statusElement.className = `badge badge-${type}`;
+    }
+
+    function updateNotificationCount() {
+        const countElement = document.getElementById('notificationCount');
+        countElement.textContent = notificationCount;
+    }
+
+    // Event listeners
+    document.getElementById('clearAllBtn').addEventListener('click', function() {
+        const notifications = document.querySelectorAll('.notification-item');
+        notifications.forEach(notification => notification.remove());
+        notificationCount = 0;
+        updateNotificationCount();
+        
+        // Add "no notifications" message back
+        const notificationsContainer = document.getElementById('notifications');
+        notificationsContainer.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-bell-slash fa-3x mb-3"></i>
+                <p>No notifications yet. Real-time notifications will appear here.</p>
+            </div>
+        `;
+    });
+
+    document.getElementById('testNotificationBtn').addEventListener('click', function() {
+        addNotification("Test Notification", "This is a test notification to verify the system is working!", "primary", "fas fa-test-tube");
+    });
+</script>
+
+<style>
+    .notification-list {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .notification-item {
+        margin-bottom: 10px;
+        border-left: 4px solid;
+    }
+    
+    .notification-item.alert-success {
+        border-left-color: #28a745;
+    }
+    
+    .notification-item.alert-info {
+        border-left-color: #17a2b8;
+    }
+    
+    .notification-item.alert-warning {
+        border-left-color: #ffc107;
+    }
+    
+    .notification-item.alert-danger {
+        border-left-color: #dc3545;
+    }
+    
+    .notification-item.alert-primary {
+        border-left-color: #007bff;
+    }
+</style>

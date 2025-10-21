@@ -52,5 +52,11 @@ namespace Business_Logic_Layer.Services
             var context = CreateDbContext();
             return new VehicleService(context);
         }
+
+        public IDealerService CreateDealerService()
+        {
+            var context = CreateDbContext();
+            return new DealerService(context);
+        }
     }
 }

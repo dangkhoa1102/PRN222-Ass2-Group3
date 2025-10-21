@@ -114,12 +114,6 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Orders/PendingOrdersCus">
-                                                <i class="fas fa-hourglass-half"></i>
-                                                <span>Processing Orders</span>
-                                            </a>
-                                        </li>
-                                        <li>
                                             <a class="dropdown-item" asp-page="/Orders/HistoryCus">
                                                 <i class="fas fa-history"></i>
                                                 <span>Order History</span>
@@ -128,6 +122,12 @@
                                     }
                                     @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase))
                                     {
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Orders/CreateOrder">
+                                                <i class="fas fa-plus-circle"></i>
+                                                <span>Create Order</span>
+                                            </a>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item" asp-page="/Admin/ManageOrders">
                                                 <i class="fas fa-cogs"></i>
@@ -205,7 +205,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item modern-dropdown-item" href="#notifications">
+                                        <a class="dropdown-item modern-dropdown-item" asp-page="/NotificationCenter">
                                             <i class="fas fa-bell"></i>
                                             <span>Notifications</span>
                                         </a>

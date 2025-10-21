@@ -67,12 +67,28 @@ namespace DataAccess_Layer.Repositories
             {
                 return await _context.Users
                     .Include(u => u.Dealer)
-                    .Where(u => u.IsActive.GetValueOrDefault())
+                    .Where(u => u.IsActive == true)
                     .ToListAsync();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all users");
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<User>> GetCustomersAsync()
+        {
+            try
+            {
+                return await _context.Users
+                    .Include(u => u.Dealer)
+                    .Where(u => u.IsActive == true && u.Role == "Customer")
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving customers");
                 throw;
             }
         }

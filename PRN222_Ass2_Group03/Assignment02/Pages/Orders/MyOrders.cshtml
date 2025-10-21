@@ -142,6 +142,8 @@
                     var statusBadge = status switch
                     {
                         "completed" => "badge-success",
+                        "complete" => "badge-primary",
+                        "done" => "badge-dark",
                         "processing" => "badge-warning",
                         "rejected" or "cancelled" => "badge-danger",
                         _ => "badge-info"
@@ -155,7 +157,7 @@
                         _ => "badge-info"
                     };
 
-                    <tr>
+                    <tr data-order-id="@order.Id">
                         <td>@order.OrderNumber</td>
                         <td>@order.Vehicle?.Name</td>
                         <td>@order.TotalAmount.ToString("N0") ₫</td>
@@ -179,3 +181,94 @@
         </tbody>
     </table>
 </div>
+
+<!-- SignalR Scripts -->
+<script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+<script>
+    // Get current user ID from session or hidden field
+    const currentUserId = '@Model.CurrentUserId';
+    
+    if (currentUserId) {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/orderhub")
+            .build();
+
+        connection.start().then(function () {
+            console.log("SignalR Connected for Customer");
+            console.log("Current User ID:", currentUserId);
+            // Join customer group
+            connection.invoke("JoinGroup", `customer_${currentUserId}`).then(function() {
+                console.log("Joined customer group:", `customer_${currentUserId}`);
+            }).catch(function(err) {
+                console.error("Failed to join customer group:", err);
+            });
+        }).catch(function (err) {
+            console.error("SignalR Connection Error: ", err.toString());
+        });
+
+        // Listen for order status updates
+        connection.on("OrderStatusUpdated", function (orderId, newStatus) {
+            console.log(`Order ${orderId} status updated to ${newStatus}`);
+            
+            // Find the order row and update the status badge
+            const orderRows = document.querySelectorAll('tr[data-order-id]');
+            orderRows.forEach(row => {
+                if (row.getAttribute('data-order-id') === orderId) {
+                    // Find the status badge (first .badge in the row)
+                    const statusCell = row.querySelector('td:nth-child(4) .badge');
+                    if (statusCell) {
+                        // Update status text
+                        statusCell.textContent = newStatus;
+                        
+                        // Update status badge class based on new status
+                        statusCell.className = 'badge ';
+                        switch (newStatus.toLowerCase()) {
+                            case 'completed':
+                                statusCell.className += 'badge-success';
+                                break;
+                            case 'complete':
+                                statusCell.className += 'badge-primary';
+                                break;
+                            case 'done':
+                                statusCell.className += 'badge-dark';
+                                break;
+                            case 'processing':
+                                statusCell.className += 'badge-warning';
+                                break;
+                            case 'cancelled':
+                                statusCell.className += 'badge-danger';
+                                break;
+                            default:
+                                statusCell.className += 'badge-info';
+                        }
+                        
+                        // Show notification
+                        showNotification(`Đơn hàng ${orderId} đã được cập nhật thành ${newStatus}`);
+                    }
+                }
+            });
+        });
+
+        // Show notification function
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-info alert-dismissible fade show position-fixed';
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="fas fa-info-circle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+    }
+</script>

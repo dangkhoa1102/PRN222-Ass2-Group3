@@ -2,19 +2,22 @@
 using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
     public class DetailsModel : PageModel
     {
         private readonly IOrderService _orderService;
+        private readonly OrderNotificationService _notificationService;
 
         public Order? Order { get; set; }
         public string? CurrentUserRole { get; set; }
 
-        public DetailsModel(IOrderService orderService)
+        public DetailsModel(IOrderService orderService, OrderNotificationService notificationService)
         {
             _orderService = orderService;
+            _notificationService = notificationService;
         }
 
         public async Task<IActionResult> OnGetAsync(Guid id)
@@ -43,7 +46,9 @@ namespace Assignment02.Pages.Orders
             // Check access permissions
             var userId = Guid.Parse(userIdStr);
             var isStaffOrAdmin = string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) || 
-                                string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase);
+                                string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase) ||
+                                string.Equals(CurrentUserRole, "ADMIN", StringComparison.OrdinalIgnoreCase) ||
+                                string.Equals(CurrentUserRole, "STAFF", StringComparison.OrdinalIgnoreCase);
             
             // Staff/Admin can view all orders, Customer can only view their own orders
             if (!isStaffOrAdmin && order.CustomerId != userId)
@@ -77,16 +82,21 @@ namespace Assignment02.Pages.Orders
 
                     var userId = Guid.Parse(userIdStr);
                     var isStaffOrAdmin = string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) || 
-                                        string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase);
-                    var isCustomer = string.Equals(CurrentUserRole, "Customer", StringComparison.OrdinalIgnoreCase);
+                                        string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase) ||
+                                        string.Equals(CurrentUserRole, "ADMIN", StringComparison.OrdinalIgnoreCase) ||
+                                        string.Equals(CurrentUserRole, "STAFF", StringComparison.OrdinalIgnoreCase);
+                    var isCustomer = string.Equals(CurrentUserRole, "Customer", StringComparison.OrdinalIgnoreCase) ||
+                                    string.Equals(CurrentUserRole, "CUSTOMER", StringComparison.OrdinalIgnoreCase);
+                    
+                    Console.WriteLine($"Cancel Order - UserId: {userId}, Role: {CurrentUserRole}, isCustomer: {isCustomer}, isStaffOrAdmin: {isStaffOrAdmin}");
 
                     // Check cancellation permissions
                     if (isCustomer)
                     {
                         // Customer can only cancel if order is unpaid and processing
                         if (order.CustomerId != userId || 
-                            order.PaymentStatus != "Unpaid" || 
-                            order.Status != "Processing")
+                            !string.Equals(order.PaymentStatus, "Unpaid", StringComparison.OrdinalIgnoreCase) || 
+                            !string.Equals(order.Status, "Processing", StringComparison.OrdinalIgnoreCase))
                         {
                             TempData["ErrorMessage"] = "Bạn không có quyền hủy đơn hàng này.";
                             return RedirectToPage(new { id });
@@ -108,45 +118,91 @@ namespace Assignment02.Pages.Orders
                         // Redirect based on user role after cancellation
                         if (isCustomer)
                         {
+                            Console.WriteLine("Redirecting customer to MyOrders");
                             return RedirectToPage("/Orders/MyOrders");
                         }
                         else if (isStaffOrAdmin)
                         {
+                            Console.WriteLine("Redirecting staff/admin to ManageOrders");
                             return RedirectToPage("/Admin/ManageOrders");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Fallback: redirecting back to order details");
+                            return RedirectToPage(new { id });
                         }
                     }
                     else
                     {
                         TempData["ErrorMessage"] = "Không thể hủy đơn hàng.";
+                        return RedirectToPage(new { id });
                     }
                 }
                 else if (!string.IsNullOrEmpty(newStatus))
                 {
                     // Handle order status update
                     var isStaffOrAdmin = string.Equals(CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase) || 
-                                        string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase);
-                    var isCustomer = string.Equals(CurrentUserRole, "Customer", StringComparison.OrdinalIgnoreCase);
+                                        string.Equals(CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase) ||
+                                        string.Equals(CurrentUserRole, "ADMIN", StringComparison.OrdinalIgnoreCase) ||
+                                        string.Equals(CurrentUserRole, "STAFF", StringComparison.OrdinalIgnoreCase);
+                    var isCustomer = string.Equals(CurrentUserRole, "Customer", StringComparison.OrdinalIgnoreCase) ||
+                                    string.Equals(CurrentUserRole, "CUSTOMER", StringComparison.OrdinalIgnoreCase);
 
-                    if (isCustomer && newStatus == "Completed")
+                    if (isCustomer && (newStatus == "Completed" || newStatus == "DONE"))
                     {
-                        // Customer can complete order if it's delivered
+                        // Customer can complete order if it's delivered, or mark as DONE if it's Complete
                         var order = await _orderService.GetOrderByIdAsync(id);
-                        if (order == null || order.Status != "Delivered")
+                        if (order == null)
+                        {
+                            TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
+                            return RedirectToPage(new { id });
+                        }
+                        
+                        if (newStatus == "Completed" && order.Status != "Delivered")
                         {
                             TempData["ErrorMessage"] = "Chỉ có thể hoàn thành đơn hàng đã được giao.";
                             return RedirectToPage(new { id });
                         }
+                        
+                        if (newStatus == "DONE" && order.Status != "Complete")
+                        {
+                            TempData["ErrorMessage"] = "Chỉ có thể đánh dấu DONE cho đơn hàng đã hoàn thành.";
+                            return RedirectToPage(new { id });
+                        }
                     }
-                    else if (!isStaffOrAdmin)
+                    else if (!isStaffOrAdmin && !isCustomer)
                     {
                         TempData["ErrorMessage"] = "Bạn không có quyền cập nhật trạng thái đơn hàng.";
                         return RedirectToPage(new { id });
+                    }
+
+                    // Check if trying to ship an unpaid order
+                    if (newStatus == "Shipped")
+                    {
+                        var order = await _orderService.GetOrderByIdAsync(id);
+                        if (order != null && string.Equals(order.PaymentStatus, "Unpaid", StringComparison.OrdinalIgnoreCase))
+                        {
+                            TempData["ErrorMessage"] = "Đơn hàng chưa thanh toán, không thể giao hàng!";
+                            return RedirectToPage(new { id });
+                        }
                     }
 
                     var result = await _orderService.UpdateOrderStatusAsync(id, newStatus);
                     
                     if (result)
                     {
+                        // Get order details for notification
+                        var orderForNotification = await _orderService.GetOrderByIdAsync(id);
+                        if (orderForNotification != null)
+                        {
+                            // Send SignalR notification
+                            await _notificationService.NotifyOrderStatusUpdateAsync(
+                                id.ToString(), 
+                                newStatus, 
+                                orderForNotification.CustomerId.ToString()
+                            );
+                        }
+                        
                         TempData["SuccessMessage"] = $"Trạng thái đơn hàng đã được cập nhật thành {newStatus}!";
                     }
                     else

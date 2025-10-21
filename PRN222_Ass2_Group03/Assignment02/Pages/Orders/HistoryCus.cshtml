@@ -86,6 +86,16 @@
         color: #0c5460;
     }
 
+    .badge-primary {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .badge-dark {
+        background-color: #343a40;
+        color: #ffffff;
+    }
+
     .btn-view {
         background: linear-gradient(45deg, #007bff, #0056b3);
         border: none;
@@ -134,6 +144,8 @@ else
                     var statusBadge = status switch
                     {
                         "completed" => "badge-success",
+                        "complete" => "badge-primary",
+                        "done" => "badge-dark",
                         "processing" => "badge-warning",
                         "rejected" or "cancelled" => "badge-danger",
                         _ => "badge-info"

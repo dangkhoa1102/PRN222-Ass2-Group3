@@ -1,0 +1,125 @@
+@page
+@model Assignment02.Pages.TestSignalRModel
+@{
+    ViewData["Title"] = "Test SignalR";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>SignalR Test Page</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <button id="connectBtn" class="btn btn-primary">Connect to SignalR</button>
+                        <button id="disconnectBtn" class="btn btn-danger" disabled>Disconnect</button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="messageInput">Message:</label>
+                        <input type="text" id="messageInput" class="form-control" placeholder="Enter message">
+                        <button id="sendBtn" class="btn btn-success mt-2" disabled>Send Message</button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="status">Connection Status:</label>
+                        <span id="status" class="badge badge-secondary">Disconnected</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label>Messages:</label>
+                        <div id="messages" class="border p-3" style="height: 300px; overflow-y: auto; background-color: #f8f9fa;">
+                            <p class="text-muted">No messages yet...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+<script>
+    let connection = null;
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const messageInput = document.getElementById('messageInput');
+    const status = document.getElementById('status');
+    const messages = document.getElementById('messages');
+
+    connectBtn.addEventListener('click', startConnection);
+    disconnectBtn.addEventListener('click', stopConnection);
+    sendBtn.addEventListener('click', sendMessage);
+
+    function startConnection() {
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl("/orderhub")
+            .build();
+
+        connection.start().then(function () {
+            console.log("SignalR Connected");
+            status.textContent = "Connected";
+            status.className = "badge badge-success";
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+            sendBtn.disabled = false;
+            
+            addMessage("Connected to SignalR hub", "success");
+        }).catch(function (err) {
+            console.error("SignalR Connection Error: ", err.toString());
+            addMessage("Connection failed: " + err.toString(), "danger");
+        });
+
+        // Listen for messages
+        connection.on("OrderStatusUpdated", function (orderId, newStatus) {
+            addMessage(`Order ${orderId} status updated to ${newStatus}`, "info");
+        });
+
+        connection.on("TestMessage", function (message) {
+            addMessage("Received: " + message, "info");
+        });
+    }
+
+    function stopConnection() {
+        if (connection) {
+            connection.stop().then(function () {
+                console.log("SignalR Disconnected");
+                status.textContent = "Disconnected";
+                status.className = "badge badge-secondary";
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendBtn.disabled = true;
+                addMessage("Disconnected from SignalR hub", "warning");
+            });
+        }
+    }
+
+    function sendMessage() {
+        const message = messageInput.value;
+        if (message && connection) {
+            connection.invoke("TestMessage", message).catch(function (err) {
+                console.error("Send error: ", err.toString());
+                addMessage("Send failed: " + err.toString(), "danger");
+            });
+            messageInput.value = "";
+        }
+    }
+
+    function addMessage(text, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `alert alert-${type} alert-sm mb-2`;
+        messageDiv.innerHTML = `<small>${new Date().toLocaleTimeString()}: ${text}</small>`;
+        messages.appendChild(messageDiv);
+        messages.scrollTop = messages.scrollHeight;
+    }
+</script>
+
+<style>
+    .alert-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>

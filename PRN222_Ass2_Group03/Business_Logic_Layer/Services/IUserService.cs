@@ -12,5 +12,7 @@ namespace Business_Logic_Layer.Services
         Task<bool> ValidateUserCredentialsAsync(string username, string password);
         Task<bool> IsUsernameAvailableAsync(string username);
         Task<bool> IsEmailAvailableAsync(string email);
+        Task<IEnumerable<User>> GetAllUsersAsync();
+        Task<IEnumerable<User>> GetCustomersAsync();
     }
 }

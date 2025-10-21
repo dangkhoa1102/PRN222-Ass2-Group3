@@ -7,6 +7,7 @@ namespace Business_Logic_Layer.DTOs
         public string OrderNumber { get; set; } = string.Empty;
         public Guid CustomerId { get; set; }
         public string CustomerName { get; set; } = string.Empty;
+        public string CustomerPhone { get; set; } = string.Empty;
         public Guid DealerId { get; set; }
         public string DealerName { get; set; } = string.Empty;
         public Guid VehicleId { get; set; }

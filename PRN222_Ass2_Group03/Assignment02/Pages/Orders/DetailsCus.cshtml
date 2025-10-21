@@ -170,6 +170,23 @@
         color: white;
     }
 
+    .btn-done {
+        background: linear-gradient(45deg, #17a2b8, #138496);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-done:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #138496, #17a2b8);
+        color: white;
+    }
+
     .btn-cancel {
         background: linear-gradient(45deg, #dc3545, #c82333);
         color: #fff;
@@ -185,6 +202,44 @@
         transform: scale(1.05);
         background: linear-gradient(45deg, #c82333, #dc3545);
         color: white;
+    }
+
+    .info-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid #007bff;
+    }
+
+    .section-title {
+        color: #007bff;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+
+    .appointment-item {
+        background: #fff;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border: 1px solid #e9ecef;
+    }
+
+    .vehicle-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .vehicle-image {
+        max-width: 150px;
+        max-height: 100px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
     }
 </style>
 
@@ -214,50 +269,142 @@ else
     <div class="details-container">
         <h2 class="details-header">Order Details</h2>
 
-        <div class="detail-item"><strong>Order #:</strong> @Model.Order.OrderNumber</div>
-        <div class="detail-item"><strong>Vehicle:</strong> @Model.Order.Vehicle?.Name</div>
-        <div class="detail-item"><strong>Total:</strong> @Model.Order.TotalAmount.ToString("N0") ₫</div>
+        <!-- Order Information Section -->
+        <div class="info-section">
+            <h4 class="section-title">📋 Order Information</h4>
+            <div class="detail-item"><strong>Order #:</strong> @Model.Order.OrderNumber</div>
+            <div class="detail-item"><strong>Total Amount:</strong> @Model.Order.TotalAmount.ToString("N0") ₫</div>
+            <div class="detail-item"><strong>Created At:</strong> @Model.Order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</div>
+            <div class="detail-item"><strong>Updated At:</strong> @Model.Order.UpdatedAt?.ToString("dd/MM/yyyy HH:mm")</div>
+            <div class="detail-item"><strong>Notes:</strong> @(Model.Order.Notes ?? "—")</div>
+            
+            <div class="detail-item">
+                <strong>Status:</strong>
+                @if (Model.Order.Status?.Equals("completed", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    <span class="badge badge-success">Completed</span>
+                }
+                else if (Model.Order.Status?.Equals("complete", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    <span class="badge badge-primary">Complete</span>
+                }
+                else if (Model.Order.Status?.Equals("done", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    <span class="badge badge-dark">DONE</span>
+                }
+                else if (Model.Order.Status?.Equals("processing", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    <span class="badge badge-warning">Processing</span>
+                }
+                else if (Model.Order.Status?.Equals("cancelled", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    <span class="badge badge-danger">Cancelled</span>
+                }
+                else
+                {
+                    <span class="badge badge-info">@Model.Order.Status</span>
+                }
+            </div>
 
-        <div class="detail-item">
-            <strong>Status:</strong>
-            @if (Model.Order.Status?.Equals("completed", StringComparison.OrdinalIgnoreCase) == true)
+            <div class="detail-item">
+                <strong>Payment Status:</strong>
+                @if (Model.Order.PaymentStatus == "Paid")
+                {
+                    <span class="badge badge-success">Paid</span>
+                }
+                else
+                {
+                    <span class="badge badge-danger">Unpaid</span>
+                }
+            </div>
+        </div>
+
+        <!-- Customer Information Section -->
+        <div class="info-section">
+            <h4 class="section-title">👤 Customer Information</h4>
+            <div class="detail-item"><strong>Full Name:</strong> @Model.Order.Customer?.FullName</div>
+            <div class="detail-item"><strong>Username:</strong> @Model.Order.Customer?.Username</div>
+            <div class="detail-item"><strong>Email:</strong> @Model.Order.Customer?.Email</div>
+            <div class="detail-item"><strong>Phone:</strong> @Model.Order.Customer?.Phone</div>
+            <div class="detail-item"><strong>Role:</strong> @Model.Order.Customer?.Role</div>
+            <div class="detail-item"><strong>Customer Since:</strong> @Model.Order.Customer?.CreatedAt?.ToString("dd/MM/yyyy")</div>
+        </div>
+
+        <!-- Vehicle Information Section -->
+        <div class="info-section">
+            <h4 class="section-title">🚗 Vehicle Information</h4>
+            <div class="detail-item"><strong>Vehicle Name:</strong> @Model.Order.Vehicle?.Name</div>
+            <div class="detail-item"><strong>Brand:</strong> @Model.Order.Vehicle?.Brand</div>
+            <div class="detail-item"><strong>Model:</strong> @Model.Order.Vehicle?.Model</div>
+            <div class="detail-item"><strong>Year:</strong> @Model.Order.Vehicle?.Year</div>
+            <div class="detail-item"><strong>Price:</strong> @Model.Order.Vehicle?.Price.ToString("N0") ₫</div>
+            <div class="detail-item"><strong>Stock Quantity:</strong> @Model.Order.Vehicle?.StockQuantity</div>
+            <div class="detail-item"><strong>Description:</strong> @Model.Order.Vehicle?.Description</div>
+            @if (!string.IsNullOrEmpty(Model.Order.Vehicle?.Specifications))
             {
-                <span class="badge badge-success">Completed</span>
+                <div class="detail-item"><strong>Specifications:</strong> @Model.Order.Vehicle?.Specifications</div>
             }
-            else if (Model.Order.Status?.Equals("processing", StringComparison.OrdinalIgnoreCase) == true)
+            @if (!string.IsNullOrEmpty(Model.Order.Vehicle?.Images))
             {
-                <span class="badge badge-warning">Processing</span>
-            }
-            else if (Model.Order.Status?.Equals("cancelled", StringComparison.OrdinalIgnoreCase) == true)
-            {
-                <span class="badge badge-danger">Cancelled</span>
-            }
-            else
-            {
-                <span class="badge badge-info">@Model.Order.Status</span>
+                <div class="detail-item">
+                    <strong>Images:</strong>
+                    <div class="vehicle-images">
+                        @foreach (var image in Model.Order.Vehicle.Images.Split(','))
+                        {
+                            <img src="@image.Trim()" alt="Vehicle Image" class="vehicle-image" />
+                        }
+                    </div>
+                </div>
             }
         </div>
 
-        <div class="detail-item">
-            <strong>Payment:</strong>
-            @if (Model.Order.PaymentStatus == "Paid")
-            {
-                <span class="badge badge-success">Paid</span>
-            }
-            else
-            {
-                <span class="badge badge-danger">Unpaid</span>
-            }
+        <!-- Dealer Information Section -->
+        <div class="info-section">
+            <h4 class="section-title">🏢 Dealer Information</h4>
+            <div class="detail-item"><strong>Dealer Name:</strong> @Model.Order.Dealer?.Name</div>
+            <div class="detail-item"><strong>Dealer ID:</strong> @Model.Order.DealerId</div>
         </div>
 
-        <div class="detail-item"><strong>Created At:</strong> @Model.Order.CreatedAt?.ToString("dd/MM/yyyy")</div>
-        <div class="detail-item"><strong>Notes:</strong> @(Model.Order.Notes ?? "—")</div>
+        <!-- Test Drive Appointments Section -->
+        @if (Model.Order.Customer?.TestDriveAppointments != null && Model.Order.Customer.TestDriveAppointments.Any())
+        {
+            <div class="info-section">
+                <h4 class="section-title">📅 Test Drive Appointments</h4>
+                @foreach (var appointment in Model.Order.Customer.TestDriveAppointments.Where(a => a.VehicleId == Model.Order.VehicleId))
+                {
+                    <div class="appointment-item">
+                        <div class="detail-item"><strong>Appointment Date:</strong> @appointment.AppointmentDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        <div class="detail-item"><strong>Status:</strong> 
+                            @if (appointment.Status?.Equals("completed", StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                <span class="badge badge-success">Completed</span>
+                            }
+                            else if (appointment.Status?.Equals("scheduled", StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                <span class="badge badge-warning">Scheduled</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-info">@appointment.Status</span>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(appointment.Notes))
+                        {
+                            <div class="detail-item"><strong>Notes:</strong> @appointment.Notes</div>
+                        }
+                    </div>
+                }
+            </div>
+        }
 
         <div class="text-center mt-4">
             @{
-                var isCustomer = Model.CurrentUserRole?.Equals("Customer", StringComparison.OrdinalIgnoreCase) == true;
+                var isCustomer = Model.CurrentUserRole?.Equals("Customer", StringComparison.OrdinalIgnoreCase) == true || 
+                                Model.CurrentUserRole?.Equals("CUSTOMER", StringComparison.OrdinalIgnoreCase) == true;
                 var isStaffOrAdmin = Model.CurrentUserRole?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true || 
-                                    Model.CurrentUserRole?.Equals("Staff", StringComparison.OrdinalIgnoreCase) == true;
+                                    Model.CurrentUserRole?.Equals("Staff", StringComparison.OrdinalIgnoreCase) == true ||
+                                    Model.CurrentUserRole?.Equals("ADMIN", StringComparison.OrdinalIgnoreCase) == true ||
+                                    Model.CurrentUserRole?.Equals("STAFF", StringComparison.OrdinalIgnoreCase) == true;
                 var isUnpaid = Model.Order.PaymentStatus?.Equals("Unpaid", StringComparison.OrdinalIgnoreCase) == true;
                 var isProcessing = Model.Order.Status?.Equals("Processing", StringComparison.OrdinalIgnoreCase) == true;
             }
@@ -276,6 +423,15 @@ else
             {
                 <button class="btn btn-complete" onclick="completeOrder('@Model.Order.Id')">
                     <i class="fas fa-check-circle"></i> Hoàn thành đơn hàng
+                </button>
+                <span style="margin: 0 10px;"></span>
+            }
+            
+            @* Customer DONE button *@
+            @if (isCustomer && Model.Order.Status?.Equals("Complete", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <button class="btn btn-done" onclick="updateOrderStatus('@Model.Order.Id', 'DONE')">
+                    <i class="fas fa-flag-checkered"></i> DONE
                 </button>
                 <span style="margin: 0 10px;"></span>
             }

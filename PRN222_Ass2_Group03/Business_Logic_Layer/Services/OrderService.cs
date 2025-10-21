@@ -33,7 +33,7 @@ namespace Business_Logic_Layer.Services
             return orders.Where(o => o.Status == "Pending" || o.Status == "Processing");
         }
 
-        // 🔹 Lấy chi tiết đơn hàng
+        // 🔹 Lấy chi tiết đơn hàng với đầy đủ thông tin
         public async Task<Order?> GetOrderByIdAsync(Guid orderId)
         {
             return await _orderRepository.GetById(orderId);
@@ -97,6 +97,7 @@ namespace Business_Logic_Layer.Services
                     OrderNumber = order.OrderNumber,
                     CustomerId = order.CustomerId,
                     CustomerName = order.Customer?.FullName ?? order.Customer?.Username ?? "Unknown",
+                    CustomerPhone = order.Customer?.Phone ?? "N/A",
                     DealerId = order.DealerId,
                     DealerName = order.Dealer?.Name ?? "Unknown",
                     VehicleId = order.VehicleId,

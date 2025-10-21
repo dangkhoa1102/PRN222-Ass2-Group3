@@ -106,6 +106,16 @@ namespace Business_Logic_Layer.Services
             return user != null;
         }
 
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _userRepository.GetAllUsersAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetCustomersAsync()
+        {
+            return await _userRepository.GetCustomersAsync();
+        }
+
         private bool VerifyPassword(string password, string storedHash)
         {
             // For demo purposes, check if it's plain text first (for existing users)

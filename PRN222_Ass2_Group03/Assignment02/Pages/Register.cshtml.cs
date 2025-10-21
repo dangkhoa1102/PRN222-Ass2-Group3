@@ -102,7 +102,7 @@ namespace Assignment02.Pages
                     _logger.LogInformation("New user registered successfully: {Username}", Username);
                     
                     // Set success message and redirect to Login page
-                    TempData["SuccessMessage"] = "Registration successful! Please login with your credentials.";
+                    TempData["RegistrationSuccessMessage"] = "Registration successful! Please login with your credentials.";
                     return RedirectToPage("/Login");
                 }
                 else

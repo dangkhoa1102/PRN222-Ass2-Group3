@@ -39,10 +39,10 @@ namespace Assignment02.Pages
                 Response.Redirect("/Index");
             }
 
-            // Get success message from TempData (from registration)
-            if (TempData["SuccessMessage"] != null)
+            // Only show registration success message, not order-related messages
+            if (TempData["RegistrationSuccessMessage"] != null)
             {
-                SuccessMessage = TempData["SuccessMessage"]?.ToString();
+                SuccessMessage = TempData["RegistrationSuccessMessage"]?.ToString();
             }
         }
 

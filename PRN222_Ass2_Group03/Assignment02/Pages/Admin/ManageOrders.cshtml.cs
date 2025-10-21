@@ -2,16 +2,19 @@ using Business_Logic_Layer.DTOs;
 using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages.Admin
 {
     public class ManageOrdersModel : AuthenticatedPageModel
     {
         private readonly IOrderService _orderService;
+        private readonly NotificationService _notificationService;
 
-        public ManageOrdersModel(IOrderService orderService)
+        public ManageOrdersModel(IOrderService orderService, NotificationService notificationService)
         {
             _orderService = orderService;
+            _notificationService = notificationService;
         }
 
         public List<OrderDTO> Orders { get; set; } = new();
@@ -64,11 +67,34 @@ namespace Assignment02.Pages.Admin
 
             try
             {
-                // Update order status (you might need to implement UpdateOrderStatusAsync in IOrderService)
+                // Check if trying to ship an unpaid order
+                if (newStatus == "Shipped")
+                {
+                    var order = await _orderService.GetOrderByIdAsync(orderId);
+                    if (order != null && string.Equals(order.PaymentStatus, "Unpaid", StringComparison.OrdinalIgnoreCase))
+                    {
+                        TempData["ErrorMessage"] = "Đơn hàng chưa thanh toán, không thể giao hàng!";
+                        return RedirectToPage();
+                    }
+                }
+
+                // Update order status
                 var result = await _orderService.UpdateOrderStatusAsync(orderId, newStatus);
                 
                 if (result)
                 {
+                    // Get order details for notification
+                    var order = await _orderService.GetOrderByIdAsync(orderId);
+                    if (order != null)
+                    {
+                        // Send SignalR notification
+                        await _notificationService.NotifyOrderStatusUpdateAsync(
+                            orderId.ToString(), 
+                            newStatus, 
+                            order.CustomerId.ToString()
+                        );
+                    }
+                    
                     TempData["SuccessMessage"] = "Order status updated successfully!";
                 }
                 else

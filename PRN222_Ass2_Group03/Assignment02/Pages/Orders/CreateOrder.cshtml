@@ -1,0 +1,302 @@
+@page "/Orders/CreateOrder"
+@model Assignment02.Pages.Orders.CreateOrderModel
+@{
+    ViewData["Title"] = "Create Order";
+}
+
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .create-container {
+        max-width: 800px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px 40px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .create-header {
+        text-align: center;
+        color: #007bff;
+        font-weight: 700;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        background-color: #fff;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .btn-create {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 8px;
+        transition: 0.2s;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .btn-create:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #20c997, #28a745);
+    }
+
+    .btn-cancel {
+        background: linear-gradient(45deg, #6c757d, #5a6268);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 8px;
+        transition: 0.2s;
+        cursor: pointer;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .btn-cancel:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #5a6268, #6c757d);
+        color: white;
+    }
+
+    .customer-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+        border-left: 4px solid #007bff;
+    }
+
+    .vehicle-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+        border-left: 4px solid #28a745;
+    }
+
+    .dealer-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+        border-left: 4px solid #ffc107;
+    }
+
+    .info-title {
+        font-weight: 600;
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 5px;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #198754;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #842029;
+    }
+</style>
+
+<!-- Success/Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success text-center" style="margin: 1rem 2rem;">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger text-center" style="margin: 1rem 2rem;">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="create-container">
+    <h2 class="create-header">🛒 Create New Order</h2>
+
+    <form method="post">
+        <div class="form-group">
+            <label class="form-label" for="OrderViewModel_CustomerId">Select Customer *</label>
+            <select asp-for="OrderViewModel.CustomerId" class="form-select" id="customerSelect" required>
+                <option value="">-- Choose a customer --</option>
+                @foreach (var customer in Model.Customers)
+                {
+                    <option value="@customer.Value">@customer.Text</option>
+                }
+            </select>
+            <span asp-validation-for="OrderViewModel.CustomerId" class="text-danger"></span>
+            
+            <!-- Customer Info Display -->
+            <div id="customerInfo" class="customer-info" style="display: none;">
+                <div class="info-title">👤 Customer Information</div>
+                <div id="customerDetails"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="OrderViewModel_DealerId">Select Dealer *</label>
+            <select asp-for="OrderViewModel.DealerId" class="form-select" id="dealerSelect" required>
+                <option value="">-- Choose a dealer --</option>
+                @foreach (var dealer in Model.Dealers)
+                {
+                    <option value="@dealer.Value">@dealer.Text</option>
+                }
+            </select>
+            <span asp-validation-for="OrderViewModel.DealerId" class="text-danger"></span>
+            
+            <!-- Dealer Info Display -->
+            <div id="dealerInfo" class="dealer-info" style="display: none;">
+                <div class="info-title">🏢 Dealer Information</div>
+                <div id="dealerDetails"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="OrderViewModel_VehicleId">Select Vehicle *</label>
+            <select asp-for="OrderViewModel.VehicleId" class="form-select" id="vehicleSelect" required>
+                <option value="">-- Choose a vehicle --</option>
+                @foreach (var vehicle in Model.Vehicles)
+                {
+                    <option value="@vehicle.Value">@vehicle.Text</option>
+                }
+            </select>
+            <span asp-validation-for="OrderViewModel.VehicleId" class="text-danger"></span>
+            
+            <!-- Vehicle Info Display -->
+            <div id="vehicleInfo" class="vehicle-info" style="display: none;">
+                <div class="info-title">🚗 Vehicle Information</div>
+                <div id="vehicleDetails"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="OrderViewModel_Notes">Notes</label>
+            <textarea asp-for="OrderViewModel.Notes" class="form-control" rows="4" 
+                      placeholder="Enter any additional notes for this order..."></textarea>
+            <span asp-validation-for="OrderViewModel.Notes" class="text-danger"></span>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="/Admin/ManageOrders" class="btn-cancel">
+                <i class="fas fa-arrow-left"></i> Cancel
+            </a>
+            <button type="submit" class="btn-create">
+                <i class="fas fa-plus"></i> Create Order
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Customer selection handler
+    document.getElementById('customerSelect').addEventListener('change', function() {
+        const customerInfo = document.getElementById('customerInfo');
+        const customerDetails = document.getElementById('customerDetails');
+        
+        if (this.value) {
+            const selectedText = this.options[this.selectedIndex].text;
+            customerDetails.innerHTML = `
+                <div><strong>Selected:</strong> ${selectedText}</div>
+            `;
+            customerInfo.style.display = 'block';
+        } else {
+            customerInfo.style.display = 'none';
+        }
+    });
+
+    // Dealer selection handler
+    document.getElementById('dealerSelect').addEventListener('change', function() {
+        const dealerInfo = document.getElementById('dealerInfo');
+        const dealerDetails = document.getElementById('dealerDetails');
+        
+        if (this.value) {
+            const selectedText = this.options[this.selectedIndex].text;
+            dealerDetails.innerHTML = `
+                <div><strong>Selected:</strong> ${selectedText}</div>
+            `;
+            dealerInfo.style.display = 'block';
+        } else {
+            dealerInfo.style.display = 'none';
+        }
+    });
+
+    // Vehicle selection handler
+    document.getElementById('vehicleSelect').addEventListener('change', function() {
+        const vehicleInfo = document.getElementById('vehicleInfo');
+        const vehicleDetails = document.getElementById('vehicleDetails');
+        
+        if (this.value) {
+            const selectedText = this.options[this.selectedIndex].text;
+            vehicleDetails.innerHTML = `
+                <div><strong>Selected:</strong> ${selectedText}</div>
+            `;
+            vehicleInfo.style.display = 'block';
+        } else {
+            vehicleInfo.style.display = 'none';
+        }
+    });
+</script>
