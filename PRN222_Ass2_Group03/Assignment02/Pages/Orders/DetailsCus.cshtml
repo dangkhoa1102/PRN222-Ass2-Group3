@@ -1,4 +1,4 @@
-﻿@page "/Orders/Details/{id}"
+﻿@page "/Orders/DetailsCus/{id}"
 @model Assignment02.Pages.Orders.DetailsModel
 @{
     ViewData["Title"] = "Order Details";
@@ -342,7 +342,7 @@ function updateOrderStatus(orderId, newStatus) {
         // Create a form to submit the update
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/Orders/Details/' + orderId;
+        form.action = '/Orders/DetailsCus/' + orderId;
         
         // Add order ID and new status as form data
         const orderIdInput = document.createElement('input');
@@ -373,7 +373,7 @@ function completeOrder(orderId) {
         // Create a form to submit the update
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/Orders/Details/' + orderId;
+            form.action = '/Orders/DetailsCus/' + orderId;
         
         // Add order ID and new status as form data
         const orderIdInput = document.createElement('input');
@@ -406,7 +406,7 @@ function cancelOrder(orderId) {
             // Create a form to submit the cancellation
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '/Orders/Details/' + orderId;
+                form.action = '/Orders/DetailsCus/' + orderId;
             
             // Add order ID and cancellation reason
             const orderIdInput = document.createElement('input');

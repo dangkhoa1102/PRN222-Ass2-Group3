@@ -1,7 +1,7 @@
 ﻿@page
-@model Assignment02.Pages.Orders.MyOrdersModel
+@model Assignment02.Pages.Orders.HistoryModel
 @{
-    ViewData["Title"] = "My Orders";
+    ViewData["Title"] = "Order History";
 }
 
 <style>
@@ -41,7 +41,7 @@
         }
 
         .table tbody tr {
-            background: #ffffff;
+            background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
             transition: 0.2s;
@@ -59,13 +59,11 @@
             vertical-align: middle;
         }
 
-    /* Badge styles */
     .badge {
         padding: 7px 14px;
         border-radius: 20px;
         font-size: 0.9rem;
         font-weight: 600;
-        text-transform: capitalize;
     }
 
     .badge-success {
@@ -88,8 +86,7 @@
         color: #0c5460;
     }
 
-    /* Button style */
-    .btn-details {
+    .btn-view {
         background: linear-gradient(45deg, #007bff, #0056b3);
         border: none;
         color: white;
@@ -99,42 +96,37 @@
         transition: 0.2s;
     }
 
-        .btn-details:hover {
+        .btn-view:hover {
             transform: scale(1.05);
             background: linear-gradient(45deg, #0056b3, #007bff);
         }
 
-    @@media (max-width: 768px) {
-        .orders-container {
-            padding: 10px;
-        }
-
-        .table td, .table th {
-            font-size: 0.85rem;
-            padding: 10px;
-        }
-    }
 </style>
 
 <div class="orders-container">
-    <h2>My Orders</h2>
+    <h2>Order History</h2>
 
-    <table class="table align-middle">
-        <thead>
-            <tr>
-                <th>Order #</th>
-                <th>Vehicle</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Payment</th>
-                <th>Created</th>
-                <th>Details</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.Orders != null && Model.Orders.Any())
-            {
-                foreach (var order in Model.Orders)
+@if (Model.OrderHistories == null || !Model.OrderHistories.Any())
+{
+        <div class="text-center text-muted py-4">No order history available.</div>
+}
+else
+{
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Vehicle</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Created</th>
+                    <th>Notes</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.OrderHistories)
                 {
                     var status = order.Status?.ToLowerInvariant();
                     var payment = order.PaymentStatus?.ToLowerInvariant();
@@ -163,19 +155,24 @@
                         <td><span class="badge @paymentBadge">@order.PaymentStatus</span></td>
                         <td>@order.CreatedAt?.ToString("dd/MM/yyyy")</td>
                         <td>
-                            <a asp-page="/Orders/Details" asp-route-id="@order.Id" class="btn btn-details">
-                                <i class="fas fa-info-circle"></i> Details
+                            @if (order.Status?.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) == true && !string.IsNullOrEmpty(order.Notes))
+                            {
+                                <span class="text-danger" style="font-size: 0.9rem;">
+                                    <i class="fas fa-times-circle"></i> @order.Notes
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-page="/Orders/DetailsCus" asp-route-id="@order.Id" class="btn btn-view">
+                                <i class="fas fa-eye"></i> View
                             </a>
                         </td>
                     </tr>
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="7" class="text-center text-muted py-4">No orders found.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+}

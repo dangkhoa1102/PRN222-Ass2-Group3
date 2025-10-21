@@ -416,7 +416,7 @@
                 @{ var userId = HttpContextAccessor.HttpContext?.Session.GetString("UserId"); }
                 @if (!string.IsNullOrEmpty(userId) && string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
                 {
-                    <a href="/Orders/Create?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
+                    <a href="/Orders/CreateCus?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
                         <i class="fas fa-shopping-cart"></i>
                         Mua xe
                     </a>

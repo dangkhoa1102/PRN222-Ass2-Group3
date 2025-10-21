@@ -102,31 +102,31 @@
                                     @if (string.Equals(userRole, "Customer", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Orders/Create">
+                                            <a class="dropdown-item" asp-page="/Orders/CreateCus">
                                                 <i class="fas fa-plus-circle"></i>
                                                 <span>Create New Order</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Orders/MyOrders">
+                                            <a class="dropdown-item" asp-page="/Orders/MyOrdersCus">
                                                 <i class="fas fa-receipt"></i>
                                                 <span>My Orders</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Orders/ViewOrders">
+                                            <a class="dropdown-item" asp-page="/Orders/ViewOrdersCus">
                                                 <i class="fas fa-eye"></i>
                                                 <span>View Orders</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Orders/PendingOrders">
+                                            <a class="dropdown-item" asp-page="/Orders/PendingOrdersCus">
                                                 <i class="fas fa-hourglass-half"></i>
                                                 <span>Processing Orders</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Orders/History">
+                                            <a class="dropdown-item" asp-page="/Orders/HistoryCus">
                                                 <i class="fas fa-history"></i>
                                                 <span>Order History</span>
                                             </a>

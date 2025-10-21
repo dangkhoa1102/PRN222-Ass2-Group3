@@ -108,7 +108,7 @@ namespace Assignment02.Pages.Orders
                         // Redirect based on user role after cancellation
                         if (isCustomer)
                         {
-                            return RedirectToPage("/Orders/MyOrders");
+                            return RedirectToPage("/Orders/MyOrdersCus");
                         }
                         else if (isStaffOrAdmin)
                         {
