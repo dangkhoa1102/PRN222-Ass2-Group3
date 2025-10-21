@@ -1,4 +1,4 @@
-using Business_Logic_Layer.Interfaces;
+using Business_Logic_Layer.Services;
 using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -33,17 +33,17 @@ namespace Assignment02.Pages.Orders
             return Page();
         }
 
-        // Helper ?? hi?n th? status
+       
         public static string GetStatusDisplay(string? status)
         {
             return status?.ToLower() switch
             {
-                "processing" => "?ang x? lı",
-                "confirmed" => "?ã xác nh?n",
-                "shipping" => "?ang giao hàng",
-                "completed" => "Hoàn thành",
-                "cancelled" => "?ã h?y",
-                _ => status ?? "Không xác ??nh"
+               
+                "confirmed" => "Confirmed",
+                "delivering" => "Delivering",
+                "completed" => "Completed",
+                "cancelled" => "Cancelled",
+                _ => status ?? "Unknown"
             };
         }
 
@@ -51,9 +51,9 @@ namespace Assignment02.Pages.Orders
         {
             return status?.ToLower() switch
             {
-                "processing" => "badge bg-info",
+               
                 "confirmed" => "badge bg-primary",
-                "shipping" => "badge bg-warning",
+                "delivering" => "badge bg-warning",
                 "completed" => "badge bg-success",
                 "cancelled" => "badge bg-danger",
                 _ => "badge bg-secondary"
@@ -66,7 +66,6 @@ namespace Assignment02.Pages.Orders
             {
                 "paid" => "badge bg-success",
                 "unpaid" => "badge bg-danger",
-                "partial" => "badge bg-warning",
                 _ => "badge bg-secondary"
             };
         }

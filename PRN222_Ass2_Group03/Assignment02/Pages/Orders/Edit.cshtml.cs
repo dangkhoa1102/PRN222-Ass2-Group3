@@ -1,4 +1,3 @@
-using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.Services;
 using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -69,62 +68,60 @@ namespace Assignment02.Pages.Orders
                     return RedirectToPage("/Login");
                 }
 
-                // Lấy order cũ từ database
                 var existingOrder = await _orderService.GetOrderByIdAsync(Order.Id);
                 if (existingOrder == null)
                 {
                     TempData["ErrorMessage"] = "Order not found!";
-                    return RedirectToPage("./Index");
+                    return RedirectToPage("/Orders/OrderList");
                 }
 
-                // ✅ Cập nhật CustomerId
                 if (Order.CustomerId != Guid.Empty && Order.CustomerId != existingOrder.CustomerId)
                 {
                     existingOrder.CustomerId = Order.CustomerId;
                 }
 
-                // ✅ Cập nhật VehicleId
+                
                 if (Order.VehicleId != Guid.Empty && Order.VehicleId != existingOrder.VehicleId)
                 {
                     existingOrder.VehicleId = Order.VehicleId;
                 }
 
-                // ✅ Cập nhật Status (trạng thái đơn hàng)
+                
                 if (!string.IsNullOrWhiteSpace(Order.Status))
                 {
                     existingOrder.Status = Order.Status;
                 }
 
-                // ✅ THÊM: Cập nhật PaymentStatus (trạng thái thanh toán)
+               
                 if (!string.IsNullOrWhiteSpace(Order.PaymentStatus))
                 {
                     existingOrder.PaymentStatus = Order.PaymentStatus;
                 }
 
-                // ✅ Cập nhật TotalAmount
+               
                 if (Order.TotalAmount > 0)
                 {
                     existingOrder.TotalAmount = Order.TotalAmount;
                 }
 
-                // ✅ Cập nhật CreatedAt (nếu cần)
+               
                 if (Order.CreatedAt != default(DateTime))
                 {
                     existingOrder.CreatedAt = Order.CreatedAt;
                 }
 
-                // ✅ Cập nhật Notes
+               
                 if (!string.IsNullOrWhiteSpace(Order.Notes))
                 {
                     existingOrder.Notes = Order.Notes;
                 }
                 else
                 {
-                    // Nếu Notes bị xóa trống, cho phép cập nhật thành null
+                  
                     existingOrder.Notes = null;
                 }
 
-                // Cập nhật thời gian sửa
+              
                 existingOrder.UpdatedAt = DateTime.Now;
 
                 var success = await _orderService.UpdateOrderAsync(existingOrder);
@@ -132,7 +129,7 @@ namespace Assignment02.Pages.Orders
                 if (success)
                 {
                     TempData["SuccessMessage"] = "Order updated successfully!";
-                    return RedirectToPage("./Index");
+                    return RedirectToPage("/Orders/OrderList");
                 }
                 else
                 {
@@ -151,7 +148,7 @@ namespace Assignment02.Pages.Orders
 
         private async Task LoadSelectListsAsync()
         {
-            // Lấy danh sách customers
+            
             var customers = await _userService.GetAllUsersAsync();
             var customerList = customers
                 .Where(u => u.Role?.ToLower() == "customer")
@@ -167,18 +164,18 @@ namespace Assignment02.Pages.Orders
             // TẠM THỜI dùng list rỗng
             Vehicles = new SelectList(new List<SelectListItem>(), "Value", "Text");
 
-            // ✅ Danh sách Order Status (trạng thái đơn hàng)
+           
             var statuses = new List<SelectListItem>
             {
                
                 new SelectListItem { Value = "confirmed", Text = "Confirmed" },
-                new SelectListItem { Value = "shipping", Text = "Shipping" },
+                new SelectListItem { Value = "delivering", Text = "Delivering" },
                 new SelectListItem { Value = "completed", Text = "Completed" },
                 new SelectListItem { Value = "cancelled", Text = "Cancelled" }
             };
             StatusList = new SelectList(statuses, "Value", "Text", Order?.Status?.ToLower());
 
-            // ✅ THÊM: Danh sách Payment Status (trạng thái thanh toán)
+            
             var paymentStatuses = new List<SelectListItem>
             {
                 new SelectListItem { Value = "Unpaid", Text = "Unpaid" },

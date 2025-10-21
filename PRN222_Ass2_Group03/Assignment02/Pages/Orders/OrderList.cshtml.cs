@@ -1,4 +1,4 @@
-using Business_Logic_Layer.Interfaces;
+using Business_Logic_Layer.Services;
 using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,11 +7,11 @@ using System.Text;
 
 namespace Assignment02.Pages.Orders
 {
-    public class IndexModel : PageModel
+    public class OrderListModel : PageModel
     {
         private readonly IOrderService _orderService;
 
-        public IndexModel(IOrderService orderService)
+        public OrderListModel(IOrderService orderService)
         {
             _orderService = orderService;
         }
@@ -131,7 +131,6 @@ namespace Assignment02.Pages.Orders
         {
             var allOrders = await _orderService.GetAllOrdersAsync();
 
-            // 🔍 Lọc theo từ khóa
             if (!string.IsNullOrWhiteSpace(SearchKeyword))
             {
                 var normalizedKeyword = RemoveDiacritics(SearchKeyword.Trim()).ToLowerInvariant();
@@ -148,7 +147,7 @@ namespace Assignment02.Pages.Orders
                 });
             }
 
-            // ✅ Lọc theo Status
+           
             if (!string.IsNullOrWhiteSpace(StatusFilter) && StatusFilter != "All")
             {
                 allOrders = allOrders.Where(o =>
@@ -156,7 +155,7 @@ namespace Assignment02.Pages.Orders
                     string.Equals(o.Status, StatusFilter, StringComparison.OrdinalIgnoreCase));
             }
 
-            // ✅ Lọc theo PaymentStatus
+            
             if (!string.IsNullOrWhiteSpace(PaymentStatusFilter) && PaymentStatusFilter != "All")
             {
                 allOrders = allOrders.Where(o =>

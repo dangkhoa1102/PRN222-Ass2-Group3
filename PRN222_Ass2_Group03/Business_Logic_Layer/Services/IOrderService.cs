@@ -1,34 +1,35 @@
 ﻿using EVDealerDbContext.Models;
 
-namespace Business_Logic_Layer.Interfaces
+namespace Business_Logic_Layer.Services
 {
     public interface IOrderService
     {
-        // Order CRUD
+        // ==================== ORDER OPERATIONS ====================
         Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task<Dealer?> GetFirstDealerAsync();
-
-
         Task<Order?> GetOrderByIdAsync(Guid id);
         Task<Order> CreateOrderAsync(Order order);
         Task<bool> UpdateOrderAsync(Order order);
         Task<bool> DeleteOrderAsync(Guid id);
         Task<Order?> GetOrderByOrderNumberAsync(string orderNumber);
+        Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus, Guid userId, string? notes = null);
 
-        // Customer operations
+        // ==================== CUSTOMER OPERATIONS ====================
         Task<IEnumerable<User>> SearchCustomersAsync(string keyword);
         Task<User?> GetCustomerByPhoneAsync(string phone);
         Task<User?> GetCustomerByIdAsync(Guid id);
-        Task<User> CreateCustomerAsync(User user);
+        Task<User?> CreateCustomerAsync(User user);
 
-        // Vehicle operations
+        // ==================== VEHICLE OPERATIONS ====================
         Task<IEnumerable<Vehicle>> GetAvailableVehiclesAsync();
         Task<Vehicle?> GetVehicleByIdAsync(Guid id);
 
-        // Business logic
+        // ==================== BUSINESS LOGIC ====================
         string GenerateOrderNumber();
         Task<decimal> CalculateTotalAmountAsync(Guid vehicleId, int quantity = 1);
-        Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus, Guid userId, string? notes = null);
+
+        // ==================== ORDER HISTORY ====================
         Task<IEnumerable<OrderHistory>> GetOrderHistoryAsync(Guid orderId);
+        Task<IEnumerable<OrderHistory>> GetOrderHistoryByOrderIdAsync(Guid orderId);
     }
 }

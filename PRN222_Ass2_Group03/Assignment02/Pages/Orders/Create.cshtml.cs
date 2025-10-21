@@ -1,4 +1,4 @@
-using Business_Logic_Layer.Interfaces;
+using Business_Logic_Layer.Services;
 using EVDealerDbContext.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -30,18 +30,14 @@ namespace Assignment02.Pages.Orders
         {
             try
             {
-                // Load danh sách xe còn hàng (StockQuantity > 0)
                 AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
-
-                // Khởi tạo giá trị mặc định cho PaymentStatus
-                Input.PaymentStatus = "Chưa thanh toán";
-
+                Input.PaymentStatus = "Unpaid";
                 return Page();
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Lỗi khi tải dữ liệu: {ex.Message}";
-                return RedirectToPage("./Index");
+                ErrorMessage = $"Error loading data: {ex.Message}";
+                return RedirectToPage("/Orders/OrderList");
             }
         }
 
@@ -49,47 +45,43 @@ namespace Assignment02.Pages.Orders
         {
             try
             {
-                // ✅ FIX: DI CHUYỂN LOGIC NÀY LÊN TRƯỚC - TRƯỚC KHI KIỂM TRA ModelState.IsValid
-                // Kiểm tra xem có chọn khách hàng cũ không
+                // If existing customer selected
                 if (Input.CustomerId.HasValue && Input.CustomerId.Value != Guid.Empty)
                 {
-                    // ✅ Xóa validation errors cho các trường không cần thiết
                     ModelState.Remove("Input.CustomerName");
                     ModelState.Remove("Input.CustomerPhone");
                     ModelState.Remove("Input.CustomerEmail");
                 }
                 else
                 {
-                    // ✅ Nếu KHÔNG chọn khách hàng cũ, validate thông tin khách hàng mới
+                    // Validate new customer information
                     if (string.IsNullOrWhiteSpace(Input.CustomerName))
                     {
-                        ModelState.AddModelError("Input.CustomerName", "Tên khách hàng là bắt buộc");
+                        ModelState.AddModelError("Input.CustomerName", "Customer name is required");
                     }
                     else if (Input.CustomerName.Trim().Length < 2 || Input.CustomerName.Trim().Length > 100)
                     {
-                        ModelState.AddModelError("Input.CustomerName", "Tên phải từ 2-100 ký tự");
+                        ModelState.AddModelError("Input.CustomerName", "Name must be between 2-100 characters");
                     }
 
                     if (string.IsNullOrWhiteSpace(Input.CustomerPhone))
                     {
-                        ModelState.AddModelError("Input.CustomerPhone", "Số điện thoại là bắt buộc");
+                        ModelState.AddModelError("Input.CustomerPhone", "Phone number is required");
                     }
                     else if (!System.Text.RegularExpressions.Regex.IsMatch(Input.CustomerPhone.Trim(), @"^0\d{9,10}$"))
                     {
-                        ModelState.AddModelError("Input.CustomerPhone", "Số điện thoại phải bắt đầu bằng 0 và có 10-11 chữ số");
+                        ModelState.AddModelError("Input.CustomerPhone", "Phone must start with 0 and contain 10-11 digits");
                     }
 
                     if (!string.IsNullOrWhiteSpace(Input.CustomerEmail) &&
                         !System.Text.RegularExpressions.Regex.IsMatch(Input.CustomerEmail.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                     {
-                        ModelState.AddModelError("Input.CustomerEmail", "Email không hợp lệ");
+                        ModelState.AddModelError("Input.CustomerEmail", "Invalid email format");
                     }
                 }
 
-                // ✅ BÂY GIỜ MỚI KIỂM TRA ModelState
                 if (!ModelState.IsValid)
                 {
-                    // ✅ DEBUG: Xem lỗi cụ thể là gì
                     var errors = ModelState
                         .Where(x => x.Value.Errors.Count > 0)
                         .Select(x => new {
@@ -105,134 +97,121 @@ namespace Assignment02.Pages.Orders
                     return Page();
                 }
 
-                // 1. Xử lý thông tin khách hàng (tìm hoặc tạo mới)
+                // Handle customer information
                 User? customer = await HandleCustomerInformationAsync();
                 if (customer == null)
                 {
-                    ErrorMessage = "Không thể xử lý thông tin khách hàng. Vui lòng thử lại.";
+                    ErrorMessage = "Unable to process customer information. Please try again.";
                     AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
                     return Page();
                 }
 
-                // 2. Kiểm tra xe còn trong kho không
+                // Validate vehicle
                 var vehicle = await _orderService.GetVehicleByIdAsync(Input.VehicleId);
                 if (vehicle == null)
                 {
-                    ErrorMessage = "Xe không tồn tại. Vui lòng chọn xe khác.";
+                    ErrorMessage = "Vehicle not found. Please select another vehicle.";
                     AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
                     return Page();
                 }
 
                 if (vehicle.StockQuantity <= 0)
                 {
-                    ErrorMessage = $"Xe {vehicle.Brand} {vehicle.Model} đã hết hàng. Vui lòng chọn xe khác.";
+                    ErrorMessage = $"{vehicle.Brand} {vehicle.Model} is out of stock. Please select another vehicle.";
                     AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
                     return Page();
                 }
 
-                // 3. Validate TotalAmount khớp với giá xe
+                // Validate total amount
                 if (Input.TotalAmount != vehicle.Price)
                 {
-                    ErrorMessage = "Tổng tiền không khớp với giá xe. Vui lòng thử lại.";
+                    ErrorMessage = "Total amount does not match vehicle price. Please try again.";
                     AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
                     return Page();
                 }
 
-                // 4. Lấy DealerId từ session (hoặc mặc định)
                 var dealerId = GetCurrentDealerId();
 
-                // ✅ NẾU KHÔNG CÓ TRONG SESSION, LẤY DEALER ĐẦU TIÊN TỪ DB
+                // Get default dealer if needed
                 if (dealerId == Guid.Empty)
                 {
                     var firstDealer = await _orderService.GetFirstDealerAsync();
                     if (firstDealer == null)
                     {
-                        ErrorMessage = "Không tìm thấy dealer trong hệ thống. Vui lòng liên hệ quản trị viên.";
+                        ErrorMessage = "No dealer found in system. Please contact administrator.";
                         AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
                         return Page();
                     }
                     dealerId = firstDealer.Id;
                 }
 
-                // 5. Tạo đơn hàng mới
+                // Create order
                 var order = new Order
                 {
-                    OrderNumber = _orderService.GenerateOrderNumber(), // VD: ORD-20250118-001
+                    OrderNumber = _orderService.GenerateOrderNumber(),
                     CustomerId = customer.Id,
                     VehicleId = Input.VehicleId,
                     DealerId = dealerId,
                     TotalAmount = Input.TotalAmount,
-                    Status = "confirmed", // Trạng thái mặc định: đã xác nhận
-                    PaymentStatus = Input.PaymentStatus, // "Chưa thanh toán" hoặc "Đã thanh toán"
+                    Status = "confirmed",
+                    PaymentStatus = Input.PaymentStatus,
                     Notes = string.IsNullOrWhiteSpace(Input.Notes) ? null : Input.Notes.Trim(),
                     CreatedAt = DateTime.Now
                 };
 
-                // 6. Lưu đơn hàng vào database
                 var createdOrder = await _orderService.CreateOrderAsync(order);
 
                 if (createdOrder == null)
                 {
-                    ErrorMessage = "Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại.";
+                    ErrorMessage = "An error occurred while creating the order. Please try again.";
                     AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
                     return Page();
                 }
 
-                // 7. ✅ THÀNH CÔNG → REDIRECT VỀ INDEX
-                SuccessMessage = $"✓ Đơn hàng {createdOrder.OrderNumber} đã được tạo thành công!";
-                return RedirectToPage("./Index");
+                SuccessMessage = $"✓ Order {createdOrder.OrderNumber} created successfully!";
+                return RedirectToPage("/Orders/OrderList");
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Lỗi hệ thống: {ex.Message}";
+                ErrorMessage = $"System error: {ex.Message}";
                 AvailableVehicles = await _orderService.GetAvailableVehiclesAsync();
                 return Page();
             }
         }
 
-        /// <summary>
-        /// Xử lý thông tin khách hàng - CHỈ 2 TRƯỜNG HỢP
-        /// </summary>
         private async Task<User?> HandleCustomerInformationAsync()
         {
             try
             {
-                // TRƯỜNG HỢP 1: Đã chọn khách hàng từ dropdown (có CustomerId)
-                // → Lấy thông tin khách hàng đó luôn, KHÔNG CẦN điền form
+                // CASE 1: Existing customer selected from dropdown
                 if (Input.CustomerId.HasValue && Input.CustomerId.Value != Guid.Empty)
                 {
-                    // ✅ DEBUG: Log để xem CustomerId
-                    System.Diagnostics.Debug.WriteLine($"Tìm khách hàng với ID: {Input.CustomerId.Value}");
+                    System.Diagnostics.Debug.WriteLine($"Finding customer with ID: {Input.CustomerId.Value}");
 
                     var existingCustomer = await _orderService.GetCustomerByIdAsync(Input.CustomerId.Value);
 
-                    // ✅ DEBUG: Kiểm tra kết quả
                     if (existingCustomer != null)
                     {
-                        System.Diagnostics.Debug.WriteLine($"✓ Tìm thấy khách hàng: {existingCustomer.FullName}");
+                        System.Diagnostics.Debug.WriteLine($"✓ Customer found: {existingCustomer.FullName}");
                         return existingCustomer;
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("✗ KHÔNG tìm thấy khách hàng trong DB!");
-                        ModelState.AddModelError("", $"Không tìm thấy khách hàng với ID: {Input.CustomerId.Value}");
+                        System.Diagnostics.Debug.WriteLine("✗ Customer NOT found in DB!");
+                        ModelState.AddModelError("", $"Customer not found with ID: {Input.CustomerId.Value}");
                         return null;
                     }
                 }
 
-                // TRƯỜNG HỢP 2: Không chọn từ dropdown (CustomerId = null hoặc Empty)
-                // → Tạo khách hàng MỚI với thông tin đã điền
-
-                // ✅ Kiểm tra xem có thông tin để tạo khách mới không
+                // CASE 2: Create new customer with provided information
                 if (string.IsNullOrWhiteSpace(Input.CustomerName) ||
                     string.IsNullOrWhiteSpace(Input.CustomerPhone))
                 {
-                    ModelState.AddModelError("", "Vui lòng chọn khách hàng cũ HOẶC nhập thông tin khách hàng mới (Tên và SĐT là bắt buộc).");
+                    ModelState.AddModelError("", "Please select an existing customer OR enter new customer information (Name and Phone are required).");
                     return null;
                 }
 
-                // ✅ Tạo khách hàng mới
-                System.Diagnostics.Debug.WriteLine($"Tạo khách hàng mới: {Input.CustomerName} - {Input.CustomerPhone}");
+                System.Diagnostics.Debug.WriteLine($"Creating new customer: {Input.CustomerName} - {Input.CustomerPhone}");
 
                 var newCustomer = new User
                 {
@@ -249,11 +228,11 @@ namespace Assignment02.Pages.Orders
 
                 if (createdCustomer != null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"✓ Tạo khách hàng mới thành công: {createdCustomer.Id}");
+                    System.Diagnostics.Debug.WriteLine($"✓ New customer created successfully: {createdCustomer.Id}");
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("✗ Tạo khách hàng mới THẤT BẠI!");
+                    System.Diagnostics.Debug.WriteLine("✗ Failed to create new customer!");
                 }
 
                 return createdCustomer;
@@ -262,14 +241,11 @@ namespace Assignment02.Pages.Orders
             {
                 System.Diagnostics.Debug.WriteLine($"✗ EXCEPTION: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
-                ModelState.AddModelError("", $"Lỗi xử lý khách hàng: {ex.Message}");
+                ModelState.AddModelError("", $"Customer processing error: {ex.Message}");
                 return null;
             }
         }
 
-        /// <summary>
-        /// API Handler: Tìm kiếm khách hàng theo tên hoặc SĐT
-        /// </summary>
         public async Task<IActionResult> OnGetSearchCustomersAsync(string term)
         {
             try
@@ -298,9 +274,6 @@ namespace Assignment02.Pages.Orders
             }
         }
 
-        /// <summary>
-        /// API Handler: Lấy thông tin chi tiết xe
-        /// </summary>
         public async Task<IActionResult> OnGetVehicleInfoAsync(Guid vehicleId)
         {
             try
@@ -308,7 +281,7 @@ namespace Assignment02.Pages.Orders
                 var vehicle = await _orderService.GetVehicleByIdAsync(vehicleId);
                 if (vehicle == null)
                 {
-                    return NotFound(new { error = "Không tìm thấy xe" });
+                    return NotFound(new { error = "Vehicle not found" });
                 }
 
                 return new JsonResult(new
@@ -326,9 +299,6 @@ namespace Assignment02.Pages.Orders
             }
         }
 
-        /// <summary>
-        /// Lấy DealerId hiện tại từ Session
-        /// </summary>
         private Guid GetCurrentDealerId()
         {
             var dealerId = HttpContext.Session.GetString("DealerId");
@@ -337,66 +307,37 @@ namespace Assignment02.Pages.Orders
                 return id;
             }
 
-            // ✅ Trả về Guid.Empty thay vì redirect
-            // Backend sẽ tự động gán dealer mặc định
             return Guid.Empty;
         }
 
-        /// <summary>
-        /// Input Model cho form tạo đơn hàng
-        /// </summary>
         public class OrderInputModel
         {
-            /// <summary>
-            /// ID khách hàng (nếu chọn từ dropdown)
-            /// </summary>
             public Guid? CustomerId { get; set; }
 
-            /// <summary>
-            /// Tên khách hàng (chỉ bắt buộc khi tạo mới - không dùng validation attribute)
-            /// </summary>
-            [Display(Name = "Tên khách hàng")]
+            [Display(Name = "Customer Name")]
             public string? CustomerName { get; set; }
 
-            /// <summary>
-            /// Số điện thoại (chỉ bắt buộc khi tạo mới - không dùng validation attribute)
-            /// </summary>
-            [Display(Name = "Số điện thoại")]
+            [Display(Name = "Phone Number")]
             public string? CustomerPhone { get; set; }
 
-            /// <summary>
-            /// Email (không bắt buộc)
-            /// </summary>
             [Display(Name = "Email")]
             public string? CustomerEmail { get; set; }
 
-            /// <summary>
-            /// ID xe được chọn (bắt buộc)
-            /// </summary>
-            [Required(ErrorMessage = "Vui lòng chọn xe")]
-            [Display(Name = "Xe")]
+            [Required(ErrorMessage = "Please select a vehicle")]
+            [Display(Name = "Vehicle")]
             public Guid VehicleId { get; set; }
 
-            /// <summary>
-            /// Tổng tiền (tự động tính từ giá xe)
-            /// </summary>
-            [Required(ErrorMessage = "Tổng tiền là bắt buộc")]
-            [Range(0.01, double.MaxValue, ErrorMessage = "Tổng tiền phải lớn hơn 0")]
-            [Display(Name = "Tổng tiền")]
+            [Required(ErrorMessage = "Total amount is required")]
+            [Range(0.01, double.MaxValue, ErrorMessage = "Total amount must be greater than 0")]
+            [Display(Name = "Total Amount")]
             public decimal TotalAmount { get; set; }
 
-            /// <summary>
-            /// Trạng thái thanh toán: "Chưa thanh toán" hoặc "Đã thanh toán"
-            /// </summary>
-            [Required(ErrorMessage = "Vui lòng chọn trạng thái thanh toán")]
-            [Display(Name = "Trạng thái thanh toán")]
-            public string PaymentStatus { get; set; } = "Chưa thanh toán";
+            [Required(ErrorMessage = "Please select payment status")]
+            [Display(Name = "Payment Status")]
+            public string PaymentStatus { get; set; } = "Unpaid";
 
-            /// <summary>
-            /// Ghi chú (không bắt buộc, tối đa 500 ký tự)
-            /// </summary>
-            [StringLength(500, ErrorMessage = "Ghi chú không được vượt quá 500 ký tự")]
-            [Display(Name = "Ghi chú")]
+            [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
+            [Display(Name = "Notes")]
             public string? Notes { get; set; }
         }
     }

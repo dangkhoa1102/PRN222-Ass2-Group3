@@ -1,5 +1,4 @@
-﻿using Business_Logic_Layer.Interfaces;
-using DataAccess_Layer.Repositories;
+﻿using DataAccess_Layer.Repositories;
 using EVDealerDbContext;
 using EVDealerDbContext.Models;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +15,6 @@ namespace Business_Logic_Layer.Services
         }
 
         // ==================== ORDER OPERATIONS ====================
-
 
         public async Task<Dealer?> GetFirstDealerAsync()
         {
@@ -129,14 +127,13 @@ namespace Business_Logic_Layer.Services
         }
 
         // ==================== CUSTOMER OPERATIONS ====================
-        // ✅ FIX 1: GetCustomerByIdAsync - Thêm kiểm tra IsActive
+
         public async Task<User?> GetCustomerByIdAsync(Guid id)
         {
             try
             {
                 using var _context = new EVDealerSystemContext();
 
-                // ✅ Sử dụng FirstOrDefaultAsync thay vì FindAsync để có thể filter
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u => u.Id == id &&
                                              u.Role == "Customer" &&
@@ -146,25 +143,23 @@ namespace Business_Logic_Layer.Services
             }
             catch (Exception ex)
             {
-                // ✅ Log exception để debug
                 System.Diagnostics.Debug.WriteLine($"GetCustomerByIdAsync ERROR: {ex.Message}");
                 return null;
             }
         }
 
-        // ✅ FIX 2: CreateCustomerAsync - KHÔNG throw exception trong try-catch
         public async Task<User?> CreateCustomerAsync(User user)
         {
             try
             {
                 using var _context = new EVDealerSystemContext();
 
-                // ✅ Kiểm tra phone tồn tại - RETURN NULL thay vì throw
+                // Kiểm tra phone tồn tại
                 var phoneExists = await _context.Users.AnyAsync(u => u.Phone == user.Phone);
                 if (phoneExists)
                 {
                     System.Diagnostics.Debug.WriteLine($"Phone already exists: {user.Phone}");
-                    return null; // ✅ Trả về null thay vì throw exception
+                    return null;
                 }
 
                 // Set default values
@@ -193,13 +188,11 @@ namespace Business_Logic_Layer.Services
             }
             catch (Exception ex)
             {
-                // ✅ Log và return null
                 System.Diagnostics.Debug.WriteLine($"CreateCustomerAsync ERROR: {ex.Message}");
                 return null;
             }
         }
 
-        // ✅ BONUS: Thêm method để kiểm tra khách hàng tồn tại theo phone
         public async Task<User?> GetCustomerByPhoneAsync(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone))
@@ -222,7 +215,6 @@ namespace Business_Logic_Layer.Services
             }
         }
 
-        // ✅ Method SearchCustomersAsync giữ nguyên
         public async Task<IEnumerable<User>> SearchCustomersAsync(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
@@ -251,6 +243,7 @@ namespace Business_Logic_Layer.Services
         }
 
         // ==================== VEHICLE OPERATIONS ====================
+
         public async Task<IEnumerable<Vehicle>> GetAvailableVehiclesAsync()
         {
             try
@@ -282,6 +275,7 @@ namespace Business_Logic_Layer.Services
         }
 
         // ==================== BUSINESS LOGIC ====================
+
         public string GenerateOrderNumber()
         {
             return $"ORD{DateTime.Now:yyyyMMddHHmmss}";
@@ -297,6 +291,8 @@ namespace Business_Logic_Layer.Services
 
             return vehicle.Price * quantity;
         }
+
+        // ==================== ORDER HISTORY ====================
 
         public async Task<IEnumerable<OrderHistory>> GetOrderHistoryAsync(Guid orderId)
         {
@@ -315,7 +311,13 @@ namespace Business_Logic_Layer.Services
             }
         }
 
+        public async Task<IEnumerable<OrderHistory>> GetOrderHistoryByOrderIdAsync(Guid orderId)
+        {
+            return await GetOrderHistoryAsync(orderId);
+        }
+
         // ==================== PRIVATE HELPER ====================
+
         private async Task CreateOrderHistoryAsync(Guid orderId, string status, string notes, Guid userId)
         {
             try
