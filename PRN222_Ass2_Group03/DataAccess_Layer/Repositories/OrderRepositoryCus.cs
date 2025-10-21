@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess_Layer.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepositoryCus : IOrderRepositoryCus
     {
         private readonly EVDealerSystemContext _context;
 
-        public OrderRepository(EVDealerSystemContext context)
+        public OrderRepositoryCus(EVDealerSystemContext context)
         {
             _context = context;
         }

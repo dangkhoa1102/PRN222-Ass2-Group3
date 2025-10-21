@@ -7,12 +7,12 @@ namespace Assignment02.Pages.Orders
 {
     public class DetailsModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
 
         public Order? Order { get; set; }
         public string? CurrentUserRole { get; set; }
 
-        public DetailsModel(IOrderService orderService)
+        public DetailsModel(IOrderServiceCus orderService)
         {
             _orderService = orderService;
         }

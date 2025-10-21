@@ -8,11 +8,11 @@ namespace Assignment02.Pages.Orders
 {
     public class PendingOrdersModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
 
         public IEnumerable<Order> PendingOrders { get; set; } = Enumerable.Empty<Order>();
 
-        public PendingOrdersModel(IOrderService orderService)
+        public PendingOrdersModel(IOrderServiceCus orderService)
         {
             _orderService = orderService;
         }

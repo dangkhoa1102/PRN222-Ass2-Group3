@@ -15,7 +15,7 @@ builder.Services.AddScoped<ServiceFactory>();
 
 // Register Services through Factory
 builder.Services.AddScoped<IUserService>(provider => provider.GetRequiredService<ServiceFactory>().CreateUserService());
-builder.Services.AddScoped<IOrderService>(provider => provider.GetRequiredService<ServiceFactory>().CreateOrderService());
+builder.Services.AddScoped<IOrderServiceCus>(provider => provider.GetRequiredService<ServiceFactory>().CreateOrderService());
 builder.Services.AddScoped<ICustomerTestDriveAppointmentService>(provider => provider.GetRequiredService<ServiceFactory>().CreateCustomerTestDriveAppointmentService());
 builder.Services.AddScoped<IVehicleService>(provider => provider.GetRequiredService<ServiceFactory>().CreateVehicleService());
 

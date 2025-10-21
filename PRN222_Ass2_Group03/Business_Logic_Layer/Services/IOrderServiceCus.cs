@@ -2,7 +2,7 @@
 
 namespace Business_Logic_Layer.Services
 {
-    public interface IOrderService
+    public interface IOrderServiceCus
     {
         Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId);
         Task<IEnumerable<Order>> GetOrderHistoryAsync(Guid userId);

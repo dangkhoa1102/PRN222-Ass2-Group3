@@ -7,11 +7,11 @@ namespace Assignment02.Pages.Orders
 {
     public class MyOrdersModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
 
         public List<Order> Orders { get; set; } = new();
 
-        public MyOrdersModel(IOrderService orderService)
+        public MyOrdersModel(IOrderServiceCus orderService)
         {
             _orderService = orderService;
         }

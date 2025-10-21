@@ -33,11 +33,11 @@ namespace Business_Logic_Layer.Services
             return new UserService(userRepository, logger);
         }
 
-        public IOrderService CreateOrderService()
+        public IOrderServiceCus CreateOrderService()
         {
             var context = CreateDbContext();
-            var orderRepository = new OrderRepository(context);
-            return new OrderService(orderRepository);
+            var orderRepository = new OrderRepositoryCus(context);
+            return new OrderServiceCus(orderRepository);
         }
 
         public ICustomerTestDriveAppointmentService CreateCustomerTestDriveAppointmentService()

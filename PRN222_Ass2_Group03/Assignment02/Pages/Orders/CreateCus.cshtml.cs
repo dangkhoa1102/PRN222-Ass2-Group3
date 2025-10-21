@@ -8,10 +8,10 @@ namespace Assignment02.Pages.Orders
 {
     public class CreateModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
 
-        public CreateModel(IOrderService orderService, ICustomerTestDriveAppointmentService testDriveService)
+        public CreateModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService)
         {
             _orderService = orderService;
             _testDriveService = testDriveService;

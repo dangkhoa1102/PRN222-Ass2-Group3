@@ -7,7 +7,7 @@ namespace Assignment02.Pages.Orders
 {
     public class PaymentModel : PageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
 
         public Order? Order { get; set; }
         public string SuccessMessage { get; set; } = string.Empty;
@@ -16,7 +16,7 @@ namespace Assignment02.Pages.Orders
         [BindProperty]
         public string PaymentMethod { get; set; } = string.Empty;
 
-        public PaymentModel(IOrderService orderService)
+        public PaymentModel(IOrderServiceCus orderService)
         {
             _orderService = orderService;
         }

@@ -7,9 +7,9 @@ namespace Assignment02.Pages.Admin
 {
     public class ManageOrdersModel : AuthenticatedPageModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderServiceCus _orderService;
 
-        public ManageOrdersModel(IOrderService orderService)
+        public ManageOrdersModel(IOrderServiceCus orderService)
         {
             _orderService = orderService;
         }
