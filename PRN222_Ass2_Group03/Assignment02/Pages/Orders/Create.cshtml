@@ -126,6 +126,10 @@
             <select asp-for="SelectedVehicleId" asp-items="Model.VehiclesList" required>
                 <option value="">-- Select Vehicle --</option>
             </select>
+            @if (Model.SelectedVehicleId != Guid.Empty)
+            {
+                <small class="form-text text-muted">Vehicle pre-selected from details page.</small>
+            }
         </div>
 
         <div class="form-group mb-3">

@@ -32,7 +32,7 @@ namespace Assignment02.Pages.Orders
         public string SuccessMessage { get; set; }
         public string ErrorMessage { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(Guid? vehicleId)
         {
             var dealers = await _testDriveService.GetAllDealersAsync();
             DealersList = dealers.Select(d => new SelectListItem
@@ -47,6 +47,12 @@ namespace Assignment02.Pages.Orders
                 Value = v.Id.ToString(),
                 Text = v.Name
             }).ToList();
+
+            // Pre-select vehicle if vehicleId is provided
+            if (vehicleId.HasValue)
+            {
+                SelectedVehicleId = vehicleId.Value;
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()

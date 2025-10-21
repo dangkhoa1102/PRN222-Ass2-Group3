@@ -1,9 +1,6 @@
 ﻿using DataAccess_Layer.Repositories;
 using EVDealerDbContext.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Business_Logic_Layer.DTOs;
 
 namespace Business_Logic_Layer.Services
 {
@@ -87,6 +84,39 @@ namespace Business_Logic_Layer.Services
             return await _orderRepository.GetAll();
         }
 
+        public async Task<List<OrderDTO>> GetAllOrdersDTOAsync()
+        {
+            var orders = await _orderRepository.GetAll();
+            var orderDTOs = new List<OrderDTO>();
+
+            foreach (var order in orders)
+            {
+                var orderDTO = new OrderDTO
+                {
+                    Id = order.Id,
+                    OrderNumber = order.OrderNumber,
+                    CustomerId = order.CustomerId,
+                    CustomerName = order.Customer?.FullName ?? order.Customer?.Username ?? "Unknown",
+                    DealerId = order.DealerId,
+                    DealerName = order.Dealer?.Name ?? "Unknown",
+                    VehicleId = order.VehicleId,
+                    VehicleName = order.Vehicle?.Name ?? "Unknown",
+                    VehicleBrand = order.Vehicle?.Brand ?? "",
+                    VehicleModel = order.Vehicle?.Model ?? "",
+                    VehicleImage = order.Vehicle?.Images ?? "",
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status ?? "Unknown",
+                    PaymentStatus = order.PaymentStatus ?? "Unknown",
+                    Notes = order.Notes ?? "",
+                    CreatedAt = order.CreatedAt,
+                    UpdatedAt = order.UpdatedAt
+                };
+                orderDTOs.Add(orderDTO);
+            }
+
+            return orderDTOs;
+        }
+
         // 🔹 Cập nhật trạng thái đơn hàng
         public async Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus)
         {
@@ -95,6 +125,16 @@ namespace Business_Logic_Layer.Services
                 return false;
 
             order.Status = newStatus;
+            order.UpdatedAt = DateTime.Now;
+            return await _orderRepository.Update(order);
+        }
+
+        // 🔹 Cập nhật toàn bộ đơn hàng
+        public async Task<bool> UpdateOrderAsync(Order order)
+        {
+            if (order == null)
+                return false;
+
             order.UpdatedAt = DateTime.Now;
             return await _orderRepository.Update(order);
         }
