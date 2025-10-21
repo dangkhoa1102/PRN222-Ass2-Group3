@@ -31,19 +31,19 @@ namespace Assignment02.Pages
         public async Task OnGetAsync(Guid? vehicleId)
         {
             Dealers = (await _appointmentService.GetAllDealersAsync()).ToList();
-            Vehicles = new List<Vehicle>();
             AvailableTimeSlots = new List<TestDriveAppointment>();
+            
+            // Always load all vehicles for selection
+            var allVehicles = await _vehicleService.GetAllVehiclesAsync();
+            Vehicles = allVehicles.ToList();
             
             // Pre-select vehicle if vehicleId is provided
             if (vehicleId.HasValue)
             {
-                var allVehicles = await _vehicleService.GetAllVehiclesAsync();
                 var selectedVehicle = allVehicles.FirstOrDefault(v => v.Id == vehicleId.Value);
                 if (selectedVehicle != null)
                 {
                     Appointment.VehicleId = selectedVehicle.Id;
-                    // Load all vehicles for selection
-                    Vehicles = allVehicles.ToList();
                 }
             }
         }
