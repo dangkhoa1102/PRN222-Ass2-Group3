@@ -80,6 +80,13 @@ namespace Assignment02.Pages.Orders
                     return Forbid();
                 }
 
+                // Check if order is already paid (for staff/admin)
+                if (isPrivileged && string.Equals(order.PaymentStatus, "Paid", StringComparison.OrdinalIgnoreCase))
+                {
+                    TempData["ErrorMessage"] = "Không thể hủy đơn hàng đã thanh toán.";
+                    return RedirectToPage();
+                }
+
                 bool result = await _orderService.CancelOrderAsync(id, "Cancelled by user");
 
                 if (result)

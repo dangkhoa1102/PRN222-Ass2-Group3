@@ -14,6 +14,7 @@ namespace Assignment02.Pages.TestDrives
         }
 
         public List<TestDriveAppointmentDTO> History { get; set; } = new();
+        public string CurrentUserId => UserId ?? "";
 
         public async Task<IActionResult> OnGetAsync()
         {

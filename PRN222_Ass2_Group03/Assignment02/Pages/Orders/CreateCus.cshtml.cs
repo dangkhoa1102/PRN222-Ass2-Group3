@@ -32,6 +32,7 @@ namespace Assignment02.Pages.Orders
 
         public List<SelectListItem> DealersList { get; set; }
         public List<SelectListItem> VehiclesList { get; set; }
+        public VehicleDTO? SelectedVehicle { get; set; }
 
         public string SuccessMessage { get; set; }
         public string ErrorMessage { get; set; }
@@ -56,6 +57,38 @@ namespace Assignment02.Pages.Orders
             if (vehicleId.HasValue)
             {
                 SelectedVehicleId = vehicleId.Value;
+                // Load vehicle details
+                var allVehicles = await _testDriveService.GetAvailableVehiclesAsync(Guid.Empty);
+                SelectedVehicle = allVehicles.FirstOrDefault(v => v.Id == vehicleId.Value);
+            }
+        }
+
+        public async Task<IActionResult> OnGetGetVehicleInfoAsync(Guid vehicleId)
+        {
+            try
+            {
+                var allVehicles = await _testDriveService.GetAvailableVehiclesAsync(Guid.Empty);
+                var vehicle = allVehicles.FirstOrDefault(v => v.Id == vehicleId);
+                
+                if (vehicle != null)
+                {
+                    return new JsonResult(new
+                    {
+                        id = vehicle.Id,
+                        name = vehicle.Name,
+                        brand = vehicle.Brand,
+                        model = vehicle.Model,
+                        year = vehicle.Year,
+                        price = vehicle.Price,
+                        images = vehicle.Images
+                    });
+                }
+                
+                return new JsonResult(new { error = "Vehicle not found" });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = ex.Message });
             }
         }
 

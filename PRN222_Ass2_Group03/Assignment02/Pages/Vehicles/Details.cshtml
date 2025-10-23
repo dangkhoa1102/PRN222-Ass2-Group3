@@ -1,7 +1,7 @@
 @page "/Vehicles/Details/{id}"
 @model Assignment02.Pages.Vehicles.DetailsModel
 @{
-    ViewData["Title"] = "Chi tiết xe";
+    ViewData["Title"] = "Vehicle Details - EV Dealer System";
 }
 
 @section Styles {
@@ -336,13 +336,13 @@
 
             <div class="vehicle-info-grid">
                 <div class="info-card">
-                    <h3><i class="fas fa-info-circle"></i> Thông tin cơ bản</h3>
+                    <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
                     <div class="info-item">
-                        <span class="info-label">Tên xe:</span>
+                        <span class="info-label">Vehicle Name:</span>
                         <span class="info-value">@Model.Vehicle.Name</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Hãng:</span>
+                        <span class="info-label">Brand:</span>
                         <span class="info-value">@Model.Vehicle.Brand</span>
                     </div>
                     <div class="info-item">
@@ -350,23 +350,23 @@
                         <span class="info-value">@Model.Vehicle.Model</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Năm sản xuất:</span>
+                        <span class="info-label">Manufacturing Year:</span>
                         <span class="info-value">@Model.Vehicle.Year</span>
                     </div>
                 </div>
 
                 <div class="info-card">
-                    <h3><i class="fas fa-warehouse"></i> Thông tin kho</h3>
+                    <h3><i class="fas fa-warehouse"></i> Inventory Information</h3>
                     <div class="info-item">
-                        <span class="info-label">Số lượng tồn kho:</span>
+                        <span class="info-label">Quantity in Stock:</span>
                         <span class="info-value">@Model.Vehicle.StockQuantity</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Trạng thái:</span>
-                        <span class="info-value">@(Model.Vehicle.IsActive == true ? "Hoạt động" : "Ngừng hoạt động")</span>
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">@(Model.Vehicle.IsActive == true ? "Active" : "Inactive")</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Ngày tạo:</span>
+                        <span class="info-label">Creation Date:</span>
                         <span class="info-value">@Model.Vehicle.CreatedAt?.ToString("dd/MM/yyyy")</span>
                     </div>
                 </div>
@@ -375,7 +375,7 @@
             @if (!string.IsNullOrEmpty(Model.Vehicle.Description))
             {
                 <div class="description-section">
-                    <h3><i class="fas fa-align-left"></i> Mô tả</h3>
+                    <h3><i class="fas fa-align-left"></i> Description</h3>
                     <p>@Model.Vehicle.Description</p>
                 </div>
             }
@@ -383,7 +383,7 @@
             @if (!string.IsNullOrEmpty(Model.Vehicle.Specifications))
             {
                 <div class="specifications-section">
-                    <h3><i class="fas fa-cogs"></i> Thông số kỹ thuật</h3>
+                    <h3><i class="fas fa-cogs"></i> Technical Specifications</h3>
                     <div class="spec-list">
                         @try
                         {
@@ -409,7 +409,7 @@
             <div class="action-buttons">
                 <a href="/BookTestDrive?vehicleId=@Model.Vehicle.Id" class="btn-action btn-test-drive">
                     <i class="fas fa-car-side"></i>
-                    Đặt lịch lái thử
+                    Book Test Drive
                 </a>
                 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
                 @{ var role = HttpContextAccessor.HttpContext?.Session.GetString("Role"); }
@@ -418,27 +418,27 @@
                 {
                     <a href="/Orders/CreateCus?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
                         <i class="fas fa-shopping-cart"></i>
-                        Mua xe
+                        Buy Car
                     </a>
                 }
                 @if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
                 {
                     <a href="/Orders/CreateOrder?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
                         <i class="fas fa-shopping-cart"></i>
-                        Mua xe
+                        Buy Car
                     </a>
                     <a href="/Vehicles/Edit/@Model.Vehicle.Id" class="btn-action btn-edit">
                         <i class="fas fa-edit"></i>
-                        Chỉnh sửa
+                        Edit
                     </a>
                     <a href="/Vehicles/Delete/@Model.Vehicle.Id" class="btn-action btn-delete">
                         <i class="fas fa-trash"></i>
-                        Xóa
+                        Delete
                     </a>
                 }
                 <a href="/Vehicles/Index" class="btn-action btn-back">
                     <i class="fas fa-arrow-left"></i>
-                    Quay lại
+                    Back
                 </a>
             </div>
         </div>

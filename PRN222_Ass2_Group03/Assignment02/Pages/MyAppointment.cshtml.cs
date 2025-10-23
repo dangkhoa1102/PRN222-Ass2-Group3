@@ -22,6 +22,7 @@ namespace Assignment02.Pages
         public string CancelNote { get; set; } = string.Empty;
 
         public string UserRole => CurrentUserRole ?? "Customer";
+        public string CurrentUserId => UserId ?? "";
 
         public async Task OnGetAsync()
         {
@@ -45,7 +46,9 @@ namespace Assignment02.Pages
             // Hiển thị các lịch hiện tại/đang xử lý + Completed (để user mark Done)
             Appointments = allAppointments
                 .Where(a =>
-                    (a.Status != null && a.Status.ToLower() != "cancelled" && a.Status.ToLower() != "done")
+                    (a.Status != null && 
+                     a.Status.ToLower() != "cancelled" && 
+                     a.Status.ToLower() != "done")
                     && a.AppointmentDate >= DateTime.Now.AddDays(-1))
                 .OrderBy(a => a.AppointmentDate)
                 .ToList();
@@ -65,46 +68,44 @@ namespace Assignment02.Pages
                 return RedirectToPage("/Login");
             }
 
-            // Kiểm tra phân quyền: Chỉ cho phép cancel appointment của chính mình (trừ admin/staff)
-            if (string.Equals(UserRole, "Customer", StringComparison.OrdinalIgnoreCase))
-            {
-                // Kiểm tra xem appointment có thuộc về user này không
-                var appointment = Appointments.FirstOrDefault(a => a.Id == id);
-                if (appointment == null || appointment.CustomerId != userId)
-                {
-                    ModelState.AddModelError("", "Bạn chỉ có thể hủy lịch hẹn của chính mình.");
-                    Appointments = await _appointmentService.GetCustomerAppointmentsAsync(userId);
-                    return Page();
-                }
-            }
-
             try
             {
                 // Gọi hàm CancelAppointmentAsync với note từ form
                 var success = await _appointmentService.CancelAppointmentAsync(id, userId, CancelNote);
                 if (!success)
                 {
-                    ModelState.AddModelError("", "Không thể hủy lịch hẹn. Vui lòng kiểm tra lại.");
+                    TempData["ErrorMessage"] = "Unable to cancel the appointment. Please try again.";
                 }
                 else
                 {
-                    // Gửi SignalR notification
+                    TempData["SuccessMessage"] = "Appointment has been cancelled successfully.";
+                    
+                    // Send SignalR notification
                     var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
                     if (appointment != null)
                     {
+                        Console.WriteLine($"Sending SignalR notification for cancelled appointment: {appointment.Id}");
                         await _notificationService.NotifyTestDriveCancelled(
                             appointment.Customer?.FullName ?? "Unknown Customer",
                             appointment.Vehicle?.Name ?? "Unknown Vehicle"
                         );
-                        await _notificationService.NotifyPageReload("appointments", "cancelled_by_customer");
+                        await _notificationService.NotifyPageReload("appointments", "cancelled");
+                        Console.WriteLine("SignalR notifications sent successfully");
                     }
-                    
-                    TempData["SuccessMessage"] = "Lịch hẹn đã được hủy thành công.";
+                    else
+                    {
+                        Console.WriteLine("Appointment not found for SignalR notification");
+                    }
                 }
             }
             catch (InvalidOperationException ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                TempData["ErrorMessage"] = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while cancelling the appointment.";
+                Console.WriteLine($"Error cancelling appointment: {ex.Message}");
             }
 
             // Làm mới danh sách và quay lại trang với thông báo
@@ -125,11 +126,23 @@ namespace Assignment02.Pages
             var success = await _appointmentService.MarkDoneByCustomerAsync(id, userId);
             if (!success)
             {
-                TempData["ErrorMessage"] = "Không thể đánh dấu hoàn thành.";
+                TempData["ErrorMessage"] = "Unable to mark as done.";
             }
             else
             {
-                TempData["SuccessMessage"] = "Đã đánh dấu hoàn thành!";
+                TempData["SuccessMessage"] = "Appointment marked as done successfully!";
+                
+                // Send SignalR notification
+                var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
+                if (appointment != null)
+                {
+                    await _notificationService.NotifyTestDriveUpdated(
+                        appointment.Customer?.FullName ?? "Unknown Customer",
+                        appointment.Vehicle?.Name ?? "Unknown Vehicle",
+                        "Done"
+                    );
+                    await _notificationService.NotifyPageReload("appointments", "done");
+                }
             }
             return RedirectToPage();
         }

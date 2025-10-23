@@ -96,19 +96,147 @@
         color: #721c24;
     }
 
-    @@media (max-width: 768px) {
-        .create-container
-
-    {
+    .vehicle-info-card {
+        background: #f8f9fa;
+        border-radius: 8px;
         padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #28a745;
     }
 
-    select, textarea {
-        font-size: 0.95rem;
+    .vehicle-info-title {
+        font-weight: 600;
+        color: #28a745;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
     }
 
+    .vehicle-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .vehicle-detail-item {
+        background: white;
+        padding: 10px;
+        border-radius: 6px;
+        border-left: 3px solid #007bff;
+    }
+
+    .vehicle-detail-label {
+        font-weight: 600;
+        color: #007bff;
+        font-size: 0.9rem;
+    }
+
+    .vehicle-detail-value {
+        color: #495057;
+        margin-top: 5px;
+    }
+
+    .vehicle-image {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        margin-top: 10px;
+    }
+
+    .no-image {
+        text-align: center;
+        color: #6c757d;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 10px;
     }
 </style>
+
+<script>
+    // Vehicle selection handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const vehicleSelect = document.getElementById('SelectedVehicleId');
+        if (vehicleSelect) {
+            vehicleSelect.addEventListener('change', async function() {
+                const selectedVehicleId = this.value;
+                if (selectedVehicleId) {
+                    await updateVehicleInfo(selectedVehicleId);
+                } else {
+                    hideVehicleInfo();
+                }
+            });
+            
+            // Auto-select vehicle if vehicleId is provided in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const vehicleId = urlParams.get('vehicleId');
+            
+            if (vehicleId) {
+                vehicleSelect.value = vehicleId;
+                // Trigger change event to show vehicle info
+                vehicleSelect.dispatchEvent(new Event('change'));
+            }
+        }
+    });
+
+    async function updateVehicleInfo(vehicleId) {
+        try {
+            const response = await fetch(`/Orders/CreateCus?handler=GetVehicleInfo&vehicleId=${vehicleId}`);
+            if (response.ok) {
+                const vehicleInfo = await response.json();
+                displayVehicleInfo(vehicleInfo);
+            }
+        } catch (error) {
+            console.error('Error loading vehicle info:', error);
+        }
+    }
+
+    function displayVehicleInfo(vehicle) {
+        const vehicleInfoCard = document.getElementById('vehicleInfoCard');
+        if (vehicleInfoCard) {
+            vehicleInfoCard.innerHTML = `
+                <div class="vehicle-info-title">🚗 Vehicle Information</div>
+                <div class="vehicle-details">
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Vehicle Name</div>
+                        <div class="vehicle-detail-value">${vehicle.name}</div>
+                    </div>
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Brand</div>
+                        <div class="vehicle-detail-value">${vehicle.brand}</div>
+                    </div>
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Model</div>
+                        <div class="vehicle-detail-value">${vehicle.model}</div>
+                    </div>
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Year</div>
+                        <div class="vehicle-detail-value">${vehicle.year}</div>
+                    </div>
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Price</div>
+                        <div class="vehicle-detail-value">${vehicle.price.toLocaleString()} ₫</div>
+                    </div>
+                </div>
+                ${vehicle.images ? 
+                    `<img src="${vehicle.images}" alt="${vehicle.name}" class="vehicle-image" />` : 
+                    `<div class="no-image">
+                        <i class="fas fa-car" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>No image available</p>
+                    </div>`
+                }
+            `;
+            vehicleInfoCard.style.display = 'block';
+        }
+    }
+
+    function hideVehicleInfo() {
+        const vehicleInfoCard = document.getElementById('vehicleInfoCard');
+        if (vehicleInfoCard) {
+            vehicleInfoCard.style.display = 'none';
+        }
+    }
+</script>
 
 <div class="create-container">
     <h2>Create New Order</h2>
@@ -130,6 +258,11 @@
             {
                 <small class="form-text text-muted">Vehicle pre-selected from details page.</small>
             }
+        </div>
+
+        <!-- Vehicle Information Display -->
+        <div id="vehicleInfoCard" class="vehicle-info-card" style="display: none;">
+            <!-- Vehicle info will be populated by JavaScript -->
         </div>
 
         <div class="form-group mb-3">
