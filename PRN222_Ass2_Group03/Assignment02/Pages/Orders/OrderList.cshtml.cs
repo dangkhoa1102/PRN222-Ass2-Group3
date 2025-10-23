@@ -108,6 +108,8 @@ namespace Assignment02.Pages.Orders
                 }
 
                 var userId = Guid.Parse(userIdString);
+
+                // ✅ Gọi đúng hàm trong OrderService
                 var success = await _orderService.UpdateOrderStatusAsync(id, status, userId);
 
                 if (success)

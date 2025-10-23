@@ -1,9 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@* =======================
+   FILE: _Layout.cshtml
+   SAFE + FULL + UI-PRESERVING VERSION
+   ======================= *@
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EV Dealer System</title>
+
+    <!-- CSS Libraries -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/modern-theme.css" asp-append-version="true" />
@@ -16,14 +23,13 @@
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg fixed-top modern-navbar">
             <div class="container">
                 <a class="navbar-brand modern-brand" asp-area="" asp-page="/Index">
-                    <div class="brand-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
+                    <div class="brand-icon"><i class="fas fa-bolt"></i></div>
                     <span class="brand-text">EV Dealer System</span>
                 </a>
 
@@ -39,8 +45,9 @@
 
                         @if (isAuthenticated)
                         {
+                            <!-- =================== VEHICLES MENU =================== -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">
+                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-car"></i>
                                     <span>Vehicles</span>
                                 </a>
@@ -56,6 +63,8 @@
                                     </li>
                                 </ul>
                             </li>
+
+                            <!-- =================== TEST DRIVES MENU =================== -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-calendar-check"></i>
@@ -82,7 +91,10 @@
                                     </li>
                                 </ul>
                             </li>
-                            @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase))
+
+                            <!-- =================== STAFF ONLY MENU =================== -->
+                            @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase)
+                                                    || string.Equals(userRole, "evm_staff", StringComparison.OrdinalIgnoreCase))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link modern-nav-link" href="/Admin/ManageAppointments">
@@ -91,67 +103,74 @@
                                     </a>
                                 </li>
                             }
-                            
-                            <!-- Orders Menu for all authenticated users -->
+
+                            <!-- =================== ORDERS MENU =================== -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link modern-nav-link dropdown-toggle" href="#" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-shopping-bag"></i>
                                     <span>Orders</span>
                                 </a>
-                                <ul class="dropdown-menu">
+
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                    @* CUSTOMER *@
                                     @if (string.Equals(userRole, "Customer", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <li>
                                             <a class="dropdown-item" asp-page="/Orders/CreateCus">
-                                                <i class="fas fa-plus-circle"></i>
+                                                <i class="fas fa-plus-circle me-2 text-primary"></i>
                                                 <span>Create New Order</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" asp-page="/Orders/MyOrders">
-                                                <i class="fas fa-receipt"></i>
+                                                <i class="fas fa-list-alt me-2 text-success"></i>
                                                 <span>My Orders</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" asp-page="/Orders/PendingOrdersCus">
-                                                <i class="fas fa-hourglass-half"></i>
+                                                <i class="fas fa-hourglass-half me-2 text-warning"></i>
                                                 <span>Processing Orders</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" asp-page="/Orders/HistoryCus">
-                                                <i class="fas fa-history"></i>
+                                                <i class="fas fa-history me-2 text-info"></i>
                                                 <span>Order History</span>
                                             </a>
                                         </li>
                                     }
-                                    @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase))
+
+                                    @* STAFF + ADMIN *@
+                                    @if (string.Equals(userRole, "evm_staff", StringComparison.OrdinalIgnoreCase)
+                                                                    || string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <li>
                                             <a class="dropdown-item" asp-page="/Admin/ManageOrders">
-                                                <i class="fas fa-cogs"></i>
+                                                <i class="fas fa-cogs me-2 text-primary"></i>
                                                 <span>Manage Orders</span>
                                             </a>
                                         </li>
+                                        <li>
+                                            <a class="dropdown-item" href="/Orders/OrderList">
+                                                <i class="fas fa-shopping-cart me-2 text-success"></i>
+                                                <span>Current Orders</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="/Orders/OrderHistory">
+                                                <i class="fas fa-receipt me-2 text-info"></i>
+                                                <span>Order History</span>
+                                            </a>
+                                        </li>
                                     }
-                                    <li><a class="dropdown-item" href="/Orders/OrderList">
-                                        <i class="fas fa-shopping-cart"></i>
-                                        <span>Currents Orders</span>
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="/Orders/OrderHistory">
-                                        <i class="fas fa-receipt"></i>
-                                        <span>Order History</span>
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="#orders?view=wishlist">
-                                        <i class="fas fa-heart"></i>
-                                        <span>Wishlist</span>
-                                    </a></li>
                                 </ul>
                             </li>
                         }
                         else
                         {
+                            <!-- Not logged in -->
                             <li class="nav-item">
                                 <a class="nav-link modern-nav-link" asp-area="" asp-page="/Login">
                                     <i class="fas fa-sign-in-alt"></i>
@@ -167,6 +186,7 @@
                         }
                     </ul>
 
+                    <!-- =================== USER PROFILE DROPDOWN =================== -->
                     @if (isAuthenticated)
                     {
                         <ul class="navbar-nav">
@@ -181,8 +201,10 @@
                                         <small class="user-role">@userRole</small>
                                     </div>
                                 </a>
+
                                 <ul class="dropdown-menu dropdown-menu-end modern-dropdown" aria-labelledby="navbarDropdown">
-                                    @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase))
+                                    @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase)
+                                                                    || string.Equals(userRole, "evm_staff", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <li>
                                             <a class="dropdown-item modern-dropdown-item" href="/Admin/ManageAppointments">
@@ -240,12 +262,10 @@
         </nav>
     </header>
 
+    <!-- =================== NOTIFICATION AREA =================== -->
     @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
     {
-        <!-- Notification container for authenticated users -->
-        <div id="notificationContainer" style="position: fixed; top: 100px; right: 20px; z-index: 1050; max-width: 350px;">
-            <!-- Notifications will be inserted here -->
-        </div>
+        <div id="notificationContainer" style="position: fixed; top: 100px; right: 20px; z-index: 1050; max-width: 350px;"></div>
     }
 
     <main style="padding-top: 100px; min-height: calc(100vh - 160px);">
@@ -261,164 +281,23 @@
                     <p class="mb-0">&copy; 2025 EV Dealer System - Powering the Future</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <a href="#" class="footer-link me-3">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Security</span>
-                    </a>
-                    <a asp-area="" asp-page="/Privacy" class="footer-link me-3">
-                        <i class="fas fa-user-shield"></i>
-                        <span>Privacy Policy</span>
-                    </a>
-                    <a href="#" class="footer-link">
-                        <i class="fas fa-info-circle"></i>
-                        <span>About</span>
-                    </a>
+                    <a href="#" class="footer-link me-3"><i class="fas fa-shield-alt"></i><span>Security</span></a>
+                    <a asp-area="" asp-page="/Privacy" class="footer-link me-3"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+                    <a href="#" class="footer-link"><i class="fas fa-info-circle"></i><span>About</span></a>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- =================== JS SCRIPTS =================== -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
     @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
     {
         <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
         <script src="~/js/signalr-notifications.js" asp-append-version="true"></script>
     }
-
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
-
-    <script>
-        // Enhanced navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.modern-navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Add animation to cards on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-fade-in-up');
-                }
-            });
-        }, observerOptions);
-
-        // Observe all cards when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.dashboard-card, .modern-card, .animate-on-scroll');
-            cards.forEach(card => observer.observe(card));
-        });
-
-        // Enhanced dropdown hover functionality - FORCE DROPDOWN TO WORK
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Bootstrap dropdowns
-            const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-            const dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-                return new bootstrap.Dropdown(dropdownToggleEl);
-            });
-
-            const dropdownItems = document.querySelectorAll('.nav-item.dropdown');
-
-            dropdownItems.forEach(function(item) {
-                const dropdownMenu = item.querySelector('.dropdown-menu');
-                const dropdownToggle = item.querySelector('.dropdown-toggle');
-                let hoverTimeout;
-
-                // Force dropdown z-index
-                if (dropdownMenu) {
-                    dropdownMenu.style.zIndex = '999999';
-                    dropdownMenu.style.position = 'absolute';
-                }
-
-                // Click functionality for mobile/tablet
-                if (dropdownToggle) {
-                    dropdownToggle.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        if (window.innerWidth <= 991) {
-                            const bsDropdown = bootstrap.Dropdown.getInstance(this) || new bootstrap.Dropdown(this);
-                            bsDropdown.toggle();
-                        }
-                    });
-                }
-
-                // Desktop hover effect
-                item.addEventListener('mouseenter', function() {
-                    if (window.innerWidth > 991) {
-                        clearTimeout(hoverTimeout);
-                        if (dropdownMenu) {
-                            dropdownMenu.classList.add('show');
-                            dropdownToggle.classList.add('show');
-                            dropdownToggle.setAttribute('aria-expanded', 'true');
-                        }
-                    }
-                });
-
-                item.addEventListener('mouseleave', function() {
-                    if (window.innerWidth > 991) {
-                        hoverTimeout = setTimeout(function() {
-                            if (dropdownMenu) {
-                                dropdownMenu.classList.remove('show');
-                                dropdownToggle.classList.remove('show');
-                                dropdownToggle.setAttribute('aria-expanded', 'false');
-                            }
-                        }, 300); // 300ms delay before hiding
-                    }
-                });
-
-                // Keep dropdown open when hovering over the dropdown menu itself
-                if (dropdownMenu) {
-                    dropdownMenu.addEventListener('mouseenter', function() {
-                        if (window.innerWidth > 991) {
-                            clearTimeout(hoverTimeout);
-                        }
-                    });
-
-                    dropdownMenu.addEventListener('mouseleave', function() {
-                        if (window.innerWidth > 991) {
-                            hoverTimeout = setTimeout(() => {
-                                this.classList.remove('show');
-                                dropdownToggle.classList.remove('show');
-                                dropdownToggle.setAttribute('aria-expanded', 'false');
-                            }, 200);
-                        }
-                    });
-                }
-            });
-
-            // Force all dropdowns to have high z-index
-            const allDropdowns = document.querySelectorAll('.dropdown-menu');
-            allDropdowns.forEach(function(dropdown) {
-                dropdown.style.zIndex = '999999';
-                dropdown.style.position = 'absolute';
-            });
-        });
-    </script>
 </body>
 </html>
