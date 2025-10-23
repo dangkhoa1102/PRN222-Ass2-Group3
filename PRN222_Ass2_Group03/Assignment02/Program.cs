@@ -1,5 +1,8 @@
 ﻿using Assignment02.Hubs;
 using Business_Logic_Layer.Services;
+using DataAccess_Layer.Repositories;
+using EVDealerDbContext;
+using Microsoft.EntityFrameworkCore;
 
 // Add Razor Pages & SignalR
 var builder = WebApplication.CreateBuilder(args);

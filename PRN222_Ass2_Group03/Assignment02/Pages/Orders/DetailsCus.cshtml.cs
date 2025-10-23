@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Orders
 {
-    public class DetailsModel : PageModel
+    public class DetailsCusModel : PageModel
     {
         private readonly IOrderServiceCus _orderService;
 
         public Order? Order { get; set; }
         public string? CurrentUserRole { get; set; }
 
-        public DetailsModel(IOrderServiceCus orderService)
+        public DetailsCusModel(IOrderServiceCus orderService)
         {
             _orderService = orderService;
         }

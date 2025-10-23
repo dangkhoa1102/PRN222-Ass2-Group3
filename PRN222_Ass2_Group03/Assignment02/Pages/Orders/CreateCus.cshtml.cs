@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Orders
 {
-    public class CreateModel : PageModel
+    public class CreateCusModel : PageModel
     {
         private readonly IOrderServiceCus _orderService;
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
 
-        public CreateModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService)
+        public CreateCusModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService)
         {
             _orderService = orderService;
             _testDriveService = testDriveService;
@@ -60,7 +60,7 @@ namespace Assignment02.Pages.Orders
             var customerIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(customerIdStr))
             {
-                ErrorMessage = "Please log in to create an order.";
+               ErrorMessage = "Please log in to create an order.";
                 return Page();
             }
 
