@@ -40,25 +40,25 @@ namespace Assignment02.Pages.Orders
             return Page();
         }
 
-        public async Task<IActionResult> OnPostMarkDoneAsync(Guid id)
-        {
-            var userIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdStr))
-                return RedirectToPage("/Login");
+        //public async Task<IActionResult> OnPostMarkDoneAsync(Guid id)
+        //{
+        //    var userIdStr = HttpContext.Session.GetString("UserId");
+        //    if (string.IsNullOrEmpty(userIdStr))
+        //        return RedirectToPage("/Login");
 
-            Guid userId = Guid.Parse(userIdStr);
-            var success = await _orderService.MarkDoneByCustomerAsync(id, userId);
+        //    Guid userId = Guid.Parse(userIdStr);
+        //    var success = await _orderService.MarkDoneByCustomerAsync(id, userId);
             
-            if (success)
-            {
-                TempData["SuccessMessage"] = "Order marked as done successfully!";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Unable to mark order as done.";
-            }
+        //    if (success)
+        //    {
+        //        TempData["SuccessMessage"] = "Order marked as done successfully!";
+        //    }
+        //    else
+        //    {
+        //        TempData["ErrorMessage"] = "Unable to mark order as done.";
+        //    }
             
-            return RedirectToPage();
-        }
+        //    return RedirectToPage();
+        //}
     }
 }

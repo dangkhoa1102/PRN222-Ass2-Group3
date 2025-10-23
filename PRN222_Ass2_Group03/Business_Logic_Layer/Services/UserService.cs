@@ -72,7 +72,7 @@ namespace Business_Logic_Layer.Services
             return await _userRepository.GetAllUsersAsync();
         }
 
-        public async Task<User?> GetUserByUsernameAsync(string username)
+     
         public async Task<UserDTO?> GetUserByUsernameAsync(string username)
         {
             var user = await _userRepository.GetUserByUsernameAsync(username);
@@ -137,11 +137,11 @@ namespace Business_Logic_Layer.Services
             return user != null;
         }
 
-        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
-        {
-            var users = await _userRepository.GetAllUsersAsync();
-            return users.Select(ConvertToDTO);
-        }
+        //public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
+        //{
+        //    var users = await _userRepository.GetAllUsersAsync();
+        //    return users.Select(ConvertToDTO);
+        //}
 
         public async Task<IEnumerable<UserDTO>> GetCustomersAsync()
         {
@@ -168,6 +168,11 @@ namespace Business_Logic_Layer.Services
             using var sha256 = SHA256.Create();
             var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + "salt"));
             return Convert.ToBase64String(hashedBytes);
+        }
+
+        Task<IEnumerable<UserDTO>> IUserService.GetAllUsersAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

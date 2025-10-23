@@ -14,8 +14,8 @@ namespace Assignment02.Pages.Orders
         public OrderDTO? Order { get; set; }
         public string? CurrentUserRole { get; set; }
 
-        public DetailsCusModel(IOrderServiceCus orderService)
-        public DetailsModel(IOrderServiceCus orderService, RealTimeNotificationService notificationService)
+    
+        public DetailsCusModel(IOrderServiceCus orderService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _notificationService = notificationService;

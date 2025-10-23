@@ -14,8 +14,8 @@ namespace Assignment02.Pages.Orders
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
         private readonly RealTimeNotificationService _notificationService;
 
-        public CreateCusModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService)
-        public CreateModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService, RealTimeNotificationService notificationService)
+
+        public CreateCusModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _testDriveService = testDriveService;
