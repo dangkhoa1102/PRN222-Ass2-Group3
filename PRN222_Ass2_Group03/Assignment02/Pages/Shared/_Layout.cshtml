@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="user-role" content="@Context.Session.GetString("UserRole")" />
     <title>@ViewData["Title"] - EV Dealer System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -114,12 +115,6 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Orders/PendingOrdersCus">
-                                                <i class="fas fa-hourglass-half"></i>
-                                                <span>Processing Orders</span>
-                                            </a>
-                                        </li>
-                                        <li>
                                             <a class="dropdown-item" asp-page="/Orders/HistoryCus">
                                                 <i class="fas fa-history"></i>
                                                 <span>Order History</span>
@@ -128,6 +123,12 @@
                                     }
                                     @if (string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase))
                                     {
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Orders/CreateOrder">
+                                                <i class="fas fa-plus-circle"></i>
+                                                <span>Create Order</span>
+                                            </a>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item" asp-page="/Admin/ManageOrders">
                                                 <i class="fas fa-cogs"></i>
@@ -205,7 +206,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item modern-dropdown-item" href="#notifications">
+                                        <a class="dropdown-item modern-dropdown-item" asp-page="/NotificationCenter">
                                             <i class="fas fa-bell"></i>
                                             <span>Notifications</span>
                                         </a>
@@ -271,8 +272,8 @@
 
     @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
     {
-        <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
-        <script src="~/js/signalr-notifications.js" asp-append-version="true"></script>
+        <script src="https://unpkg.com/@@microsoft/signalr@@latest/dist/browser/signalr.min.js"></script>
+        <script src="~/js/realtime.js" asp-append-version="true"></script>
     }
 
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -1,20 +1,22 @@
 ﻿using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages
 {
     public class MyAppointmentModel : AuthenticatedPageModel
     {
         private readonly ICustomerTestDriveAppointmentService _appointmentService;
+        private readonly RealTimeNotificationService _notificationService;
 
-        public MyAppointmentModel(ICustomerTestDriveAppointmentService appointmentService)
+        public MyAppointmentModel(ICustomerTestDriveAppointmentService appointmentService, RealTimeNotificationService notificationService)
         {
             _appointmentService = appointmentService;
+            _notificationService = notificationService;
         }
 
-        public IEnumerable<TestDriveAppointment> Appointments { get; set; } = new List<TestDriveAppointment>();
+        public IEnumerable<TestDriveAppointmentDTO> Appointments { get; set; } = new List<TestDriveAppointmentDTO>();
 
         [BindProperty]
         public string CancelNote { get; set; } = string.Empty;
@@ -86,6 +88,17 @@ namespace Assignment02.Pages
                 }
                 else
                 {
+                    // Gửi SignalR notification
+                    var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
+                    if (appointment != null)
+                    {
+                        await _notificationService.NotifyTestDriveCancelled(
+                            appointment.Customer?.FullName ?? "Unknown Customer",
+                            appointment.Vehicle?.Name ?? "Unknown Vehicle"
+                        );
+                        await _notificationService.NotifyPageReload("appointments", "cancelled_by_customer");
+                    }
+                    
                     TempData["SuccessMessage"] = "Lịch hẹn đã được hủy thành công.";
                 }
             }
@@ -122,7 +135,7 @@ namespace Assignment02.Pages
         }
 
         // Helper method để kiểm tra quyền cancel
-        public bool CanCancelAppointment(TestDriveAppointment appointment)
+        public bool CanCancelAppointment(TestDriveAppointmentDTO appointment)
         {
             if (appointment.Status == "Cancelled" || appointment.AppointmentDate <= DateTime.Now.AddHours(24))
                 return false;

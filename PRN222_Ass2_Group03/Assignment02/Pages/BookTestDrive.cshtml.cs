@@ -1,7 +1,8 @@
 ﻿using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages
 {
@@ -9,41 +10,69 @@ namespace Assignment02.Pages
     {
         private readonly ICustomerTestDriveAppointmentService _appointmentService;
         private readonly IVehicleService _vehicleService;
+        private readonly RealTimeNotificationService _notificationService;
         
-        public BookTestDriveModel(ICustomerTestDriveAppointmentService appointmentService, IVehicleService vehicleService)
+        public BookTestDriveModel(ICustomerTestDriveAppointmentService appointmentService, IVehicleService vehicleService, RealTimeNotificationService notificationService)
         {
             _appointmentService = appointmentService;
             _vehicleService = vehicleService;
+            _notificationService = notificationService;
         }
 
         [BindProperty]
-        public TestDriveAppointment Appointment { get; set; } = new TestDriveAppointment();
+        public TestDriveAppointmentDTO Appointment { get; set; } = new TestDriveAppointmentDTO();
 
         [BindProperty]
         public string SelectedTimeSlot { get; set; } = string.Empty;
 
-        public IList<Dealer> Dealers { get; set; } = new List<Dealer>();
-        public IList<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
-        public IList<TestDriveAppointment> AvailableTimeSlots { get; set; } = new List<TestDriveAppointment>();
+        public IList<DealerDTO> Dealers { get; set; } = new List<DealerDTO>();
+        public IList<VehicleDTO> Vehicles { get; set; } = new List<VehicleDTO>();
+        public IList<TestDriveAppointmentDTO> AvailableTimeSlots { get; set; } = new List<TestDriveAppointmentDTO>();
         public string ErrorMessage { get; set; } = string.Empty;
         public string SuccessMessage { get; set; } = string.Empty;
 
-        public async Task OnGetAsync(Guid? vehicleId)
+        public async Task OnGetAsync(Guid? vehicleId, Guid? dealerId, DateTime? date)
         {
             Dealers = (await _appointmentService.GetAllDealersAsync()).ToList();
-            Vehicles = new List<Vehicle>();
-            AvailableTimeSlots = new List<TestDriveAppointment>();
+            AvailableTimeSlots = new List<TestDriveAppointmentDTO>();
+            
+            // Always load all vehicles for selection
+            var allVehicles = await _vehicleService.GetAllVehiclesAsync();
+            Vehicles = allVehicles.ToList();
             
             // Pre-select vehicle if vehicleId is provided
             if (vehicleId.HasValue)
             {
-                var allVehicles = await _vehicleService.GetAllVehiclesAsync();
                 var selectedVehicle = allVehicles.FirstOrDefault(v => v.Id == vehicleId.Value);
                 if (selectedVehicle != null)
                 {
                     Appointment.VehicleId = selectedVehicle.Id;
-                    // Load all vehicles for selection
-                    Vehicles = allVehicles.ToList();
+                }
+            }
+            
+            // Pre-select dealer if dealerId is provided
+            if (dealerId.HasValue)
+            {
+                Appointment.DealerId = dealerId.Value;
+            }
+            
+            // Pre-select date if date is provided
+            if (date.HasValue)
+            {
+                Appointment.AppointmentDate = date.Value;
+            }
+            
+            // Load time slots if both dealer and date are provided
+            if (dealerId.HasValue && date.HasValue)
+            {
+                try
+                {
+                    AvailableTimeSlots = (await _appointmentService.GetAvailableTimeSlotsAsync(dealerId.Value, date.Value)).ToList();
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Lỗi khi tải khung giờ: {ex.Message}";
+                    AvailableTimeSlots = new List<TestDriveAppointmentDTO>();
                 }
             }
         }
@@ -128,6 +157,17 @@ namespace Assignment02.Pages
 
                 // Kiểm tra status của appointment
                 bool isSuccess = appointment.Status == "pending";
+
+                if (isSuccess)
+                {
+                    // Gửi notification real-time
+                    await _notificationService.NotifyTestDriveBooked(
+                        appointment.Customer?.FullName ?? "Unknown Customer",
+                        appointment.Vehicle?.Name ?? "Unknown Vehicle",
+                        appointment.AppointmentDate
+                    );
+                    await _notificationService.NotifyPageReload("appointments", "new_appointment");
+                }
 
                 return new JsonResult(new
                 {

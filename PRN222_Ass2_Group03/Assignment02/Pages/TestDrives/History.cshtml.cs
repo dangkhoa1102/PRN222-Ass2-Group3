@@ -1,7 +1,6 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.TestDrives
 {
@@ -14,7 +13,7 @@ namespace Assignment02.Pages.TestDrives
             _appointmentService = appointmentService;
         }
 
-        public List<TestDriveAppointment> History { get; set; } = new();
+        public List<TestDriveAppointmentDTO> History { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {

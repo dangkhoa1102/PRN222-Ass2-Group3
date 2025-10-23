@@ -50,6 +50,7 @@ namespace DataAccess_Layer.Repositories
         {
             return await _context.Orders
                 .Include(o => o.Customer)
+                    .ThenInclude(c => c.TestDriveAppointments)
                 .Include(o => o.Vehicle)
                 .Include(o => o.Dealer)
                 .Include(o => o.OrderHistories)

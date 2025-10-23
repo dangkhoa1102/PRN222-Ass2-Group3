@@ -1,8 +1,10 @@
 
 using Business_Logic_Layer.Services;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
@@ -10,11 +12,13 @@ namespace Assignment02.Pages.Orders
     {
         private readonly IOrderServiceCus _orderService;
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
+        private readonly RealTimeNotificationService _notificationService;
 
-        public CreateModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService)
+        public CreateModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _testDriveService = testDriveService;
+            _notificationService = notificationService;
         }
 
         [BindProperty]
@@ -24,7 +28,7 @@ namespace Assignment02.Pages.Orders
         public Guid SelectedVehicleId { get; set; }
 
         [BindProperty]
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
         public List<SelectListItem> DealersList { get; set; }
         public List<SelectListItem> VehiclesList { get; set; }
@@ -68,7 +72,12 @@ namespace Assignment02.Pages.Orders
 
             try
             {
-                var newOrder = await _orderService.CreateOrderAsync(customerId, SelectedDealerId, SelectedVehicleId, Notes);
+                var newOrder = await _orderService.CreateOrderAsync(customerId, SelectedDealerId, SelectedVehicleId, Notes ?? string.Empty);
+                
+                // Gửi notification real-time
+                await _notificationService.NotifyOrderCreated(newOrder.OrderNumber, newOrder.CustomerName, newOrder.VehicleName);
+                await _notificationService.NotifyPageReload("orders", "new_order");
+                
                 SuccessMessage = "Order created successfully!";
                 return RedirectToPage("/Orders/MyOrders");
             }

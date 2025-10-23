@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Assignment02.Pages
 {
@@ -39,10 +38,10 @@ namespace Assignment02.Pages
                 Response.Redirect("/Index");
             }
 
-            // Get success message from TempData (from registration)
-            if (TempData["SuccessMessage"] != null)
+            // Only show registration success message, not order-related messages
+            if (TempData["RegistrationSuccessMessage"] != null)
             {
-                SuccessMessage = TempData["SuccessMessage"]?.ToString();
+                SuccessMessage = TempData["RegistrationSuccessMessage"]?.ToString();
             }
         }
 

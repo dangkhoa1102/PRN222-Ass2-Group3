@@ -423,6 +423,10 @@
                 }
                 @if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
                 {
+                    <a href="/Orders/CreateOrder?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
+                        <i class="fas fa-shopping-cart"></i>
+                        Mua xe
+                    </a>
                     <a href="/Vehicles/Edit/@Model.Vehicle.Id" class="btn-action btn-edit">
                         <i class="fas fa-edit"></i>
                         Chỉnh sửa

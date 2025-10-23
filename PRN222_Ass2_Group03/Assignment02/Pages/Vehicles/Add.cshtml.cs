@@ -1,8 +1,6 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.IO;
 
 namespace Assignment02.Pages.Vehicles
 {
@@ -16,7 +14,7 @@ namespace Assignment02.Pages.Vehicles
         }
 
         [BindProperty]
-        public Vehicle Vehicle { get; set; } = new Vehicle();
+        public VehicleDTO Vehicle { get; set; } = new VehicleDTO();
 
         [BindProperty]
         public IFormFile? ImageFile { get; set; }

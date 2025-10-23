@@ -237,9 +237,11 @@
         font-weight: 500;
     }
 
-    .dealer-cell {
-        color: #6c757d;
-        font-size: 0.85rem;
+    .phone-cell {
+        color: #2196F3;
+        font-weight: 500;
+        font-size: 0.9rem;
+        font-family: 'Courier New', monospace;
     }
 
     .amount-cell {
@@ -285,6 +287,8 @@
     .status-confirmed { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
     .status-processing { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); color: #856404; }
     .status-shipped { background: linear-gradient(135deg, #e2e3f0, #d1d7f0); color: #6f42c1; }
+    .status-complete { background: linear-gradient(135deg, #cce5ff, #b3d9ff); color: #004085; }
+    .status-done { background: linear-gradient(135deg, #343a40, #495057); color: #ffffff; }
     .status-completed { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #198754; }
     .status-cancelled { background: linear-gradient(135deg, #f8d7da, #f5c6cb); color: #842029; }
 
@@ -360,6 +364,30 @@
         background: linear-gradient(135deg, #673AB7, #9C27B0);
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+    }
+
+    .btn-ship-disabled {
+        background: linear-gradient(135deg, #9E9E9E, #757575);
+        color: #BDBDBD;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .btn-ship-disabled:hover {
+        background: linear-gradient(135deg, #9E9E9E, #757575);
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-complete {
+        background: linear-gradient(135deg, #4CAF50, #8BC34A);
+        color: white;
+    }
+
+    .btn-complete:hover {
+        background: linear-gradient(135deg, #8BC34A, #4CAF50);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
     }
 
     .btn-deliver {
@@ -570,7 +598,7 @@
                             <tr>
                                 <th>Customer</th>
                                 <th>Vehicle</th>
-                                <th>Dealer</th>
+                                <th>Phone</th>
                                 <th>Status</th>
                                 <th>Payment</th>
                                 <th>Total Amount</th>
@@ -584,10 +612,10 @@
                             {
                                 @foreach (var order in Model.Orders)
                                 {
-                                    <tr>
+                                    <tr data-order-id="@order.Id">
                                         <td class="customer-cell">@order.CustomerName</td>
                                         <td class="vehicle-cell">@order.VehicleName</td>
-                                        <td class="dealer-cell">@order.DealerName</td>
+                                        <td class="phone-cell">@order.CustomerPhone</td>
                                         <td>
                                             <span class="status-badge status-@(order.Status?.ToLower())">
                                                 @order.Status
@@ -631,14 +659,23 @@
                                                 }
                                                 @if (order.Status == "Processing")
                                                 {
-                                                    <button class="btn-action btn-ship" onclick="updateOrderStatus('@order.Id', 'Shipped')">
-                                                        <i class="fas fa-shipping-fast"></i> Ship
-                                                    </button>
+                                                    @if (string.Equals(order.PaymentStatus, "Unpaid", StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                        <button class="btn-action btn-ship-disabled" disabled title="Đơn hàng chưa thanh toán, không thể giao hàng">
+                                                            <i class="fas fa-shipping-fast"></i> Ship
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="btn-action btn-ship" onclick="updateOrderStatus('@order.Id', 'Shipped')">
+                                                            <i class="fas fa-shipping-fast"></i> Ship
+                                                        </button>
+                                                    }
                                                 }
                                                 @if (order.Status == "Shipped")
                                                 {
-                                                    <button class="btn-action btn-ship" onclick="updateOrderStatus('@order.Id', 'Shipped')">
-                                                        <i class="fas fa-shipping-fast"></i> Ship
+                                                    <button class="btn-action btn-complete" onclick="updateOrderStatus('@order.Id', 'Complete')">
+                                                        <i class="fas fa-check-circle"></i> Complete
                                                     </button>
                                                 }
                                             </div>
@@ -719,6 +756,72 @@
                 document.body.appendChild(form);
                 form.submit();
             }
+        }
+    </script>
+
+    <!-- SignalR Scripts -->
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/orderhub")
+            .build();
+
+        connection.start().then(function () {
+            console.log("SignalR Connected for Staff");
+            // Join staff group
+            connection.invoke("JoinGroup", "staff").then(function() {
+                console.log("Joined staff group");
+            }).catch(function(err) {
+                console.error("Failed to join staff group:", err);
+            });
+        }).catch(function (err) {
+            console.error("SignalR Connection Error: ", err.toString());
+        });
+
+        // Listen for order status updates
+        connection.on("OrderStatusUpdated", function (orderId, newStatus) {
+            console.log(`Order ${orderId} status updated to ${newStatus}`);
+            
+            // Find the order row and update the status badge
+            const orderRows = document.querySelectorAll('tr[data-order-id]');
+            orderRows.forEach(row => {
+                if (row.getAttribute('data-order-id') === orderId) {
+                    // Find the status badge (4th column)
+                    const statusCell = row.querySelector('td:nth-child(4) .status-badge');
+                    if (statusCell) {
+                        // Update status text
+                        statusCell.textContent = newStatus;
+                        
+                        // Update status badge class based on new status
+                        statusCell.className = 'status-badge status-' + newStatus.toLowerCase();
+                        
+                        // Show notification
+                        showNotification(`Đơn hàng ${orderId} đã được cập nhật thành ${newStatus}`);
+                    }
+                }
+            });
+        });
+
+        // Show notification function
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-success alert-dismissible fade show position-fixed';
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
         }
     </script>
 }

@@ -1,20 +1,22 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Assignment02.Services;
 
 namespace Assignment02.Pages.Admin
 {
     public class ManageAppointmentsModel : AuthenticatedPageModel
     {
         private readonly ICustomerTestDriveAppointmentService _appointmentService;
+        private readonly RealTimeNotificationService _notificationService;
 
-        public ManageAppointmentsModel(ICustomerTestDriveAppointmentService appointmentService)
+        public ManageAppointmentsModel(ICustomerTestDriveAppointmentService appointmentService, RealTimeNotificationService notificationService)
         {
             _appointmentService = appointmentService;
+            _notificationService = notificationService;
         }
 
-        public IEnumerable<TestDriveAppointment> Appointments { get; set; } = new List<TestDriveAppointment>();
+        public IEnumerable<TestDriveAppointmentDTO> Appointments { get; set; } = new List<TestDriveAppointmentDTO>();
         public string? FilterStatus { get; set; }
 
         [BindProperty]
@@ -65,6 +67,18 @@ namespace Assignment02.Pages.Admin
                 
                 if (success)
                 {
+                    // Gửi SignalR notification
+                    var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
+                    if (appointment != null)
+                    {
+                        await _notificationService.NotifyTestDriveUpdated(
+                            appointment.Customer?.FullName ?? "Unknown Customer",
+                            appointment.Vehicle?.Name ?? "Unknown Vehicle",
+                            status
+                        );
+                        await _notificationService.NotifyPageReload("appointments", "status_update");
+                    }
+                    
                     TempData["SuccessMessage"] = $"Cập nhật trạng thái thành {status} thành công.";
                 }
                 else
@@ -92,6 +106,17 @@ namespace Assignment02.Pages.Admin
                 var success = await _appointmentService.CancelAppointmentByStaffAsync(id, CancelNote);
                 if (success)
                 {
+                    // Gửi SignalR notification
+                    var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
+                    if (appointment != null)
+                    {
+                        await _notificationService.NotifyTestDriveCancelled(
+                            appointment.Customer?.FullName ?? "Unknown Customer",
+                            appointment.Vehicle?.Name ?? "Unknown Vehicle"
+                        );
+                        await _notificationService.NotifyPageReload("appointments", "cancelled");
+                    }
+                    
                     TempData["SuccessMessage"] = "Hủy lịch hẹn thành công.";
                 }
                 else
@@ -113,7 +138,7 @@ namespace Assignment02.Pages.Admin
         }
 
         // Helper method để kiểm tra quyền cancel
-        public bool CanCancelAppointment(TestDriveAppointment appointment)
+        public bool CanCancelAppointment(TestDriveAppointmentDTO appointment)
         {
             if (appointment.Status == "Cancelled")
                 return false;

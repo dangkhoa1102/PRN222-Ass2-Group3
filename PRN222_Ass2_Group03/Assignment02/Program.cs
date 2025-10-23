@@ -1,4 +1,5 @@
 ﻿using Assignment02.Hubs;
+using Assignment02.Services;
 using Business_Logic_Layer.Services;
 
 // Add Razor Pages & SignalR
@@ -18,6 +19,10 @@ builder.Services.AddScoped<IUserService>(provider => provider.GetRequiredService
 builder.Services.AddScoped<IOrderServiceCus>(provider => provider.GetRequiredService<ServiceFactory>().CreateOrderService());
 builder.Services.AddScoped<ICustomerTestDriveAppointmentService>(provider => provider.GetRequiredService<ServiceFactory>().CreateCustomerTestDriveAppointmentService());
 builder.Services.AddScoped<IVehicleService>(provider => provider.GetRequiredService<ServiceFactory>().CreateVehicleService());
+builder.Services.AddScoped<IDealerService>(provider => provider.GetRequiredService<ServiceFactory>().CreateDealerService());
+
+// Register SignalR Services
+builder.Services.AddScoped<RealTimeNotificationService>();
 
 // ===============================
 // 💾 Session Configuration
@@ -92,7 +97,6 @@ app.UseAuthorization();
 // 🌐 Map Razor Pages & SignalR Hubs
 // ===============================
 app.MapRazorPages();
-app.MapHub<ChatHub>("/chathub");
-app.MapHub<NotificationHub>("/notificationhub");
+app.MapHub<RealTimeHub>("/realtimehub");
 
 app.Run();

@@ -1,5 +1,5 @@
 using Business_Logic_Layer.Services;
-using EVDealerDbContext.Models;
+using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,7 +9,7 @@ namespace Assignment02.Pages.Orders
     {
         private readonly IOrderServiceCus _orderService;
 
-        public List<Order> OrderHistories { get; set; } = new();
+        public List<OrderDTO> OrderHistories { get; set; } = new();
 
         public HistoryModel(IOrderServiceCus orderService)
         {
@@ -24,12 +24,14 @@ namespace Assignment02.Pages.Orders
 
             Guid userId = Guid.Parse(userIdStr);
             
-            // Lấy các order đã hoàn thành (Completed, Cancelled, Done)
+            // Lấy các order đã hoàn thành (Completed, Complete, Cancelled, Done, DONE)
             var allOrders = await _orderService.GetOrdersByUserIdAsync(userId);
             OrderHistories = allOrders.Where(o => 
-                o.Status == "Completed" || 
-                o.Status == "Cancelled" || 
-                o.Status == "Done"
+                string.Equals(o.Status, "Completed", StringComparison.OrdinalIgnoreCase) || 
+                string.Equals(o.Status, "Complete", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(o.Status, "Cancelled", StringComparison.OrdinalIgnoreCase) || 
+                string.Equals(o.Status, "Done", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(o.Status, "DONE", StringComparison.OrdinalIgnoreCase)
             ).ToList();
 
             return Page();
