@@ -6,7 +6,7 @@ using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
-    public class DetailsModel : PageModel
+    public class DetailsCusModel : PageModel
     {
         private readonly IOrderServiceCus _orderService;
         private readonly RealTimeNotificationService _notificationService;
@@ -14,6 +14,7 @@ namespace Assignment02.Pages.Orders
         public OrderDTO? Order { get; set; }
         public string? CurrentUserRole { get; set; }
 
+        public DetailsCusModel(IOrderServiceCus orderService)
         public DetailsModel(IOrderServiceCus orderService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;

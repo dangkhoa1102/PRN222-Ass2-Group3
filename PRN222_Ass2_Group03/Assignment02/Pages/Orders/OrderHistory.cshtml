@@ -1,0 +1,261 @@
+﻿@page
+@model Assignment02.Pages.OrderHistory.IndexModel
+@{
+    ViewData["Title"] = "Order History";
+    Layout = "_Layout"; 
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/orderhistory.css" />
+}
+
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="bi bi-clock-history me-2"></i>Order History
+                </h2>
+                <p class="text-muted mb-0">Track order status changes and updates</p>
+            </div>
+            <a href="/Orders/Index" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Orders
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Side - Order List -->
+        <div class="col-lg-4">
+            <div class="orders-card">
+                <div class="orders-card-header">
+                    <i class="bi bi-list-ul me-2"></i>
+                    <span>Your Orders</span>
+                    <span class="badge bg-primary ms-auto">@Model.Orders.Count()</span>
+                </div>
+                <div class="orders-card-body">
+                    <!-- Search Box -->
+                    <div class="search-box mb-3">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="searchOrder" class="form-control" placeholder="Search order number..." />
+                    </div>
+
+                    <!-- Order List -->
+                    <div class="order-list" id="orderList">
+                        @if (!Model.Orders.Any())
+                        {
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p>No orders found</p>
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var order in Model.Orders)
+                            {
+                                <div class="order-item @(Model.SelectedOrderId == order.Id ? "active" : "")"
+                                     data-order-id="@order.Id"
+                                     onclick="selectOrder('@order.Id')">
+                                    <div class="order-item-header">
+                                        <span class="order-number">@order.OrderNumber</span>
+                                        <span class="badge badge-@GetStatusClass(order.Status)">
+                                            @order.Status
+                                        </span>
+                                    </div>
+                                    <div class="order-item-body">
+                                        <div class="order-info">
+                                            <i class="bi bi-person-circle"></i>
+                                            <span>@order.Customer?.FullName</span>
+                                        </div>
+                                        <div class="order-info">
+                                            <i class="bi bi-car-front"></i>
+                                            <span>@order.Vehicle?.Brand @order.Vehicle?.Model</span>
+                                        </div>
+                                        <div class="order-info">
+                                            <i class="bi bi-calendar3"></i>
+                                            <span>@order.CreatedAt?.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Timeline -->
+        <div class="col-lg-8">
+            <div class="timeline-card">
+                <div class="timeline-card-header">
+                    <i class="bi bi-clock-history me-2"></i>
+                    <span>Order Timeline</span>
+                </div>
+                <div class="timeline-card-body" id="timelineContent">
+                    @if (Model.SelectedOrderId == null || !Model.Orders.Any())
+                    {
+                        <div class="empty-timeline">
+                            <i class="bi bi-arrow-left-circle"></i>
+                            <h5>Select an order to view history</h5>
+                            <p>Choose an order from the left panel to see its complete timeline</p>
+                        </div>
+                    }
+                    else
+                    {
+                        var selectedOrder = Model.Orders.FirstOrDefault(o => o.Id == Model.SelectedOrderId);
+                        if (selectedOrder != null)
+                        {
+                            <!-- Order Summary -->
+                            <div class="order-summary">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="mb-3">@selectedOrder.OrderNumber</h5>
+                                        <div class="summary-item">
+                                            <span class="label">Customer:</span>
+                                            <span class="value">@selectedOrder.Customer?.FullName</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="label">Phone:</span>
+                                            <span class="value">@selectedOrder.Customer?.Phone</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="label">Vehicle:</span>
+                                            <span class="value">@selectedOrder.Vehicle?.Brand @selectedOrder.Vehicle?.Model</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="summary-item">
+                                            <span class="label">Total Amount:</span>
+                                            <span class="value fw-bold text-success">@selectedOrder.TotalAmount.ToString("N0") VND</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="label">Payment Status:</span>
+                                            <span class="badge badge-payment-@selectedOrder.PaymentStatus?.ToLower()">
+                                                @selectedOrder.PaymentStatus
+                                            </span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="label">Current Status:</span>
+                                            <span class="badge badge-@GetStatusClass(selectedOrder.Status)">
+                                                @selectedOrder.Status
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Timeline -->
+                            <div class="timeline">
+                                <h6 class="timeline-title">
+                                    <i class="bi bi-list-columns-reverse me-2"></i>Status History
+                                </h6>
+
+                                @if (!Model.OrderHistories.Any())
+                                {
+                                    <div class="timeline-empty">
+                                        <i class="bi bi-info-circle"></i>
+                                        <p>No history records found for this order</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @foreach (var history in Model.OrderHistories.OrderByDescending(h => h.CreatedAt))
+                                    {
+                                        <div class="timeline-item">
+                                            <div class="timeline-marker status-@GetStatusClass(history.Status)">
+                                                <i class="bi @GetStatusIcon(history.Status)"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <div class="timeline-header">
+                                                    <h6 class="timeline-status">
+                                                        Status changed to:
+                                                        <span class="badge badge-@GetStatusClass(history.Status)">
+                                                            @history.Status
+                                                        </span>
+                                                    </h6>
+                                                    <span class="timeline-time">
+                                                        <i class="bi bi-clock"></i>
+                                                        @history.CreatedAt?.ToString("dd/MM/yyyy HH:mm")
+                                                    </span>
+                                                </div>
+                                                <div class="timeline-body">
+                                                    <div class="timeline-user">
+                                                        <i class="bi bi-person-badge"></i>
+                                                        <span>Changed by: @(history.CreatedByNavigation?.FullName ?? "System")</span>
+                                                    </div>
+                                                    @if (!string.IsNullOrWhiteSpace(history.Notes))
+                                                    {
+                                                        <div class="timeline-notes">
+                                                            <i class="bi bi-chat-left-text"></i>
+                                                            <span>@history.Notes</span>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusClass(string status)
+    {
+        return status?.ToLower() switch
+        {
+            "confirmed" => "confirmed",
+            "delivering" => "delivering",
+            "completed" => "completed",
+            "cancelled" => "cancelled",
+            "processing" => "processing",
+            _ => "secondary"
+        };
+    }
+
+    string GetStatusIcon(string status)
+    {
+        return status?.ToLower() switch
+        {
+            "confirmed" => "bi-check-circle-fill",
+            "delivering" => "bi-truck",
+            "completed" => "bi-check-all",
+            "cancelled" => "bi-x-circle-fill",
+            "processing" => "bi-hourglass-split",
+            _ => "bi-circle"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        function selectOrder(orderId) {
+            window.location.href = `?orderId=${orderId}`;
+        }
+
+        // Search functionality
+        document.getElementById('searchOrder').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const orderItems = document.querySelectorAll('.order-item');
+
+            orderItems.forEach(item => {
+                const orderNumber = item.querySelector('.order-number').textContent.toLowerCase();
+                const customerName = item.querySelector('.order-item-body .order-info span').textContent.toLowerCase();
+
+                if (orderNumber.includes(searchTerm) || customerName.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+}

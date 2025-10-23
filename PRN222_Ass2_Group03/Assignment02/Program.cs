@@ -1,9 +1,15 @@
 ﻿using Assignment02.Hubs;
 using Assignment02.Services;
 using Business_Logic_Layer.Services;
+using DataAccess_Layer.Repositories;
+using EVDealerDbContext;
+using Microsoft.EntityFrameworkCore;
 
 // Add Razor Pages & SignalR
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<EVDealerSystemContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection"))
+);
 
 // ===============================
 // Add EF DbContext
@@ -19,6 +25,15 @@ builder.Services.AddScoped<IUserService>(provider => provider.GetRequiredService
 builder.Services.AddScoped<IOrderServiceCus>(provider => provider.GetRequiredService<ServiceFactory>().CreateOrderService());
 builder.Services.AddScoped<ICustomerTestDriveAppointmentService>(provider => provider.GetRequiredService<ServiceFactory>().CreateCustomerTestDriveAppointmentService());
 builder.Services.AddScoped<IVehicleService>(provider => provider.GetRequiredService<ServiceFactory>().CreateVehicleService());
+// Register repositories and services (they will use EVDealerSystemContext's own connection)
+    
+// Register repositories and services
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICustomerTestDriveAppointment, CustomerTestDriveAppointment>();
+builder.Services.AddScoped<ICustomerTestDriveAppointmentService, CustomerTestDriveAppointmentService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IDealerService>(provider => provider.GetRequiredService<ServiceFactory>().CreateDealerService());
 
 // Register SignalR Services

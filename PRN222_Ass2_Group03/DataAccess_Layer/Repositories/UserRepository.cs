@@ -16,6 +16,9 @@ namespace DataAccess_Layer.Repositories
             _logger = logger;
         }
 
+
+      
+
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
             try

@@ -67,6 +67,12 @@ namespace Business_Logic_Layer.Services
             return user != null ? ConvertToDTO(user) : null;
         }
 
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _userRepository.GetAllUsersAsync();
+        }
+
+        public async Task<User?> GetUserByUsernameAsync(string username)
         public async Task<UserDTO?> GetUserByUsernameAsync(string username)
         {
             var user = await _userRepository.GetUserByUsernameAsync(username);

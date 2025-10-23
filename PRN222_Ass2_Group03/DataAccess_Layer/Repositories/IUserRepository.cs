@@ -13,5 +13,8 @@ namespace DataAccess_Layer.Repositories
         Task<User> UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(Guid id);
         Task<bool> UserExistsAsync(string username, string email);
+
+
+       
     }
 }

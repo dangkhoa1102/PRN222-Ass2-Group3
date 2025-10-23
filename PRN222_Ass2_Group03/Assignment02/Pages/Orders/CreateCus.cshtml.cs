@@ -8,12 +8,13 @@ using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
-    public class CreateModel : PageModel
+    public class CreateCusModel : PageModel
     {
         private readonly IOrderServiceCus _orderService;
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
         private readonly RealTimeNotificationService _notificationService;
 
+        public CreateCusModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService)
         public CreateModel(IOrderServiceCus orderService, ICustomerTestDriveAppointmentService testDriveService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
@@ -97,7 +98,7 @@ namespace Assignment02.Pages.Orders
             var customerIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(customerIdStr))
             {
-                ErrorMessage = "Please log in to create an order.";
+               ErrorMessage = "Please log in to create an order.";
                 return Page();
             }
 
