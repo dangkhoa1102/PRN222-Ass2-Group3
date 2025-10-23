@@ -108,6 +108,13 @@ namespace Assignment02.Pages.Orders
                         return RedirectToPage(new { id });
                     }
 
+                    // Check if order is already paid (for staff/admin)
+                    if (isStaffOrAdmin && string.Equals(order.PaymentStatus, "Paid", StringComparison.OrdinalIgnoreCase))
+                    {
+                        TempData["ErrorMessage"] = "Không thể hủy đơn hàng đã thanh toán.";
+                        return RedirectToPage(new { id });
+                    }
+
                     // Cancel the order
                     var result = await _orderService.CancelOrderAsync(id, cancelReason);
                     

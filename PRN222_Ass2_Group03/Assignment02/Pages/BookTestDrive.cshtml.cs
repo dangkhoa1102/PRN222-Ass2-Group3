@@ -30,6 +30,7 @@ namespace Assignment02.Pages
         public IList<TestDriveAppointmentDTO> AvailableTimeSlots { get; set; } = new List<TestDriveAppointmentDTO>();
         public string ErrorMessage { get; set; } = string.Empty;
         public string SuccessMessage { get; set; } = string.Empty;
+        public string CurrentUserId => HttpContext.Session.GetString("UserId") ?? "";
 
         public async Task OnGetAsync(Guid? vehicleId, Guid? dealerId, DateTime? date)
         {
@@ -87,8 +88,16 @@ namespace Assignment02.Pages
 
         public async Task<IActionResult> OnGetTimeSlotsAsync(Guid dealerId, DateTime date)
         {
-            var timeSlots = await _appointmentService.GetAvailableTimeSlotsAsync(dealerId, date);
-            return new JsonResult(timeSlots);
+            try
+            {
+                var timeSlots = await _appointmentService.GetAvailableTimeSlotsAsync(dealerId, date);
+                return new JsonResult(timeSlots);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading time slots: {ex.Message}");
+                return new JsonResult(new List<TestDriveAppointmentDTO>());
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()

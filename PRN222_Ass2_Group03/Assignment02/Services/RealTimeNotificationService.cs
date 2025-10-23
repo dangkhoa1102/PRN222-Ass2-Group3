@@ -15,12 +15,14 @@ namespace Assignment02.Services
         // Gửi thông báo reload trang cho tất cả clients
         public async Task NotifyPageReload(string pageName, string action = "update")
         {
+            Console.WriteLine($"Sending PageReload notification: {pageName} - {action}");
             await _hubContext.Clients.All.SendAsync("PageReload", new
             {
                 page = pageName,
                 action = action,
                 timestamp = DateTime.Now
             });
+            Console.WriteLine("PageReload notification sent successfully");
         }
 
         // Gửi thông báo reload cho một group cụ thể (staff hoặc customer)
@@ -96,12 +98,14 @@ namespace Assignment02.Services
         // Gửi thông báo khi test drive bị hủy
         public async Task NotifyTestDriveCancelled(string customerName, string vehicleName)
         {
+            Console.WriteLine($"Sending TestDriveCancelled notification: {customerName} - {vehicleName}");
             await _hubContext.Clients.All.SendAsync("TestDriveCancelled", new
             {
                 customerName = customerName,
                 vehicleName = vehicleName,
                 timestamp = DateTime.Now
             });
+            Console.WriteLine("TestDriveCancelled notification sent successfully");
         }
 
         // Gửi thông báo khi vehicle được cập nhật

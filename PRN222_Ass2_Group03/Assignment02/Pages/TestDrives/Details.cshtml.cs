@@ -17,6 +17,7 @@ namespace Assignment02.Pages.TestDrives
         }
 
         public TestDriveAppointmentDTO? Appointment { get; set; }
+        public string CurrentUserId => UserId ?? "";
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {
@@ -36,8 +37,11 @@ namespace Assignment02.Pages.TestDrives
                 return NotFound();
             }
 
-            // Owner check
-            if (appointment.CustomerId != userId)
+            // Owner check - Allow staff/admin to view any appointment
+            var userRole = CurrentUserRole ?? "Customer";
+            if (appointment.CustomerId != userId && 
+                !string.Equals(userRole, "Staff", StringComparison.OrdinalIgnoreCase) && 
+                !string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase))
             {
                 return Forbid();
             }
@@ -70,9 +74,9 @@ namespace Assignment02.Pages.TestDrives
                 await _notificationService.NotifyTestDriveUpdated(
                     appointment.Customer?.FullName ?? "Unknown Customer",
                     appointment.Vehicle?.Name ?? "Unknown Vehicle",
-                    "Completed"
+                    "Done"
                 );
-                await _notificationService.NotifyPageReload("appointments", "completed");
+                await _notificationService.NotifyPageReload("appointments", "done");
             }
             
             return RedirectToPage(new { id });

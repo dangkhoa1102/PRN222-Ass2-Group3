@@ -1,70 +1,370 @@
 @page "/TestDrives/Details/{id}"
 @model Assignment02.Pages.TestDrives.DetailsModel
 @{
-    ViewData["Title"] = "Appointment Details";
+    ViewData["Title"] = "Test Drive Appointment Details";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/myAppointments.css" asp-append-version="true" />
     <style>
-        .details-wrap { max-width: 900px; margin: 0 auto; }
-        .details-card {
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px; overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .details-header { background: linear-gradient(135deg,#2196F3 0%,#4CAF50 100%); color: #fff; padding: 2rem; }
-        .details-body { padding: 2rem; }
-        .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .meta .item { background:#f8f9fa; padding:1rem; border-radius:12px; border-left:4px solid #2196F3; }
-        .actions { padding: 1.5rem 2rem; background:#f8f9fa; display:flex; gap: .75rem; }
-    </style>
-}
+    body {
+        background-color: #f4f6f9;
+    }
 
-<div class="details-wrap">
-    @if (Model.Appointment != null)
+    .details-container {
+        max-width: 800px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px 40px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .details-header {
+        text-align: center;
+        color: #007bff;
+        font-weight: 700;
+        margin-bottom: 25px;
+    }
+
+    .detail-item {
+        margin-bottom: 15px;
+        font-size: 1.05rem;
+    }
+
+    .badge {
+        padding: 7px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .badge-success {
+        background-color: #d4edda;
+        color: #198754;
+    }
+
+    .badge-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-danger {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .badge-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .btn-back {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+
+    .btn-back:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #0056b3, #007bff);
+    }
+
+    .btn-cancel {
+        background: linear-gradient(45deg, #dc3545, #c82333);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #c82333, #dc3545);
+        color: white;
+    }
+
+    .btn-complete {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-complete:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #20c997, #28a745);
+        color: white;
+    }
+
+    .btn-paid {
+        background: linear-gradient(45deg, #ffc107, #ff8c00);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-paid:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #ff8c00, #ffc107);
+        color: white;
+    }
+
+    .info-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid #007bff;
+    }
+
+    .section-title {
+        color: #007bff;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+
+    .vehicle-image {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        margin-top: 10px;
+    }
+
+    .no-image {
+        text-align: center;
+        color: #6c757d;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+</style>
+
+<!-- SignalR Scripts -->
+<script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+<script>
+    // Get current user ID from session or hidden field
+    const currentUserId = '@Model.CurrentUserId';
+    
+    if (currentUserId) {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/realtimehub")
+            .build();
+
+        connection.start().then(function () {
+            console.log("SignalR Connected for Test Drive Details");
+            console.log("Current User ID:", currentUserId);
+            // Join customer group
+            connection.invoke("JoinGroup", `customer_${currentUserId}`).then(function() {
+                console.log("Joined customer group:", `customer_${currentUserId}`);
+            }).catch(function(err) {
+                console.error("Failed to join customer group:", err);
+            });
+        }).catch(function (err) {
+            console.error("SignalR Connection Error: ", err.toString());
+        });
+
+        // Listen for test drive status updates
+        connection.on("TestDriveUpdated", function (data) {
+            console.log(`Test drive updated: ${data.customerName} - ${data.vehicleName} - ${data.status}`);
+            
+            // Update the status badge on the page
+            const statusBadge = document.querySelector('.status-badge');
+            if (statusBadge) {
+                statusBadge.textContent = data.status;
+                // Update badge class based on status
+                statusBadge.className = 'status-badge badge ';
+                switch (data.status.toLowerCase()) {
+                    case 'confirmed':
+                        statusBadge.className += 'badge-success';
+                        break;
+                    case 'pending':
+                        statusBadge.className += 'badge-warning';
+                        break;
+                    case 'cancelled':
+                        statusBadge.className += 'badge-danger';
+                        break;
+                    default:
+                        statusBadge.className += 'badge-info';
+                }
+            }
+            
+            showNotification(`Test drive appointment updated: ${data.status}`);
+        });
+
+        // Listen for test drive cancellations
+        connection.on("TestDriveCancelled", function (data) {
+            console.log(`Test drive cancelled: ${data.customerName} - ${data.vehicleName}`);
+            showNotification(`Test drive appointment cancelled: ${data.vehicleName}`);
+        });
+
+        // Show notification function
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-info alert-dismissible fade show position-fixed';
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="fas fa-info-circle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+    }
+</script>
+
+<script>
+    function goBack() {
+        // Check if there's a referrer and it's from our domain
+        if (document.referrer && document.referrer.includes(window.location.hostname)) {
+            // Check if referrer is from History page
+            if (document.referrer.includes('/TestDrives/History')) {
+                window.location.href = '/TestDrives/History';
+            }
+            // Check if referrer is from MyAppointment page
+            else if (document.referrer.includes('/MyAppointment')) {
+                window.location.href = '/MyAppointment';
+            }
+            // Default fallback
+            else {
+                window.history.back();
+            }
+        } else {
+            // No referrer or external referrer, go to MyAppointment
+            window.location.href = '/MyAppointment';
+        }
+    }
+</script>
+
+@if (Model.Appointment == null)
+{
+    <div class="alert alert-danger text-center mt-5">Appointment not found.</div>
+}
+else
+{
+    <!-- Success/Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
     {
-        <div class="details-card">
-            <div class="details-header">
-                <h2 class="mb-1">@Model.Appointment.Vehicle?.Name</h2>
-                <div>@Model.Appointment.Dealer?.Name</div>
+        <div class="alert alert-success text-center mt-3" style="margin: 1rem 2rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #198754;">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
             </div>
-            <div class="details-body">
-                <div class="meta mb-3">
-                    <div class="item"><strong>Date</strong><div>@Model.Appointment.AppointmentDate.ToString("dd/MM/yyyy HH:mm")</div></div>
-                    <div class="item"><strong>Status</strong><div>@(Model.Appointment.Status?.ToLower()=="pending"?"Processing":Model.Appointment.Status)</div></div>
+    }
+    
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center mt-3" style="margin: 1rem 2rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #f8d7da, #f5c6cb); color: #842029;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
                 </div>
-                @if (!string.IsNullOrEmpty(Model.Appointment.Notes))
+    }
+
+    <div class="details-container">
+        <h2 class="details-header">Test Drive Appointment Details</h2>
+
+        <!-- Appointment Information Section -->
+        <div class="info-section">
+            <h4 class="section-title">📋 Appointment Information</h4>
+            <div class="detail-item"><strong>Appointment Date:</strong> @Model.Appointment.AppointmentDate.ToString("dd/MM/yyyy")</div>
+            <div class="detail-item"><strong>Appointment Time:</strong> @Model.Appointment.AppointmentDate.ToString("HH:mm")</div>
+            <div class="detail-item"><strong>Notes:</strong> @(Model.Appointment.Notes ?? "—")</div>
+            
+            <div class="detail-item">
+                <strong>Status:</strong>
+                @if (Model.Appointment.Status?.Equals("completed", StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    <div class="item" style="background:#f8f9fa;padding:1rem;border-radius:12px;border-left:4px solid #4CAF50;">
-                        <strong>Notes</strong>
-                        <div>@Model.Appointment.Notes</div>
-                    </div>
+                    <span class="badge badge-success">Completed</span>
+                }
+                else if (Model.Appointment.Status?.Equals("pending", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    <span class="badge badge-warning">Processing</span>
+                }
+                else if (Model.Appointment.Status?.Equals("cancelled", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    <span class="badge badge-danger">Cancelled</span>
+                }
+                else
+                {
+                    <span class="badge badge-info">@Model.Appointment.Status</span>
                 }
             </div>
-            <div class="actions">
-                <a asp-page="/MyAppointment" class="btn btn-secondary">Back</a>
-                @if ((Model.Appointment.Status?.ToLower()=="pending" || Model.Appointment.Status?.ToLower()=="processing"))
-                {
-                    <form method="post" asp-page="/MyAppointment" asp-page-handler="Cancel" asp-route-id="@Model.Appointment.Id" class="d-inline">
-                        <input type="hidden" name="CancelNote" value="Cancelled from details page" />
-                        <button type="submit" class="btn btn-danger">Cancel</button>
-                    </form>
-                }
-                @if ((Model.Appointment.Status?.ToLower()=="completed"))
-                {
-                    <form method="post" asp-page-handler="MarkDone" asp-route-id="@Model.Appointment.Id" class="d-inline">
-                        <button type="submit" class="btn btn-primary">Mark as DONE</button>
-                    </form>
-                }
-            </div>
+        </div>
+
+        <!-- Vehicle Information Section -->
+        <div class="info-section">
+            <h4 class="section-title">🚗 Vehicle Information</h4>
+            <div class="detail-item"><strong>Vehicle Name:</strong> @Model.Appointment.Vehicle?.Name</div>
+            <div class="detail-item"><strong>Model:</strong> @Model.Appointment.Vehicle?.Model</div>
+            @if (!string.IsNullOrEmpty(Model.Appointment.Vehicle?.Images))
+            {
+                <div class="detail-item">
+                    <strong>Image:</strong>
+                    <img src="@Model.Appointment.Vehicle.Images" alt="Vehicle Image" class="vehicle-image" />
         </div>
     }
     else
     {
-        <p>Appointment not found.</p>
+                <div class="detail-item">
+                    <strong>Image:</strong>
+                    <div class="no-image">
+                        <i class="fas fa-car" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>No image available</p>
+                    </div>
+                </div>
     }
 </div>
 
+        <!-- Dealer Information Section -->
+        <div class="info-section">
+            <h4 class="section-title">🏢 Dealer Information</h4>
+            <div class="detail-item"><strong>Dealer Name:</strong> @Model.Appointment.Dealer?.Name</div>
+            <div class="detail-item"><strong>Address:</strong> @Model.Appointment.Dealer?.Address</div>
+        </div>
 
+        <div class="text-center mt-4">
+            @if (string.Equals(Model.CurrentUserRole, "Staff", StringComparison.OrdinalIgnoreCase) || 
+                 string.Equals(Model.CurrentUserRole, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                <a href="/Admin/ManageAppointments" class="btn btn-back">← Back to Manage Appointments</a>
+            }
+            else
+            {
+                <button onclick="goBack()" class="btn btn-back">← Back</button>
+            }
+            
+            @if ((Model.Appointment.Status?.ToLower() == "completed"))
+            {
+                <form method="post" asp-page-handler="MarkDone" asp-route-id="@Model.Appointment.Id" class="d-inline">
+                    <button type="submit" class="btn btn-complete">
+                        <i class="fas fa-check"></i> Mark as Done
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+}
