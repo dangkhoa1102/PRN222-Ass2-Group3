@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Vehicles
 {
-    public class DetailsModel : PageModel
+    public class DetailsModel : AuthenticatedPageModel
     {
         private readonly IVehicleService _vehicleService;
 
@@ -18,6 +18,12 @@ namespace Assignment02.Pages.Vehicles
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {
+            // Check authentication
+            if (!IsAuthenticated)
+            {
+                return RedirectToPage("/Login");
+            }
+
             try
             {
                 // Validate ID

@@ -99,4 +99,21 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapHub<RealTimeHub>("/realtimehub");
 
+// Test database connection on startup
+try
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var serviceFactory = scope.ServiceProvider.GetRequiredService<ServiceFactory>();
+        var orderService = serviceFactory.CreateOrderService();
+        var orders = await orderService.GetAllOrdersAsync();
+        Console.WriteLine($"Database connection successful. Found {orders.Count} orders.");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Database connection failed: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+}
+
 app.Run();

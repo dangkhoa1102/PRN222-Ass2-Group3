@@ -1,12 +1,14 @@
 using Business_Logic_Layer.DTOs;
 using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
+using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
     public class ViewOrdersModel : AuthenticatedPageModel
     {
         private readonly IOrderServiceCus _orderService;
+        private readonly RealTimeNotificationService _notificationService;
 
         public List<OrderDTO> Orders { get; set; } = new();
 
@@ -22,9 +24,10 @@ namespace Assignment02.Pages.Orders
         [BindProperty(SupportsGet = true)]
         public DateTime? ToDate { get; set; }
 
-        public ViewOrdersModel(IOrderServiceCus orderService)
+        public ViewOrdersModel(IOrderServiceCus orderService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
+            _notificationService = notificationService;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -91,6 +94,10 @@ namespace Assignment02.Pages.Orders
 
                 if (result)
                 {
+                    // Gửi notification real-time khi order bị hủy
+                    await _notificationService.NotifyOrderCancelled(order.OrderNumber, order.CustomerName, order.VehicleName);
+                    await _notificationService.NotifyPageReload("orders", "order_cancelled");
+                    
                     TempData["SuccessMessage"] = "Đơn hàng đã được hủy thành công.";
                 }
                 else

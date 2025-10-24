@@ -195,6 +195,18 @@
             border-color: rgba(255, 255, 255, 0.3);
         }
 
+        .btn-disabled {
+            background: #6c757d;
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
         .btn-delete:active {
             transform: translateY(-2px) scale(1.02);
         }
@@ -318,15 +330,15 @@
 <div class="vehicle-detail-container">
     <div class="vehicle-detail-card">
         <div class="vehicle-detail-header">
-            <h1 class="vehicle-detail-title">@Model.Vehicle.Name</h1>
-            <p class="vehicle-detail-subtitle">@Model.Vehicle.Brand @Model.Vehicle.Model</p>
+            <h1 class="vehicle-detail-title">@Model.Vehicle?.Name</h1>
+            <p class="vehicle-detail-subtitle">@Model.Vehicle?.Brand @Model.Vehicle?.Model</p>
         </div>
 
         <div class="vehicle-detail-content">
-            @if (!string.IsNullOrEmpty(Model.Vehicle.Images))
+            @if (!string.IsNullOrEmpty(Model.Vehicle?.Images))
             {
                 <div class="vehicle-image-section">
-                    <img src="@Model.Vehicle.Images" alt="@Model.Vehicle.Name" class="vehicle-main-image" />
+                    <img src="@Model.Vehicle?.Images" alt="@Model.Vehicle?.Name" class="vehicle-main-image" />
                 </div>
             }
 
@@ -359,7 +371,17 @@
                     <h3><i class="fas fa-warehouse"></i> Inventory Information</h3>
                     <div class="info-item">
                         <span class="info-label">Quantity in Stock:</span>
-                        <span class="info-value">@Model.Vehicle.StockQuantity</span>
+                        <span class="info-value @(Model.Vehicle.StockQuantity <= 0 ? "text-danger" : Model.Vehicle.StockQuantity <= 5 ? "text-warning" : "text-success")">
+                            @Model.Vehicle.StockQuantity
+                            @if (Model.Vehicle.StockQuantity <= 0)
+                            {
+                                <span class="badge bg-danger ms-2">Out of Stock</span>
+                            }
+                            else if (Model.Vehicle.StockQuantity <= 5)
+                            {
+                                <span class="badge bg-warning ms-2">Low Stock</span>
+                            }
+                        </span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Status:</span>
@@ -387,7 +409,7 @@
                     <div class="spec-list">
                         @try
                         {
-                            var specs = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Model.Vehicle.Specifications ?? "{}");
+                            var specs = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Model.Vehicle?.Specifications ?? "{}");
                             @foreach (var spec in specs)
                             {
                                 <div class="spec-item">
@@ -407,7 +429,7 @@
             }
 
             <div class="action-buttons">
-                <a href="/BookTestDrive?vehicleId=@Model.Vehicle.Id" class="btn-action btn-test-drive">
+                <a href="/BookTestDrive?vehicleId=@Model.Vehicle?.Id" class="btn-action btn-test-drive">
                     <i class="fas fa-car-side"></i>
                     Book Test Drive
                 </a>
@@ -416,17 +438,37 @@
                 @{ var userId = HttpContextAccessor.HttpContext?.Session.GetString("UserId"); }
                 @if (!string.IsNullOrEmpty(userId) && string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
                 {
-                    <a href="/Orders/CreateCus?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
-                        <i class="fas fa-shopping-cart"></i>
-                        Buy Car
-                    </a>
+                    @if (Model.Vehicle.StockQuantity > 0)
+                    {
+                        <a href="/Orders/CreateCus?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
+                            <i class="fas fa-shopping-cart"></i>
+                            Buy Car
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn-action btn-disabled" disabled>
+                            <i class="fas fa-times-circle"></i>
+                            Out of Stock
+                        </button>
+                    }
                 }
                 @if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
                 {
-                    <a href="/Orders/CreateOrder?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
-                        <i class="fas fa-shopping-cart"></i>
-                        Buy Car
-                    </a>
+                    @if (Model.Vehicle.StockQuantity > 0)
+                    {
+                        <a href="/Orders/CreateOrder?vehicleId=@Model.Vehicle.Id" class="btn-action btn-buy">
+                            <i class="fas fa-shopping-cart"></i>
+                            Buy Car
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn-action btn-disabled" disabled>
+                            <i class="fas fa-times-circle"></i>
+                            Out of Stock
+                        </button>
+                    }
                     <a href="/Vehicles/Edit/@Model.Vehicle.Id" class="btn-action btn-edit">
                         <i class="fas fa-edit"></i>
                         Edit

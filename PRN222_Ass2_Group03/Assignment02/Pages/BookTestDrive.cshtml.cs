@@ -91,6 +91,18 @@ namespace Assignment02.Pages
             try
             {
                 var timeSlots = await _appointmentService.GetAvailableTimeSlotsAsync(dealerId, date);
+                
+                // Filter out past time slots for today
+                var now = DateTime.Now;
+                var today = now.Date;
+                
+                if (date.Date == today)
+                {
+                    // If the selected date is today, filter out past time slots
+                    var currentTime = now.TimeOfDay;
+                    timeSlots = timeSlots.Where(slot => slot.AppointmentDate.TimeOfDay > currentTime).ToList();
+                }
+                
                 return new JsonResult(timeSlots);
             }
             catch (Exception ex)
@@ -131,6 +143,13 @@ namespace Assignment02.Pages
                 if (!isPM && hour == 12) hour = 0;
 
                 Appointment.AppointmentDate = Appointment.AppointmentDate.Date.Add(new TimeSpan(hour, minute, 0));
+
+                // Validate that the appointment time is not in the past
+                var now = DateTime.Now;
+                if (Appointment.AppointmentDate <= now)
+                {
+                    return new JsonResult(new { success = false, message = "Không thể đặt lịch hẹn trong quá khứ. Vui lòng chọn thời gian trong tương lai." });
+                }
 
                 // Get CustomerId from session
                 var customerIdString = HttpContext.Session.GetString("UserId");

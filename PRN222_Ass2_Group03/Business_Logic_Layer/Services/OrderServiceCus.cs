@@ -7,10 +7,12 @@ namespace Business_Logic_Layer.Services
     public class OrderServiceCus : IOrderServiceCus
     {
         private readonly IOrderRepositoryCus _orderRepository;
+        private readonly IVehicleService _vehicleService;
 
-        public OrderServiceCus(IOrderRepositoryCus orderRepository)
+        public OrderServiceCus(IOrderRepositoryCus orderRepository, IVehicleService vehicleService)
         {
             _orderRepository = orderRepository;
+            _vehicleService = vehicleService;
         }
 
         private OrderDTO ConvertToDTO(Order order)
@@ -78,33 +80,95 @@ namespace Business_Logic_Layer.Services
             order.Notes = Notes;
             order.UpdatedAt = DateTime.Now;
 
-            return await _orderRepository.Update(order);
+            var updateResult = await _orderRepository.Update(order);
+            
+            // If order cancellation is successful, increase stock quantity back
+            if (updateResult)
+            {
+                try
+                {
+                    await _vehicleService.IncreaseStockQuantityAsync(order.VehicleId, 1);
+                    Console.WriteLine($"Stock quantity increased back for vehicle {order.VehicleId} after order cancellation");
+                }
+                catch (Exception stockEx)
+                {
+                    Console.WriteLine($"Failed to increase stock back: {stockEx.Message}");
+                    // Note: Order is already cancelled, so we just log the error
+                }
+            }
+
+            return updateResult;
         }
         public async Task<OrderDTO> CreateOrderAsync(Guid customerId, Guid dealerId, Guid vehicleId, string notes)
         {
-            var now = DateTime.Now;
-            string orderNumber = $"ORD-{now:yyyyMMdd-HHmm}";
-
-            var vehiclePrice = await _orderRepository.GetVehiclePriceById(vehicleId);
-            decimal total = vehiclePrice ?? 0;
-
-            var newOrder = new Order
+            try
             {
-                Id = Guid.NewGuid(),
-                OrderNumber = orderNumber,
-                CustomerId = customerId,
-                DealerId = dealerId,
-                VehicleId = vehicleId,
-                Notes = string.IsNullOrWhiteSpace(notes) ? "Không có ghi chú" : notes,
-                Status = "Processing",
-                PaymentStatus = "Unpaid",
-                TotalAmount = total,
-                CreatedAt = now,
-                UpdatedAt = now
-            };
+                var now = DateTime.Now;
+                string orderNumber = $"ORD-{now:yyyyMMdd-HHmm}";
 
-            await _orderRepository.Add(newOrder);
-            return ConvertToDTO(newOrder);
+                // Validate that vehicle exists and get price
+                var vehiclePrice = await _orderRepository.GetVehiclePriceById(vehicleId);
+                if (vehiclePrice == null)
+                {
+                    throw new ArgumentException($"Vehicle with ID {vehicleId} not found.");
+                }
+                decimal total = vehiclePrice.Value;
+
+                // Check stock quantity before creating order
+                var vehicle = await _vehicleService.GetVehicleByIdAsync(vehicleId);
+                if (vehicle == null)
+                {
+                    throw new ArgumentException($"Vehicle with ID {vehicleId} not found.");
+                }
+                
+                if (vehicle.StockQuantity <= 0)
+                {
+                    throw new InvalidOperationException($"Xe này đã hết hàng trong kho. Số lượng hiện tại: {vehicle.StockQuantity}");
+                }
+
+                var newOrder = new Order
+                {
+                    Id = Guid.NewGuid(),
+                    OrderNumber = orderNumber,
+                    CustomerId = customerId,
+                    DealerId = dealerId,
+                    VehicleId = vehicleId,
+                    Notes = string.IsNullOrWhiteSpace(notes) ? "Không có ghi chú" : notes,
+                    Status = "Processing",
+                    PaymentStatus = "Unpaid",
+                    TotalAmount = total,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                };
+
+                var result = await _orderRepository.Add(newOrder);
+                if (!result)
+                {
+                    throw new InvalidOperationException("Failed to save order to database.");
+                }
+
+                // Decrease stock quantity after successful order creation
+                try
+                {
+                    await _vehicleService.DecreaseStockQuantityAsync(vehicleId, 1);
+                    Console.WriteLine($"Stock quantity decreased for vehicle {vehicleId}");
+                }
+                catch (Exception stockEx)
+                {
+                    // If stock decrease fails, we should rollback the order
+                    Console.WriteLine($"Failed to decrease stock: {stockEx.Message}");
+                    // Note: In a production environment, you might want to implement transaction rollback here
+                    throw new InvalidOperationException($"Order created but failed to update stock: {stockEx.Message}");
+                }
+                
+                return ConvertToDTO(newOrder);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CreateOrderAsync: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
         }
         public async Task<List<OrderDTO>> GetAllOrdersAsync()
         {
@@ -171,6 +235,26 @@ namespace Business_Logic_Layer.Services
             order.Status = orderDto.Status;
             order.PaymentStatus = orderDto.PaymentStatus;
             order.Notes = orderDto.Notes;
+            order.UpdatedAt = DateTime.Now;
+            return await _orderRepository.Update(order);
+        }
+
+        // 🔹 Đánh dấu đơn hàng là hoàn thành bởi khách hàng
+        public async Task<bool> MarkDoneByCustomerAsync(Guid orderId, Guid customerId)
+        {
+            var order = await _orderRepository.GetById(orderId);
+            if (order == null)
+                return false;
+
+            // Kiểm tra xem đơn hàng có thuộc về khách hàng này không
+            if (order.CustomerId != customerId)
+                return false;
+
+            // Chỉ cho phép đánh dấu hoàn thành nếu đơn hàng đang ở trạng thái "Complete"
+            if (order.Status != "Complete")
+                return false;
+
+            order.Status = "Done";
             order.UpdatedAt = DateTime.Now;
             return await _orderRepository.Update(order);
         }

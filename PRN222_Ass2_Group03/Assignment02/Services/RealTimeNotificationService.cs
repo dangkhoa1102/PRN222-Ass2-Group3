@@ -118,5 +118,33 @@ namespace Assignment02.Services
                 timestamp = DateTime.Now
             });
         }
+
+        // Gửi thông báo khi khách hàng đánh dấu đơn hàng là DONE
+        public async Task NotifyOrderMarkedDone(string orderNumber, string customerName, string vehicleName)
+        {
+            Console.WriteLine($"Sending OrderMarkedDone notification: {orderNumber} - {customerName} - {vehicleName}");
+            await _hubContext.Clients.All.SendAsync("OrderMarkedDone", new
+            {
+                orderNumber = orderNumber,
+                customerName = customerName,
+                vehicleName = vehicleName,
+                timestamp = DateTime.Now
+            });
+            Console.WriteLine("OrderMarkedDone notification sent successfully");
+        }
+
+        // Gửi thông báo khi order bị hủy
+        public async Task NotifyOrderCancelled(string orderNumber, string customerName, string vehicleName)
+        {
+            Console.WriteLine($"Sending OrderCancelled notification: {orderNumber} - {customerName} - {vehicleName}");
+            await _hubContext.Clients.All.SendAsync("OrderCancelled", new
+            {
+                orderNumber = orderNumber,
+                customerName = customerName,
+                vehicleName = vehicleName,
+                timestamp = DateTime.Now
+            });
+            Console.WriteLine("OrderCancelled notification sent successfully");
+        }
     }
 }

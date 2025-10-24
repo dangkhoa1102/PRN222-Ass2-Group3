@@ -157,5 +157,18 @@ namespace Business_Logic_Layer.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> IncreaseStockQuantityAsync(Guid vehicleId, int quantity = 1)
+        {
+            var vehicle = await _context.Vehicles.FindAsync(vehicleId);
+            if (vehicle == null)
+            {
+                return false;
+            }
+
+            vehicle.StockQuantity += quantity;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

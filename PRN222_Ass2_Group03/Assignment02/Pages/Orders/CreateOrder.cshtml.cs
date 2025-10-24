@@ -2,6 +2,7 @@ using Business_Logic_Layer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
@@ -11,6 +12,7 @@ namespace Assignment02.Pages.Orders
         private readonly IUserService _userService;
         private readonly IVehicleService _vehicleService;
         private readonly IDealerService _dealerService;
+        private readonly RealTimeNotificationService _notificationService;
 
         [BindProperty]
         public CreateOrderViewModel OrderViewModel { get; set; } = new();
@@ -19,12 +21,13 @@ namespace Assignment02.Pages.Orders
         public List<SelectListItem> Vehicles { get; set; } = new();
         public List<SelectListItem> Dealers { get; set; } = new();
 
-        public CreateOrderModel(IOrderServiceCus orderService, IUserService userService, IVehicleService vehicleService, IDealerService dealerService)
+        public CreateOrderModel(IOrderServiceCus orderService, IUserService userService, IVehicleService vehicleService, IDealerService dealerService, RealTimeNotificationService notificationService)
         {
             _orderService = orderService;
             _userService = userService;
             _vehicleService = vehicleService;
             _dealerService = dealerService;
+            _notificationService = notificationService;
         }
 
         public async Task<IActionResult> OnGetAsync(Guid? vehicleId)
@@ -55,6 +58,34 @@ namespace Assignment02.Pages.Orders
             return Page();
         }
 
+        public async Task<IActionResult> OnGetGetVehicleInfoAsync(Guid vehicleId)
+        {
+            try
+            {
+                var vehicle = await _vehicleService.GetVehicleByIdAsync(vehicleId);
+                
+                if (vehicle != null)
+                {
+                    return new JsonResult(new
+                    {
+                        id = vehicle.Id,
+                        name = vehicle.Name,
+                        brand = vehicle.Brand,
+                        model = vehicle.Model,
+                        year = vehicle.Year,
+                        price = vehicle.Price,
+                        images = vehicle.Images
+                    });
+                }
+                
+                return new JsonResult(new { error = "Vehicle not found" });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = ex.Message });
+            }
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
@@ -80,6 +111,18 @@ namespace Assignment02.Pages.Orders
 
             try
             {
+                // Validate preferred delivery date
+                if (OrderViewModel.PreferredDeliveryDate.HasValue)
+                {
+                    var now = DateTime.Now;
+                    if (OrderViewModel.PreferredDeliveryDate.Value <= now)
+                    {
+                        TempData["ErrorMessage"] = "Preferred delivery date cannot be in the past. Please select a future date.";
+                        await LoadDropdownData();
+                        return Page();
+                    }
+                }
+
                 // Create the order using selected dealer
                 var order = await _orderService.CreateOrderAsync(
                     OrderViewModel.CustomerId,
@@ -87,6 +130,10 @@ namespace Assignment02.Pages.Orders
                     OrderViewModel.VehicleId,
                     OrderViewModel.Notes ?? string.Empty
                 );
+
+                // Gửi notification real-time
+                await _notificationService.NotifyOrderCreated(order.OrderNumber, order.CustomerName, order.VehicleName);
+                await _notificationService.NotifyPageReload("orders", "new_order");
 
                 TempData["SuccessMessage"] = $"Đơn hàng đã được tạo thành công với mã: {order.OrderNumber}";
                 return RedirectToPage("/Admin/ManageOrders");
@@ -151,5 +198,6 @@ namespace Assignment02.Pages.Orders
         public Guid VehicleId { get; set; }
         public Guid DealerId { get; set; }
         public string? Notes { get; set; }
+        public DateTime? PreferredDeliveryDate { get; set; }
     }
 }

@@ -156,6 +156,62 @@
         background: linear-gradient(135deg, #f8d7da, #f5c6cb);
         color: #842029;
     }
+
+    .vehicle-info-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #28a745;
+    }
+
+    .vehicle-info-title {
+        font-weight: 600;
+        color: #28a745;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+
+    .vehicle-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .vehicle-detail-item {
+        background: white;
+        padding: 10px;
+        border-radius: 6px;
+        border-left: 3px solid #007bff;
+    }
+
+    .vehicle-detail-label {
+        font-weight: 600;
+        color: #007bff;
+        font-size: 0.9rem;
+    }
+
+    .vehicle-detail-value {
+        color: #495057;
+        margin-top: 5px;
+    }
+
+    .vehicle-image {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        margin-top: 10px;
+    }
+
+    .no-image {
+        text-align: center;
+        color: #6c757d;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
 </style>
 
 <!-- Success/Error Messages -->
@@ -238,10 +294,16 @@
             }
             
             <!-- Vehicle Info Display -->
-            <div id="vehicleInfo" class="vehicle-info" style="display: none;">
-                <div class="info-title">🚗 Vehicle Information</div>
-                <div id="vehicleDetails"></div>
+            <div id="vehicleInfoCard" class="vehicle-info-card" style="display: none;">
+                <!-- Vehicle info will be populated by JavaScript -->
             </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="OrderViewModel_PreferredDeliveryDate">Preferred Delivery Date (Optional)</label>
+            <input asp-for="OrderViewModel.PreferredDeliveryDate" type="date" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            <small class="form-text text-muted">Select preferred delivery date. Cannot be in the past.</small>
+            <span asp-validation-for="OrderViewModel.PreferredDeliveryDate" class="text-danger"></span>
         </div>
 
         <div class="form-group">
@@ -296,18 +358,97 @@
     });
 
     // Vehicle selection handler
-    document.getElementById('vehicleSelect').addEventListener('change', function() {
-        const vehicleInfo = document.getElementById('vehicleInfo');
-        const vehicleDetails = document.getElementById('vehicleDetails');
+    document.getElementById('vehicleSelect').addEventListener('change', async function() {
+        const vehicleInfoCard = document.getElementById('vehicleInfoCard');
         
         if (this.value) {
-            const selectedText = this.options[this.selectedIndex].text;
-            vehicleDetails.innerHTML = `
-                <div><strong>Selected:</strong> ${selectedText}</div>
-            `;
-            vehicleInfo.style.display = 'block';
+            await updateVehicleInfo(this.value);
         } else {
-            vehicleInfo.style.display = 'none';
+            vehicleInfoCard.style.display = 'none';
+        }
+    });
+
+    async function updateVehicleInfo(vehicleId) {
+        try {
+            const response = await fetch(`/Orders/CreateOrder?handler=GetVehicleInfo&vehicleId=${vehicleId}`);
+            if (response.ok) {
+                const vehicleInfo = await response.json();
+                displayVehicleInfo(vehicleInfo);
+            }
+        } catch (error) {
+            console.error('Error loading vehicle info:', error);
+        }
+    }
+
+    function displayVehicleInfo(vehicle) {
+        const vehicleInfoCard = document.getElementById('vehicleInfoCard');
+        if (vehicleInfoCard) {
+            vehicleInfoCard.innerHTML = `
+                <div class="vehicle-info-title">🚗 Vehicle Information</div>
+                <div class="vehicle-details">
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Vehicle Name</div>
+                        <div class="vehicle-detail-value">${vehicle.name}</div>
+                    </div>
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Brand</div>
+                        <div class="vehicle-detail-value">${vehicle.brand}</div>
+                    </div>
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Model</div>
+                        <div class="vehicle-detail-value">${vehicle.model}</div>
+                    </div>
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Year</div>
+                        <div class="vehicle-detail-value">${vehicle.year}</div>
+                    </div>
+                    <div class="vehicle-detail-item">
+                        <div class="vehicle-detail-label">Price</div>
+                        <div class="vehicle-detail-value">${vehicle.price.toLocaleString()} ₫</div>
+                    </div>
+                </div>
+                ${vehicle.images ? 
+                    `<img src="${vehicle.images}" alt="${vehicle.name}" class="vehicle-image" />` : 
+                    `<div class="no-image">
+                        <i class="fas fa-car" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>No image available</p>
+                    </div>`
+                }
+            `;
+            vehicleInfoCard.style.display = 'block';
+        }
+    }
+
+    // Auto-load vehicle info if vehicleId is provided in URL
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const vehicleId = urlParams.get('vehicleId');
+        
+        if (vehicleId) {
+            const vehicleSelect = document.getElementById('vehicleSelect');
+            vehicleSelect.value = vehicleId;
+            // Trigger change event to show vehicle info
+            updateVehicleInfo(vehicleId);
+        }
+
+        // Form validation for delivery date
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                const deliveryDateInput = document.querySelector('input[name="OrderViewModel.PreferredDeliveryDate"]');
+                if (deliveryDateInput && deliveryDateInput.value) {
+                    const selectedDate = new Date(deliveryDateInput.value);
+                    const now = new Date();
+                    now.setHours(0, 0, 0, 0);
+                    
+                    if (selectedDate < now) {
+                        event.preventDefault();
+                        alert('Preferred delivery date cannot be in the past. Please select a future date.');
+                        deliveryDateInput.focus();
+                        return false;
+                    }
+                }
+            });
         }
     });
 </script>

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Vehicles
 {
-    public class IndexModel : PageModel
+    public class IndexModel : AuthenticatedPageModel
     {
         private readonly IVehicleService _vehicleService;
 

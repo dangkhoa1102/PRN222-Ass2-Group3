@@ -193,11 +193,11 @@
                         <div class="vehicle-details">
                             <div class="detail-item">
                                 <i class="fas fa-car"></i>
-                                <span><strong>Tên:</strong> @Model.Vehicle.Name</span>
+                                <span><strong>Tên:</strong> @Model.Vehicle?.Name</span>
                             </div>
                             <div class="detail-item">
                                 <i class="fas fa-cog"></i>
-                                <span><strong>Model:</strong> @Model.Vehicle.Model</span>
+                                <span><strong>Model:</strong> @Model.Vehicle?.Model</span>
                             </div>
                             <div class="detail-item">
                                 <i class="fas fa-calendar"></i>
@@ -242,7 +242,7 @@
             e.preventDefault();
             
             if (confirm('Bạn có chắc chắn 100% muốn xóa xe này không?\n\nHành động này KHÔNG THỂ hoàn tác!')) {
-                if (confirm('Lần cuối cùng - Bạn có chắc chắn muốn xóa xe "@Model.Vehicle.Name" không?')) {
+                if (confirm('Lần cuối cùng - Bạn có chắc chắn muốn xóa xe "@Model.Vehicle?.Name" không?')) {
                     this.submit();
                 }
             }

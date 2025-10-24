@@ -760,10 +760,10 @@
     </script>
 
     <!-- SignalR Scripts -->
-    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script src="~/lib/microsoft-signalr/dist/browser/signalr.min.js"></script>
     <script>
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/orderhub")
+            .withUrl("/realtimehub")
             .build();
 
         connection.start().then(function () {
@@ -800,6 +800,31 @@
                     }
                 }
             });
+        });
+
+        // Listen for order marked as done by customer
+        connection.on("OrderMarkedDone", function (data) {
+            console.log(`Order marked as done: ${data.orderNumber} by ${data.customerName}`);
+            
+            // Show notification
+            showNotification(`Khách hàng ${data.customerName} đã đánh dấu đơn hàng ${data.orderNumber} là hoàn thành!`);
+            
+            // Reload the page to show updated data
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        });
+
+        // Listen for page reload notifications
+        connection.on("PageReload", function (data) {
+            console.log(`Page reload notification: ${data.page} - ${data.action}`);
+            
+            if (data.page === "orders" && (data.action === "order_marked_done" || data.action === "status_update")) {
+                // Reload the page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
         });
 
         // Show notification function

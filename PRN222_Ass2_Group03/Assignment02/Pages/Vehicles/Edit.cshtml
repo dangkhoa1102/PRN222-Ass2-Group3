@@ -212,11 +212,11 @@
                         <div class="image-preview-container" id="imagePreview" style="display: none; margin-top: 1rem;">
                             <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                         </div>
-                        @if (!string.IsNullOrEmpty(Model.Vehicle.Images))
+                        @if (!string.IsNullOrEmpty(Model.Vehicle?.Images))
                         {
                             <div class="current-image" style="margin-top: 1rem;">
                                 <p><strong>Hình ảnh hiện tại:</strong></p>
-                                <img src="@Model.Vehicle.Images" alt="Current image" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                <img src="@Model.Vehicle?.Images" alt="Current image" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                             </div>
                         }
                         <small class="form-text text-muted">Chọn hình ảnh mới từ máy tính của bạn (JPG, PNG, GIF)</small>
@@ -308,7 +308,7 @@
         function confirmDelete() {
             if (confirm('Bạn có chắc chắn muốn xóa xe này không? Hành động này không thể hoàn tác!')) {
                 // Redirect to delete action
-                window.location.href = '/Vehicles/Delete/@Model.Vehicle.Id';
+                window.location.href = '/Vehicles/Delete/@Model.Vehicle?.Id';
             }
         }
     </script>

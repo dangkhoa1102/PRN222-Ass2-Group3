@@ -120,6 +120,10 @@ namespace Assignment02.Pages.Orders
                     
                     if (result)
                     {
+                        // Gửi notification real-time khi order bị hủy
+                        await _notificationService.NotifyOrderCancelled(order.OrderNumber, order.CustomerName, order.VehicleName);
+                        await _notificationService.NotifyPageReload("orders", "order_cancelled");
+                        
                         TempData["SuccessMessage"] = $"Đơn hàng đã được hủy với lý do: {cancelReason}";
                         
                         // Redirect based on user role after cancellation

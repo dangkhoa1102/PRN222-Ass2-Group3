@@ -66,6 +66,20 @@ async function initializeSignalR() {
             }
         });
 
+        // Lắng nghe thông báo order bị hủy
+        connection.on("OrderCancelled", function (data) {
+            console.log("❌ Order cancelled:", data);
+            showNotification(`Đơn hàng ${data.orderNumber} đã bị hủy bởi ${data.customerName}`, "warning");
+            
+            // Reload nếu đang ở trang orders
+            const currentPage = getCurrentPageName();
+            if (currentPage.includes("order") || currentPage.includes("manage")) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        });
+
         // Lắng nghe thông báo payment được cập nhật
         connection.on("PaymentUpdated", function (data) {
             console.log("💳 Payment updated:", data);

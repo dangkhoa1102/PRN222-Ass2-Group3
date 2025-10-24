@@ -14,5 +14,6 @@ namespace Business_Logic_Layer.Services
         Task<List<OrderDTO>> GetAllOrdersDTOAsync();
         Task<bool> UpdateOrderStatusAsync(Guid orderId, string newStatus);
         Task<bool> UpdateOrderAsync(OrderDTO order);
+        Task<bool> MarkDoneByCustomerAsync(Guid orderId, Guid customerId);
     }
 }

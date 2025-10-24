@@ -10,5 +10,6 @@ namespace Business_Logic_Layer.Services
         Task<VehicleDTO> UpdateVehicleAsync(VehicleDTO vehicle);
         Task<bool> DeleteVehicleAsync(Guid id);
         Task<bool> DecreaseStockQuantityAsync(Guid vehicleId, int quantity = 1);
+        Task<bool> IncreaseStockQuantityAsync(Guid vehicleId, int quantity = 1);
     }
 }

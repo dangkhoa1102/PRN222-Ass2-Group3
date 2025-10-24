@@ -3,12 +3,11 @@ using Business_Logic_Layer.Services;
 using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Assignment02.Services;
 
 namespace Assignment02.Pages.Orders
 {
-    public class CreateModel : PageModel
+    public class CreateModel : AuthenticatedPageModel
     {
         private readonly IOrderServiceCus _orderService;
         private readonly ICustomerTestDriveAppointmentService _testDriveService;
@@ -30,15 +29,24 @@ namespace Assignment02.Pages.Orders
         [BindProperty]
         public string? Notes { get; set; }
 
-        public List<SelectListItem> DealersList { get; set; }
-        public List<SelectListItem> VehiclesList { get; set; }
+        [BindProperty]
+        public DateTime? PreferredDeliveryDate { get; set; }
+
+        public List<SelectListItem> DealersList { get; set; } = new();
+        public List<SelectListItem> VehiclesList { get; set; } = new();
         public VehicleDTO? SelectedVehicle { get; set; }
 
-        public string SuccessMessage { get; set; }
-        public string ErrorMessage { get; set; }
+        public string SuccessMessage { get; set; } = string.Empty;
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public async Task OnGetAsync(Guid? vehicleId)
         {
+            // Check authentication
+            if (!IsAuthenticated)
+            {
+                return;
+            }
+
             var dealers = await _testDriveService.GetAllDealersAsync();
             DealersList = dealers.Select(d => new SelectListItem
             {
@@ -105,6 +113,30 @@ namespace Assignment02.Pages.Orders
 
             try
             {
+                // Validate required fields
+                if (SelectedDealerId == Guid.Empty)
+                {
+                    ErrorMessage = "Please select a dealer.";
+                    return Page();
+                }
+                
+                if (SelectedVehicleId == Guid.Empty)
+                {
+                    ErrorMessage = "Please select a vehicle.";
+                    return Page();
+                }
+
+                // Validate preferred delivery date
+                if (PreferredDeliveryDate.HasValue)
+                {
+                    var now = DateTime.Now;
+                    if (PreferredDeliveryDate.Value <= now)
+                    {
+                        ErrorMessage = "Preferred delivery date cannot be in the past. Please select a future date.";
+                        return Page();
+                    }
+                }
+
                 var newOrder = await _orderService.CreateOrderAsync(customerId, SelectedDealerId, SelectedVehicleId, Notes ?? string.Empty);
                 
                 // Gửi notification real-time
@@ -116,7 +148,21 @@ namespace Assignment02.Pages.Orders
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Failed to create order: " + ex.Message;
+                // Log detailed error for debugging
+                Console.WriteLine($"Error creating order: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                // Check for specific database errors
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                    ErrorMessage = $"Failed to create order: {ex.InnerException.Message}";
+                }
+                else
+                {
+                    ErrorMessage = "Failed to create order: " + ex.Message;
+                }
+                
                 return Page();
             }
         }

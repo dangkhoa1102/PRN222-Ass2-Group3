@@ -37,7 +37,8 @@ namespace Business_Logic_Layer.Services
         {
             var context = CreateDbContext();
             var orderRepository = new OrderRepositoryCus(context);
-            return new OrderServiceCus(orderRepository);
+            var vehicleService = new VehicleService(context);
+            return new OrderServiceCus(orderRepository, vehicleService);
         }
 
         public ICustomerTestDriveAppointmentService CreateCustomerTestDriveAppointmentService()

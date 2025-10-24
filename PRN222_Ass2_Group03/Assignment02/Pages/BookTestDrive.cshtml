@@ -176,7 +176,7 @@
 </style>
 
 <!-- SignalR Scripts -->
-<script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+<script src="~/lib/microsoft-signalr/dist/browser/signalr.min.js"></script>
 <script>
     // Get current user ID from session or hidden field
     const currentUserId = '@Model.CurrentUserId';
@@ -334,6 +334,12 @@
             </select>
             <span asp-validation-for="SelectedTimeSlot" class="text-danger"></span>
             
+            <!-- Current Time Info -->
+            <div id="currentTimeInfo" class="time-info" style="display: none;">
+                <div class="info-title">🕐 Current Time</div>
+                <div id="currentTimeDetails"></div>
+            </div>
+            
             <!-- Time Info Display -->
             <div id="timeInfo" class="time-info" style="display: none;">
                 <div class="info-title">⏰ Time Information</div>
@@ -462,6 +468,19 @@
         document.getElementById("AppointmentDate").addEventListener("change", async function () {
             const dealerId = document.getElementById("DealerId").value;
             const date = this.value;
+            
+            // Show current time info for today
+            const selectedDate = new Date(date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const isToday = selectedDate.getTime() === today.getTime();
+            
+            if (isToday) {
+                showCurrentTimeInfo();
+            } else {
+                hideCurrentTimeInfo();
+            }
+            
             if (dealerId && date) {
                 await updateTimeSlots(dealerId, date);
             } else {
@@ -470,6 +489,35 @@
                 timeSlotSelect.innerHTML = '<option value="">-- Select Time --</option>';
             }
         });
+        
+        // Show current time info
+        function showCurrentTimeInfo() {
+            const currentTimeInfo = document.getElementById('currentTimeInfo');
+            const currentTimeDetails = document.getElementById('currentTimeDetails');
+            
+            if (currentTimeInfo && currentTimeDetails) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('vi-VN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                currentTimeDetails.innerHTML = `
+                    <div><strong>Thời gian hiện tại:</strong> ${timeString}</div>
+                    <div><small>Chỉ có thể chọn thời gian sau thời điểm này</small></div>
+                `;
+                currentTimeInfo.style.display = 'block';
+            }
+        }
+        
+        // Hide current time info
+        function hideCurrentTimeInfo() {
+            const currentTimeInfo = document.getElementById('currentTimeInfo');
+            if (currentTimeInfo) {
+                currentTimeInfo.style.display = 'none';
+            }
+        }
 
         async function updateTimeSlots(dealerId, date) {
             try {
@@ -485,6 +533,11 @@
                 timeSlotSelect.innerHTML = '<option value="">-- Select Time --</option>';
                 
                 if (timeSlots && timeSlots.length > 0) {
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const selectedDate = new Date(date);
+                    const isToday = selectedDate.getTime() === today.getTime();
+                    
                     timeSlots.forEach(slot => {
                         try {
                             let appointmentDate;
@@ -499,7 +552,20 @@
                             
                             const time = appointmentDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                             const timeValue = appointmentDate.toTimeString().substring(0, 5);
-                            timeSlotSelect.innerHTML += `<option value="${timeValue}">${time}</option>`;
+                            
+                            // Check if this time slot is in the past (for today only)
+                            let isPastTime = false;
+                            if (isToday) {
+                                const slotTime = appointmentDate.getTime();
+                                const currentTime = now.getTime();
+                                isPastTime = slotTime <= currentTime;
+                            }
+                            
+                            if (isPastTime) {
+                                timeSlotSelect.innerHTML += `<option value="${timeValue}" disabled style="color: #999;">${time} (Đã qua)</option>`;
+                            } else {
+                                timeSlotSelect.innerHTML += `<option value="${timeValue}">${time}</option>`;
+                            }
                         } catch (e) {
                             console.error('Error parsing time slot:', e, slot);
                         }
@@ -521,12 +587,26 @@
             const formData = new FormData(form);
 
             const dateInput = document.getElementById('AppointmentDate').value;
+            const timeInput = document.getElementById('TimeSlot').value;
             const selectedDate = new Date(dateInput);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
+            
             if (selectedDate < today) {
                 alert('Ngày hẹn không thể là ngày trong quá khứ.');
                 return;
+            }
+            
+            // Check if selected time is in the past (for today)
+            if (selectedDate.getTime() === today.getTime() && timeInput) {
+                const [hours, minutes] = timeInput.split(':').map(Number);
+                const selectedDateTime = new Date(selectedDate);
+                selectedDateTime.setHours(hours, minutes, 0, 0);
+                
+                if (selectedDateTime <= new Date()) {
+                    alert('Không thể đặt lịch hẹn trong quá khứ. Vui lòng chọn thời gian trong tương lai.');
+                    return;
+                }
             }
 
             const submitBtn = document.querySelector('.btn-create');
