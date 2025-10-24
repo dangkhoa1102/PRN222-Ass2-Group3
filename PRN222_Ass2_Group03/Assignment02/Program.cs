@@ -17,7 +17,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITestDriveRepository, TestDriveRepository>();
 builder.Services.AddScoped<ITestDriveService, TestDriveService>();
-
+builder.Services.AddSignalR();
 // Configure session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -70,7 +70,7 @@ app.Use(async (context, next) =>
 app.UseAuthorization();
 
 app.MapRazorPages();
-app.MapHub<ChatHub>("/chathub");
+app.MapHub<TestDriveHub>("/chathub");
 app.MapHub<NotificationHub>("/notificationhub");
 
 app.Run();
