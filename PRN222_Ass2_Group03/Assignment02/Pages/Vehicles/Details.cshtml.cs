@@ -1,7 +1,6 @@
 using Business_Logic_Layer.Services;
 using Business_Logic_Layer.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Assignment02.Pages.Vehicles
 {
